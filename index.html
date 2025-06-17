@@ -348,7 +348,37 @@ menuBtn.addEventListener('click', () => {
     agendaContainer.style.display = 'none';
   }
 });
-  
+  function atualizarAgendaVisual() {
+  const ul = document.getElementById('agendaContatos');
+  ul.innerHTML = '';
+
+  agendaContatos.forEach((contato, index) => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <strong>${contato.nome}</strong> - ${contato.numero} 
+      <span style="color:red; float:right; cursor:pointer;" onclick="excluirContato(${index})">❌</span>
+    `;
+
+    li.onclick = (e) => {
+      // Impede que o clique no ❌ selecione o contato
+      if (e.target.tagName === 'SPAN') return;
+      document.getElementById("nomeInput").value = contato.nome;
+      document.getElementById("numeroInput").value = contato.numero;
+      alert(`Contato ${contato.nome} selecionado!`);
+    };
+
+    ul.appendChild(li);
+  });
+}
+
+function excluirContato(index) {
+  const confirmar = confirm(`Deseja excluir o contato ${agendaContatos[index].nome}?`);
+  if (confirmar) {
+    agendaContatos.splice(index, 1);
+    localStorage.setItem('agendaContatos', JSON.stringify(agendaContatos));
+    atualizarAgendaVisual();
+  }
+}
 </script>
 </body>
 </html>
