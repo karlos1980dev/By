@@ -65,6 +65,10 @@
      .valoresInput{
          width:30%;
      }
+     #agendaContatosContainer {
+    max-height: 400px;
+    overflow-y: auto;
+}
   </style>
 </head>
 <body>
@@ -76,9 +80,9 @@
       <h3 style="text-align:center;">Agenda de Contatos</h3>
       <ul id="agendaContatos"></ul>
     </div>
-
+<button onclick="salvarContatoNaAgenda()">+ Salvar Contato</button>
     <input type="text" id="nomeInput" placeholder="Seu nome" required>
-    <input type="tel" id="numeroInput" placeholder="WhatsApp com DDD (somente números)" required>
+<input type="tel" id="numeroInput" placeholder="WhatsApp com DDD (somente números)" required>
 
 <select id="horarioInput">
       <option value="10:00">10:00h</option>
@@ -412,15 +416,20 @@ function salvarContatoNaAgenda() {
     if (nome && numero) {
         const jaExiste = agendaContatos.some(contato => contato.numero === numero);
 
-        if (!jaExiste) {
-            const novoContato = { nome, numero };
-            agendaContatos.push(novoContato);
-            localStorage.setItem('agendaContatos', JSON.stringify(agendaContatos));
-            atualizarAgendaVisual();
+        if (jaExiste) {
+            alert(`⚠️ O contato ${nome} já está salvo.`);
+            return;
         }
+
+        const novoContato = { nome, numero };
+        agendaContatos.push(novoContato);
+        localStorage.setItem('agendaContatos', JSON.stringify(agendaContatos));
+        atualizarAgendaVisual();
+        alert(`✅ Contato ${nome} salvo com sucesso!`);
+    } else {
+        alert('⚠️ Preencha o nome e número para salvar o contato.');
     }
 }
-
 function atualizarAgendaVisual() {
     const ul = document.getElementById('agendaContatos');
     ul.innerHTML = '';
