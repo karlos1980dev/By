@@ -266,6 +266,9 @@ function calcularTotal() {
         const grupos = container.querySelectorAll('.grupo');
         const valorUnitario = parseFloat(document.getElementById("valor" + tipo.charAt(0).toUpperCase() + tipo.slice(1)).value) || 0;
 
+        let temAposta = false;
+        let divisaoPremio = 1;
+
         grupos.forEach(grupo => {
             const numeroInput = grupo.querySelector('.numero');
             const numero = numeroInput.value;
@@ -273,17 +276,27 @@ function calcularTotal() {
 
             if (numero !== "" && valorUnitario > 0) {
                 totalPagar += valorUnitario;
-
-                const divisor = divisao === 5 ? 5 : divisao === 10 ? 10 : 1;
-                totalReceber += (valorUnitario * valoresPremio[tipo]) / divisor;
+                if (!temAposta) {
+                    divisaoPremio = divisao;
+                    temAposta = true;
+                }
             }
         });
+
+        if (temAposta) {
+            const premioBase = valoresPremio[tipo];
+            const premioFinal = premioBase / divisaoPremio;
+            totalReceber += premioFinal;
+        }
     });
 
     // Duque de dezena
     const containerDuque = document.getElementById('duqueContainer');
     const gruposDuque = containerDuque.querySelectorAll('.grupo');
     const valorDuque = parseFloat(document.getElementById("valorDuque").value) || 0;
+
+    let temDuque = false;
+    let divisaoDuque = 1;
 
     gruposDuque.forEach(grupo => {
         const inputsDuque = grupo.querySelectorAll('.numero');
@@ -293,16 +306,22 @@ function calcularTotal() {
 
         if (numero1 !== "" && numero2 !== "" && valorDuque > 0) {
             totalPagar += valorDuque;
-
-            const divisor = divisao === 5 ? 5 : 1;
-            totalReceber += (valorDuque * valoresPremio['duque']) / divisor;
+            if (!temDuque) {
+                divisaoDuque = divisao;
+                temDuque = true;
+            }
         }
     });
+
+    if (temDuque) {
+        const premioBaseDuque = valoresPremio['duque'];
+        const premioFinalDuque = premioBaseDuque / divisaoDuque;
+        totalReceber += premioFinalDuque;
+    }
 
     document.getElementById("totalPagar").textContent = totalPagar.toFixed(2);
     document.getElementById("totalReceber").textContent = totalReceber.toFixed(2);
 }
-
 // Gera um milhar aleatório
 function gerarMilharAleatorio() {
     return String(Math.floor(1000 + Math.random() * 9000));
@@ -318,7 +337,7 @@ function enviarWhatsApp() {
     const totalReceber = document.getElementById("totalReceber").textContent.trim();
     const data = new Date();
     const codigo = Math.floor(100000 + Math.random() * 900000);
-    const link = "https://bichopix.netlify.app/jogos";
+    const link = "https://bichopix.netlify.app/multi_jogos_clientes";
 
     let msg = `${link}\n\n          🎰 *MULTIJOGO* 🎰\n👤 *Nome:* ${nome}\n📅 *Data:* ${data.toLocaleDateString()} 🕐 ${data.toLocaleTimeString()}\n⏰ *Horário:* ${horario}\n\n`;
 
