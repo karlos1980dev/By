@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="https://raw.githubusercontent.com/karlos1980dev/By/refs/heads/main/images%20(3).jpeg" type="image/jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Multijogo</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 10px; background-color: #ff000a; }
+    .container { max-width: 500px; margin: auto; background: black; color: white; padding: 20px; border-radius: 8px; text-align:center; }
+    h3 { margin-top: 20px; text-align:center; }
+    input, select, button {
+      padding: 10px; margin: 2px 0; width:90%; border-radius: 4px; border: 1px solid #ccc;
+    }
+    input.numero { width: 100%; box-sizing: border-box; }
+    .resultado { margin-top: 15px; text-align:center; font-weight: bold; }
+    button { background-color: #25d366; color: white; border: none; cursor: pointer; width: 100%; margin-top: 10px; }
+    button:hover { background-color: #128c7e; }
+    .grupo {
+      border: 1px solid #ddd; padding: 5px; background: grey;
+      border-radius: 6px; width: 30%; box-sizing: border-box;
+      display: inline-block; margin: 1%; vertical-align: top;
+    }
+    .add-btn {
+      background-color: #007bff; color: white; width: 100%; margin-top: 5px;
+    }
+    .add-btn:hover { background-color: #0056b3; }
+    ul { padding: 0; }
+    li { list-style: none; padding: 5px; border-bottom: 1px solid grey; cursor: pointer; }
+    li:hover { background-color: #333; }
+    #agendaContatosContainer {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: black;
+      color: white;
+      border-radius: 8px;
+      padding: 10px;
+      z-index: 9999;
+      display: none;
+      width: 250px;
+      box-shadow: 0 0 10px #000;
+    }
+    #menuBtn {
+      position: fixed;
+      text-align:center;
+      top: 10px;
+      right: 10px;
+      background-color: #25d366;
+      color: white;
+      border: none;
+      border-radius: 40%;
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 10000;
+    }
+    #menuBtn:hover { background-color: #128c7e; }
+    #agendaContatos li { border-bottom: 1px solid grey; padding: 5px; cursor: pointer; }
+    #agendaContatos li:hover { background-color: #333; }
+    input type=number{
+        width:40%;
+    }
+     .valoresInput{
+         width:30%;
+     }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Multijogo</h2>
+    <button id="menuBtn">&#9776;</button>
+
+    <div id="agendaContatosContainer">
+      <h3 style="text-align:center;">Agenda de Contatos</h3>
+      <ul id="agendaContatos"></ul>
+    </div>
+
+    <input type="text" id="nomeInput" placeholder="Seu nome" required>
+    <input type="tel" id="numeroInput" placeholder="WhatsApp com DDD (somente números)" required>
+
+<select id="horarioInput">
+      <option value="10:00">10:00h</option>
+      <option value="12:00">12:00h</option>
+      <option value="15:00">15:00h</option>
+      <option value="19:00">19:00h</option>
+      <option value="21:00">21:00h</option>
+    </select>
+
+    <h3>Milhar</h3>
+    <input class="valoresInput"type="number" id="valorMilhar" placeholder="Valor da milhar" step="0.01" oninput="calcularTotal()" />
+    <div id="milharContainer"></div>
+    <button type="button" class="add-btn" onclick="adicionarCampos('milhar', 7)">+ Adicionar 5 Milhar</button>
+
+    <h3>Centena</h3>
+    <input class="valoresInput" type="number" id="valorCentena" placeholder="Valor da centena" step="0.01" oninput="calcularTotal()" />
+    <div id="centenaContainer"></div>
+    <button type="button" class="add-btn" onclick="adicionarCampos('centena', 7)">+ Adicionar 5 Centena</button>
+
+    <h3>Dezena</h3>
+    <input  class="valoresInput" type="number" id="valorDezena" placeholder="Valor da dezena" step="0.01" oninput="calcularTotal()" />
+    <div id="dezenaContainer"></div>
+    <button type="button" class="add-btn" onclick="adicionarCampos('dezena', 7)">+ Adicionar 5 Dezena</button>
+
+    <h3>Grupo</h3>
+    <input  class="valoresInput" type="number" id="valorGrupo" placeholder="Valor do grupo" step="0.01" oninput="calcularTotal()" />
+    <div id="grupoContainer"></div>
+    <button type="button" class="add-btn" onclick="adicionarCampos('grupo', 7)">+ Adicionar 5 Grupo</button>
+
+    <h3>Duque de Dezena</h3>
+    <input  class="valoresInput" type="number" id="valorDuque" placeholder="Valor do Duque de Dezena" step="0.01" oninput="calcularTotal()" />
+   
+    <div id="duqueContainer"></div>
+    <button type="button" class="add-btn" onclick="adicionarCamposDuque()">+ Adicionar Duque</button>
+
+    <div class="resultado">
+      Total a Pagar: R$ <span id="totalPagar">0.00</span><br>
+      Total a Receber: R$ <span id="totalReceber">0.00</span>
+    </div>
+
+    <button onclick="enviarWhatsApp()">Enviar via WhatsApp</button>
+  </div>
+
+<script>
+    const valoresPremio = {
+    milhar: 5000,
+    centena: 600,
+    dezena: 60,
+    grupo: 17,
+    duque: 1500
+};
+
+// Validação dos números digitados
+function validarInputNumero(input, maxLength) {
+    input.value = input.value.replace(/\D/g, '');
+    if (input.value.length > maxLength) {
+        input.value = input.value.slice(0, maxLength);
+    }
+}
+
+function validarGrupo(input) {
+    input.value = input.value.replace(/\D/g, '');
+    let valor = parseInt(input.value, 10);
+
+    if (!isNaN(valor)) {
+        if (valor < 1) valor = '';
+        if (valor > 25) valor = 25;
+        else if (valor < 10 && input.value.length === 1) {
+            input.value = '0' + valor;
+            return;
+        }
+        input.value = valor.toString().padStart(2, '0');
+    } else {
+        input.value = '';
+    }
+}
+
+// Função para adicionar campos
+function adicionarCampos(tipo, quantidade) {
+    const container = document.getElementById(tipo + 'Container');
+
+    for (let i = 0; i < quantidade - 1; i++) {
+        const div = document.createElement('div');
+        div.className = 'grupo';
+
+        const inputNumero = document.createElement('input');
+        inputNumero.type = 'number';
+        inputNumero.className = 'numero';
+
+        if (tipo === 'milhar') {
+            inputNumero.placeholder = "Milhar";
+            inputNumero.min = 0;
+            inputNumero.max = 9999;
+            inputNumero.oninput = function() {
+                if (this.value.length > 4) this.value = this.value.slice(0, 4);
+            };
+        } else if (tipo === 'centena') {
+            inputNumero.placeholder = "Centena";
+            inputNumero.min = 0;
+            inputNumero.max = 999;
+            inputNumero.oninput = function() {
+                if (this.value.length > 3) this.value = this.value.slice(0, 3);
+            };
+        } else if (tipo === 'dezena') {
+            inputNumero.placeholder = "Dezena";
+            inputNumero.min = 0;
+            inputNumero.max = 99;
+            inputNumero.oninput = function() {
+                if (this.value.length > 2) this.value = this.value.slice(0, 2);
+            };
+        } else if (tipo === 'grupo') {
+            inputNumero.placeholder = "Grupo (1-25)";
+            inputNumero.min = 1;
+            inputNumero.max = 25;
+            inputNumero.oninput = function() {
+                if (this.value < 1) this.value = 1;
+                if (this.value > 25) this.value = 25;
+            };
+        }
+
+        const select = document.createElement('select');
+        ['1', '5', '10'].forEach(op => {
+            const option = document.createElement('option');
+            option.value = op;
+            option.textContent = `1º ao ${op}º`;
+            select.appendChild(option);
+        });
+
+        div.appendChild(inputNumero);
+        div.appendChild(select);
+        container.appendChild(div);
+    }
+}
+// Duque de Dezena
+function adicionarCamposDuque() {
+    const container = document.getElementById('duqueContainer');
+
+    const div = document.createElement('div');
+    div.className = 'grupo';
+
+    const inputNumero1 = document.createElement('input');
+    inputNumero1.type = 'number';
+    inputNumero1.className = 'numero';
+    inputNumero1.placeholder = 'Dezena 1';
+    inputNumero1.min = 0;
+    inputNumero1.max = 99;
+    inputNumero1.oninput = function() {
+        if (this.value.length > 2) this.value = this.value.slice(0, 2);
+    };
+
+    const inputNumero2 = document.createElement('input');
+    inputNumero2.type = 'number';
+    inputNumero2.className = 'numero';
+    inputNumero2.placeholder = 'Dezena 2';
+    inputNumero2.min = 0;
+    inputNumero2.max = 99;
+    inputNumero2.oninput = function() {
+        if (this.value.length > 2) this.value = this.value.slice(0, 2);
+    };
+
+    const select = document.createElement('select');
+    [ '5'].forEach(op => {
+        const option = document.createElement('option');
+        option.value = op;
+        option.textContent = `1º ao ${op}º`;
+        select.appendChild(option);
+    });
+
+    div.appendChild(inputNumero1);
+    div.appendChild(inputNumero2);
+    div.appendChild(select);
+    container.appendChild(div);
+}
+// Calcula o total a pagar e a receber
+function calcularTotal() {
+    let totalPagar = 0;
+    let totalReceber = 0;
+
+    ['milhar', 'centena', 'dezena', 'grupo'].forEach(tipo => {
+        const container = document.getElementById(tipo + 'Container');
+        const grupos = container.querySelectorAll('.grupo');
+        const valorUnitario = parseFloat(document.getElementById("valor" + tipo.charAt(0).toUpperCase() + tipo.slice(1)).value) || 0;
+
+        grupos.forEach(grupo => {
+            const numeroInput = grupo.querySelector('.numero');
+            const numero = numeroInput.value;
+            const divisao = parseInt(grupo.querySelector('select').value);
+
+            if (numero !== "" && valorUnitario > 0) {
+                totalPagar += valorUnitario;
+
+                const divisor = divisao === 5 ? 5 : divisao === 10 ? 10 : 1;
+                totalReceber += (valorUnitario * valoresPremio[tipo]) / divisor;
+            }
+        });
+    });
+
+    // Duque de dezena
+    const containerDuque = document.getElementById('duqueContainer');
+    const gruposDuque = containerDuque.querySelectorAll('.grupo');
+    const valorDuque = parseFloat(document.getElementById("valorDuque").value) || 0;
+
+    gruposDuque.forEach(grupo => {
+        const inputsDuque = grupo.querySelectorAll('.numero');
+        const numero1 = inputsDuque[0].value;
+        const numero2 = inputsDuque[1].value;
+        const divisao = parseInt(grupo.querySelector('select').value);
+
+        if (numero1 !== "" && numero2 !== "" && valorDuque > 0) {
+            totalPagar += valorDuque;
+
+            const divisor = divisao === 5 ? 5 : 1;
+            totalReceber += (valorDuque * valoresPremio['duque']) / divisor;
+        }
+    });
+
+    document.getElementById("totalPagar").textContent = totalPagar.toFixed(2);
+    document.getElementById("totalReceber").textContent = totalReceber.toFixed(2);
+}
+
+// Gera um milhar aleatório
+function gerarMilharAleatorio() {
+    return String(Math.floor(1000 + Math.random() * 9000));
+}
+
+// Envio via WhatsApp
+function enviarWhatsApp() {
+    calcularTotal();
+    const nome = document.getElementById("nomeInput").value.trim();
+    const numero = document.getElementById("numeroInput").value.trim();
+    const horario = document.getElementById("horarioInput").value.trim();
+    const totalPagar = document.getElementById("totalPagar").textContent.trim();
+    const totalReceber = document.getElementById("totalReceber").textContent.trim();
+    const data = new Date();
+    const codigo = Math.floor(100000 + Math.random() * 900000);
+    const link = "https://multijogo-38.webnode.page/multijogo/";
+
+    let msg = `${link}\n\n          🎰 *MULTIJOGO* 🎰\n👤 *Nome:* ${nome}\n📅 *Data:* ${data.toLocaleDateString()} 🕐 ${data.toLocaleTimeString()}\n⏰ *Horário:* ${horario}\n\n`;
+
+    let erro = false;
+
+    const tipos = [
+        { id: 'milhar', nome: 'MILHAR', icone: '💯', tamanho: 4 },
+        { id: 'centena', nome: 'CENTENA', icone: '🎯', tamanho: 3 },
+        { id: 'dezena', nome: 'DEZENA', icone: '🔢', tamanho: 2 },
+        { id: 'grupo', nome: 'GRUPO', icone: '🧩', tamanho: 2 }
+    ];
+
+    tipos.forEach(tipo => {
+        const container = document.getElementById(tipo.id + 'Container');
+        const grupos = container.querySelectorAll('.grupo');
+        const valorUnitario = parseFloat(document.getElementById("valor" + tipo.nome.charAt(0).toUpperCase() + tipo.nome.slice(1).toLowerCase()).value) || 0;
+
+        let temAposta = false;
+
+        grupos.forEach(grupo => {
+            const numero = grupo.querySelector('.numero').value;
+            const divisao = grupo.querySelector('select').value;
+
+            if (numero !== "" && valorUnitario > 0) {
+                if (numero.length !== tipo.tamanho) {
+                    alert(`❌ O número da *${tipo.nome}* deve ter ${tipo.tamanho} dígitos.`);
+                    erro = true;
+                    return;
+                }
+                if (!temAposta) {
+                    msg += `${tipo.icone} *${tipo.nome}*\n`;
+                    temAposta = true;
+                }
+                msg += `• ${numero} - 💰 R$${valorUnitario.toFixed(2)} / 🏆1 a ${divisao} prêmio\n`;
+            }
+        });
+
+        if (temAposta) msg += '\n';
+    });
+
+    // Duque de dezena
+    const containerDuque = document.getElementById('duqueContainer');
+    const gruposDuque = containerDuque.querySelectorAll('.grupo');
+    const valorDuque = parseFloat(document.getElementById("valorDuque").value) || 0;
+
+    let temDuque = false;
+
+    gruposDuque.forEach(grupo => {
+        const inputsDuque = grupo.querySelectorAll('.numero');
+        const numero1 = inputsDuque[0].value;
+        const numero2 = inputsDuque[1].value;
+        const divisao = grupo.querySelector('select').value;
+
+        if (numero1 !== "" && numero2 !== "" && valorDuque > 0) {
+            if (numero1.length !== 2 || numero2.length !== 2) {
+                alert(`❌ O Duque precisa de duas dezenas com 2 dígitos cada.`);
+                erro = true;
+                return;
+            }
+            if (!temDuque) {
+                msg += `💠 *DUQUE DE DEZENA*\n`;
+                temDuque = true;
+            }
+            msg += `• ${numero1} x ${numero2} - 💰 R$${valorDuque.toFixed(2)} / 🏆1 a ${divisao}\n`;
+        }
+    });
+
+    if (temDuque) msg += '\n';
+
+    if (erro) return;
+
+    if (parseFloat(totalPagar) >= 10) {
+        const milharExtra = gerarMilharAleatorio();
+        msg += `💎 *MILHAR EXTRA:* ${milharExtra}\n\n`;
+    }
+
+    msg += `💸 *Total a Pagar:* R$ ${totalPagar}\n🏆 *Total a Receber:* R$ ${totalReceber}\n🔢 *N° Controle:* ${codigo}\n\n🍀 *Boa sorte!*`;
+
+    const whatsappURL = `https://api.whatsapp.com/send?phone=55${numero}&text=${encodeURIComponent(msg)}`;
+    window.open(whatsappURL, "_blank");
+}
+
+// Agenda de contatos
+const menuBtn = document.getElementById('menuBtn');
+const agendaContainer = document.getElementById('agendaContatosContainer');
+
+menuBtn.addEventListener('click', () => {
+    agendaContainer.style.display = (agendaContainer.style.display === 'none' || agendaContainer.style.display === '') ? 'block' : 'none';
+});
+
+function salvarContatoNaAgenda() {
+    const nome = document.getElementById("nomeInput").value.trim();
+    const numero = document.getElementById("numeroInput").value.trim();
+
+    if (nome && numero) {
+        const jaExiste = agendaContatos.some(contato => contato.numero === numero);
+
+        if (!jaExiste) {
+            const novoContato = { nome, numero };
+            agendaContatos.push(novoContato);
+            localStorage.setItem('agendaContatos', JSON.stringify(agendaContatos));
+            atualizarAgendaVisual();
+        }
+    }
+}
+
+function atualizarAgendaVisual() {
+    const ul = document.getElementById('agendaContatos');
+    ul.innerHTML = '';
+
+    agendaContatos.forEach((contato, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <strong>${contato.nome}</strong> - ${contato.numero} 
+          <span style="color:red; float:right; cursor:pointer;" onclick="excluirContato(${index})">❌</span>
+        `;
+
+        li.onclick = (e) => {
+            if (e.target.tagName === 'SPAN') return;
+            document.getElementById("nomeInput").value = contato.nome;
+            document.getElementById("numeroInput").value = contato.numero;
+            alert(`Contato ${contato.nome} selecionado!`);
+        };
+
+        ul.appendChild(li);
+    });
+}
+
+function excluirContato(index) {
+    const confirmar = confirm(`Deseja excluir o contato ${agendaContatos[index].nome}?`);
+    if (confirmar) {
+        agendaContatos.splice(index, 1);
+        localStorage.setItem('agendaContatos', JSON.stringify(agendaContatos));
+        atualizarAgendaVisual();
+    }
+}
+function carregarHorarios() {
+    const select = document.getElementById('horarioInput');
+    const agora = new Date();
+    const horaAtual = agora.getHours();
+    const minutoAtual = agora.getMinutes();
+
+    let primeiroDisponivel = null;
+
+    for (let i = 0; i < select.options.length; i++) {
+        const option = select.options[i];
+        const [horaOption, minutoOption] = option.value.split(':').map(Number);
+
+        const horarioFuturo =
+            horaOption > horaAtual || (horaOption === horaAtual && minutoOption > minutoAtual);
+
+        if (horarioFuturo) {
+            option.disabled = false;
+            if (!primeiroDisponivel) primeiroDisponivel = option.value;
+        } else {
+            option.disabled = true;
+        }
+    }
+
+    if (primeiroDisponivel) {
+        select.value = primeiroDisponivel;
+    } else {
+        select.value = ""; // Se nenhum disponível, limpa
+        alert("⚠️ Nenhum horário disponível para hoje.");
+    }
+}
+
+// Inicializar
+window.onload = () => {
+    carregarHorarios();
+    atualizarAgendaVisual();
+};
+// Inicializar
+let agendaContatos = JSON.parse(localStorage.getItem('agendaContatos')) || [];
+
+</script>
+</body>
+</html> 
