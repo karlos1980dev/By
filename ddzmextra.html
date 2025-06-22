@@ -127,13 +127,96 @@
   </div>
 
 <script>
-    const valoresPremio = {
+     function calcularTotal() {
+  const valoresPremio = {
     milhar: 5000,
     centena: 600,
     dezena: 60,
     grupo: 17,
     duque: 1500
-};
+  };
+
+  let totalPagar = 0;
+  let totalReceber = 0;
+
+  function calcularTipo(tipoId, valorInputId, premioValor) {
+    const container = document.getElementById(tipoId + 'Container');
+    const valorUnitario = parseFloat(document.getElementById(valorInputId).value) || 0;
+    if (valorUnitario <= 0) return { pagar: 0, receber: 0 };
+
+    const grupos = container.querySelectorAll('div');
+    if (grupos.length === 0) return { pagar: 0, receber: 0 };
+
+    let somaReceber = 0;
+    let pagar = 0;
+    let divisao1Usado = false;
+
+    grupos.forEach(grupo => {
+      const input = grupo.querySelector('input');
+      const select = grupo.querySelector('select');
+      const numero = input.value.trim();
+      const divisao = select.value;
+
+      if (numero === '') return; // Ignorar se vazio
+
+      pagar += valorUnitario; // Somar valor a pagar por input preenchido
+
+      if (divisao === '1') {
+        // Prêmio único só uma vez, mesmo que tenha vários inputs '1'
+        if (!divisao1Usado) {
+          somaReceber += premioValor * valorUnitario;
+          divisao1Usado = true;
+        }
+      } else if (divisao === '5') {
+        somaReceber += (premioValor / 5) * valorUnitario;
+      } else if (divisao === '10') {
+        somaReceber += (premioValor / 10) * valorUnitario;
+      }
+    });
+
+    return { pagar, receber: somaReceber };
+  }
+
+  // Calcular cada tipo:
+  const resMilhar = calcularTipo('milhar', 'valorMilhar', valoresPremio.milhar);
+  const resCentena = calcularTipo('centena', 'valorCentena', valoresPremio.centena);
+  const resDezena = calcularTipo('dezena', 'valorDezena', valoresPremio.dezena);
+  const resGrupo = calcularTipo('grupo', 'valorGrupo', valoresPremio.grupo);
+
+  totalPagar = resMilhar.pagar + resCentena.pagar + resDezena.pagar + resGrupo.pagar;
+  totalReceber = resMilhar.receber + resCentena.receber + resDezena.receber + resGrupo.receber;
+
+  // Duque de Dezena
+  const containerDuque = document.getElementById('duqueContainer');
+  const valorDuque = parseFloat(document.getElementById('valorDuque').value) || 0;
+  let duquePagar = 0;
+  let duqueReceber = 0;
+
+  const gruposDuque = containerDuque.querySelectorAll('div');
+  gruposDuque.forEach(grupo => {
+    const inputs = grupo.querySelectorAll('input');
+    const n1 = inputs[0].value.trim();
+    const n2 = inputs[1].value.trim();
+    const select = grupo.querySelector('select');
+    const divisao = select.value;
+
+    if (n1 === '' || n2 === '' || valorDuque <= 0) return;
+
+    duquePagar += valorDuque;
+
+    if (divisao === '5') {
+      duqueReceber += (valoresPremio.duque / 5) * valorDuque;
+    }
+  });
+
+  totalPagar += duquePagar;
+  totalReceber += duqueReceber;
+
+  // Atualiza na tela com 2 casas decimais
+  document.getElementById('totalPagar').textContent = totalPagar.toFixed(2);
+  document.getElementById('totalReceber').textContent = totalReceber.toFixed(2);
+}
+
 
 // Validação dos números digitados
 function validarInputNumero(input, maxLength) {
@@ -257,55 +340,7 @@ function adicionarCamposDuque() {
     container.appendChild(div);
 }
 // Calcula o total a pagar e a receber
-function calcularTotal() {
-    let totalPagar = 0;
-    let totalReceber = 0;
 
-    ['milhar', 'centena', 'dezena', 'grupo'].forEach(tipo => {
-        const container = document.getElementById(tipo + 'Container');
-        const grupos = container.querySelectorAll('.grupo');
-        const valorUnitario = parseFloat(document.getElementById("valor" + tipo.charAt(0).toUpperCase() + tipo.slice(1)).value) || 0;
-
-        grupos.forEach(grupo => {
-            const numeroInput = grupo.querySelector('.numero');
-            const numero = numeroInput.value;
-            const divisao = parseInt(grupo.querySelector('select').value);
-
-            if (numero !== "" && valorUnitario > 0) {
-                totalPagar += valorUnitario;
-
-                const premioBase = valoresPremio[tipo];
-                const premioFinal = premioBase / divisao;
-
-                totalReceber += premioFinal;
-            }
-        });
-    });
-
-    // Duque de dezena
-    const containerDuque = document.getElementById('duqueContainer');
-    const gruposDuque = containerDuque.querySelectorAll('.grupo');
-    const valorDuque = parseFloat(document.getElementById("valorDuque").value) || 0;
-
-    gruposDuque.forEach(grupo => {
-        const inputsDuque = grupo.querySelectorAll('.numero');
-        const numero1 = inputsDuque[0].value;
-        const numero2 = inputsDuque[1].value;
-        const divisao = parseInt(grupo.querySelector('select').value);
-
-        if (numero1 !== "" && numero2 !== "" && valorDuque > 0) {
-            totalPagar += valorDuque;
-
-            const premioBaseDuque = valoresPremio['duque'];
-            const premioFinalDuque = premioBaseDuque / divisao;
-
-            totalReceber += premioFinalDuque;
-        }
-    });
-
-    document.getElementById("totalPagar").textContent = totalPagar.toFixed(2);
-    document.getElementById("totalReceber").textContent = totalReceber.toFixed(2);
-}
 
 // Gera um milhar aleatório
 function gerarMilharAleatorio() {
@@ -322,9 +357,9 @@ function enviarWhatsApp() {
     const totalReceber = document.getElementById("totalReceber").textContent.trim();
     const data = new Date();
     const codigo = Math.floor(100000 + Math.random() * 900000);
-    const link = "https://bichopix.netlify.app/multi_jogos_clientes";
-
-    let msg = `${link}\n\n          🎰 *MULTIJOGO* 🎰\n👤 *Nome:* ${nome}\n📅 *Data:* ${data.toLocaleDateString()} 🕐 ${data.toLocaleTimeString()}\n⏰ *Horário:* ${horario}\n\n`;
+    const link = "https://bit.ly/4eb3B96";
+const pontuacao ="_________________________________";
+    let msg = `${pontuacao}\n${link}\n${pontuacao}\n\n          🎰 *MULTIJOGO* 🎰\n👤 *Nome:* ${nome}\n📅 *Data:* ${data.toLocaleDateString()} 🕐 ${data.toLocaleTimeString()}\n        ⏰ *Horário Extracao:* ${horario}\n\n`;
 
     let erro = false;
 
@@ -404,6 +439,7 @@ function enviarWhatsApp() {
     const whatsappURL = `https://api.whatsapp.com/send?phone=55${numero}&text=${encodeURIComponent(msg)}`;
     window.open(whatsappURL, "_blank");
 }
+
 
 // Agenda de contatos
 const menuBtn = document.getElementById('menuBtn');
