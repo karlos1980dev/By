@@ -256,51 +256,7 @@ function adicionarCamposDuque() {
     container.appendChild(div);
 }
 // Calcula o total a pagar e a receber
-function calcularTotal() {
-    let totalPagar = 0;
-    let totalReceber = 0;
 
-    ['milhar', 'centena', 'dezena', 'grupo'].forEach(tipo => {
-        const container = document.getElementById(tipo + 'Container');
-        const grupos = container.querySelectorAll('.grupo');
-        const valorUnitario = parseFloat(document.getElementById("valor" + tipo.charAt(0).toUpperCase() + tipo.slice(1)).value) || 0;
-
-        grupos.forEach(grupo => {
-            const numeroInput = grupo.querySelector('.numero');
-            const numero = numeroInput.value;
-            const divisao = parseInt(grupo.querySelector('select').value);
-
-            if (numero !== "" && valorUnitario > 0) {
-                totalPagar += valorUnitario;
-
-                const divisor = divisao === 5 ? 5 : divisao === 10 ? 10 : 1;
-                totalReceber += (valorUnitario * valoresPremio[tipo]) / divisor;
-            }
-        });
-    });
-
-    // Duque de dezena
-    const containerDuque = document.getElementById('duqueContainer');
-    const gruposDuque = containerDuque.querySelectorAll('.grupo');
-    const valorDuque = parseFloat(document.getElementById("valorDuque").value) || 0;
-
-    gruposDuque.forEach(grupo => {
-        const inputsDuque = grupo.querySelectorAll('.numero');
-        const numero1 = inputsDuque[0].value;
-        const numero2 = inputsDuque[1].value;
-        const divisao = parseInt(grupo.querySelector('select').value);
-
-        if (numero1 !== "" && numero2 !== "" && valorDuque > 0) {
-            totalPagar += valorDuque;
-
-            const divisor = divisao === 5 ? 5 : 1;
-            totalReceber += (valorDuque * valoresPremio['duque']) / divisor;
-        }
-    });
-
-    document.getElementById("totalPagar").textContent = totalPagar.toFixed(2);
-    document.getElementById("totalReceber").textContent = totalReceber.toFixed(2);
-}
 
 // Gera um milhar aleatório
 function gerarMilharAleatorio() {
