@@ -357,9 +357,8 @@ function enviarWhatsApp() {
     const totalReceber = document.getElementById("totalReceber").textContent.trim();
     const data = new Date();
     const codigo = Math.floor(100000 + Math.random() * 900000);
-    const link = "https://bit.ly/4eb3B96";
-const pontuacao ="_________________________________";
-    let msg = `${pontuacao}\n${link}\n${pontuacao}\n\n          🎰 *MULTIJOGO* 🎰\n👤 *Nome:* ${nome}\n📅 *Data:* ${data.toLocaleDateString()} 🕐 ${data.toLocaleTimeString()}\n        ⏰ *Horário Extracao:* ${horario}\n\n`;
+    const link = "https://bit.ly/4eb3B96"; 
+    let msg = `${link}\n${pontuacao}\n\n          🎰 *MULTIJOGO* 🎰\n👤 *Nome:* ${nome}\n📅 *Data:* ${data.toLocaleDateString()} 🕐 ${data.toLocaleTimeString()}\n        ⏰ *Horário Extracao:* ${horario}\n\n`;
 
     let erro = false;
 
