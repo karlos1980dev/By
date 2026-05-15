@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Painel Admin</title>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial;
+}
+
+body{
+  background:#0f172a;
+  color:white;
+  padding:20px;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+.card{
+  background:#1e293b;
+  padding:20px;
+  margin-bottom:20px;
+  border-radius:15px;
+  border:1px solid #334155;
+}
+
+.card h2{
+  margin-bottom:15px;
+  color:#22c55e;
+}
+
+.card p{
+  margin-top:8px;
+  line-height:1.5;
+}
+
+img{
+  width:100%;
+  max-width:300px;
+  border-radius:10px;
+  margin-top:15px;
+  border:2px solid #334155;
+}
+
+.vazio{
+  text-align:center;
+  margin-top:50px;
+  color:#94a3b8;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Painel de Solicitações</h1>
+
+<div id="lista"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+<script>
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDw5F9h-PvLwv2fENNIbrmOc3qSXxa__Uo",
+  authDomain: "emprestimo-cf2bb.firebaseapp.com",
+  databaseURL: "https://emprestimo-cf2bb-default-rtdb.firebaseio.com",
+  projectId: "emprestimo-cf2bb",
+  storageBucket: "emprestimo-cf2bb.firebasestorage.app",
+  messagingSenderId: "545934886415",
+  appId: "1:545934886415:web:3088355b8bb33f279d857a"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.database();
+
+const lista = document.getElementById("lista");
+
+db.ref("emprestimos").on("value", snapshot => {
+
+  lista.innerHTML = "";
+
+  if(!snapshot.exists()){
+
+    lista.innerHTML = `
+      <div class="vazio">
+        Nenhuma solicitação encontrada
+      </div>
+    `;
+
+    return;
+
+  }
+
+  snapshot.forEach(item => {
+
+    const dados = item.val();
+
+    lista.innerHTML += `
+
+    <div class="card">
+
+      <h2>${dados.nome}</h2>
+
+      <p><b>Valor:</b> R$ ${dados.valor}</p>
+
+      <p><b>Prazo:</b> ${dados.prazo}</p>
+
+      <p><b>CEP:</b> ${dados.cep}</p>
+
+      <p>
+        <b>Endereço:</b><br>
+
+        ${dados.endereco.rua || ""},
+        Nº ${dados.endereco.numero || ""}<br>
+
+        ${dados.endereco.bairro || ""}<br>
+
+        ${dados.endereco.cidade || ""} - ${dados.endereco.estado || ""}
+      </p>
+
+      <p><b>Ponto de referência:</b> ${dados.referencia}</p>
+
+      <p><b>Indicação:</b> ${dados.indicacao || "Nenhuma"}</p>
+
+      <p><b>Data:</b> ${dados.data}</p>
+
+      <img src="${dados.fotoRG}" alt="RG">
+
+    </div>
+
+    `;
+
+  });
+
+});
+
+</script>
+
+</body>
+</html>
