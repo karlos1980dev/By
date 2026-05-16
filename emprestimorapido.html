@@ -101,6 +101,8 @@ Valor total A Pagar : R$ 0,00
 
 <input type="tel" id="telefone" placeholder="Telefone">
 
+<input type="text" id="pix" placeholder="Chave PIX (CPF, Email, Telefone ou Aleatória)">
+
 <input type="text" id="cep" placeholder="CEP">
 
 <input type="text" id="rua" placeholder="Rua">
@@ -210,6 +212,7 @@ async function enviar(){
 
   const nome = document.getElementById("nome").value;
 const telefone = document.getElementById("telefone").value;
+const pix = document.getElementById("pix").value;
   const endereco = {
     rua: document.getElementById("rua").value,
     bairro: document.getElementById("bairro").value,
@@ -226,10 +229,11 @@ const telefone = document.getElementById("telefone").value;
 
   const prazo = document.getElementById("prazo").value;
 
-  if(
+if(
   !valor ||
   !nome ||
   !telefone ||
+  !pix ||
   !cep ||
   !endereco.rua ||
   !endereco.bairro ||
@@ -252,6 +256,7 @@ const telefone = document.getElementById("telefone").value;
   valor,
   nome,
   telefone,
+  pix,
   endereco,
   cep,
   referencia,
@@ -329,4 +334,4 @@ prazoInput.addEventListener("change", calcularTotal);
 
 
 </body>
-  </html>
+</html>
