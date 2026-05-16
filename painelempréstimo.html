@@ -57,7 +57,28 @@ img{
   margin-top:50px;
   color:#94a3b8;
 }
+.card{
+  background:#1e293b;
+  padding:20px;
+  margin-bottom:20px;
+  border-radius:15px;
+  border:1px solid #334155;
+  position:relative;
+}
 
+.excluir{
+  position:absolute;
+  top:10px;
+  right:15px;
+  cursor:pointer;
+  color:#ef4444;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.excluir:hover{
+  color:#dc2626;
+}
 </style>
 </head>
 
@@ -106,47 +127,58 @@ db.ref("emprestimos").on("value", snapshot => {
 
   snapshot.forEach(item => {
 
-    const dados = item.val();
+  const dados = item.val();
+  const id = item.key;
 
-    lista.innerHTML += `
+  lista.innerHTML += `
 
-    <div class="card">
+  <div class="card">
 
-      <h2>${dados.nome}</h2>
+    <div class="excluir" onclick="excluir('${id}')">✖</div>
 
-      <p><b>Valor:</b> R$ ${dados.valor}</p>
+    <h2>${dados.nome}</h2>
+<p><b>Telefone:</b> ${dados.telefone}</p>
+<p><b>PIX:</b> ${dados.pix}</p>
+    <p><b>Valor:</b> R$ ${dados.valor}</p>
 
-      <p><b>Prazo:</b> ${dados.prazo}</p>
+    <p><b>Prazo:</b> ${dados.prazo}</p>
 
-      <p><b>CEP:</b> ${dados.cep}</p>
+    <p><b>CEP:</b> ${dados.cep}</p>
 
-      <p>
-        <b>Endereço:</b><br>
+    <p>
+      <b>Endereço:</b><br>
 
-        ${dados.endereco.rua || ""},
-        Nº ${dados.endereco.numero || ""}<br>
+      ${dados.endereco.rua || ""},
+      Nº ${dados.endereco.numero || ""}<br>
 
-        ${dados.endereco.bairro || ""}<br>
+      ${dados.endereco.bairro || ""}<br>
 
-        ${dados.endereco.cidade || ""} - ${dados.endereco.estado || ""}
-      </p>
+      ${dados.endereco.cidade || ""} - ${dados.endereco.estado || ""}
+    </p>
 
-      <p><b>Ponto de referência:</b> ${dados.referencia}</p>
+    <p><b>Ponto de referência:</b> ${dados.referencia}</p>
 
-      <p><b>Indicação:</b> ${dados.indicacao || "Nenhuma"}</p>
+    <p><b>Indicação:</b> ${dados.indicacao || "Nenhuma"}</p>
 
-      <p><b>Data:</b> ${dados.data}</p>
+    <p><b>Data:</b> ${dados.data}</p>
 
-      <img src="${dados.fotoRG}" alt="RG">
+    <img src="${dados.fotoRG}" alt="RG">
 
-    </div>
+  </div>
 
-    `;
-
-  });
-
+  `;
 });
 
+});
+function excluir(id){
+
+  if(confirm("Deseja excluir esta solicitação?")){
+
+    db.ref("emprestimos/" + id).remove();
+
+  }
+
+}
 </script>
 
 </body>
