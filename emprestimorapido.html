@@ -114,23 +114,24 @@ button:hover{
 
 <body>
 
-<div class="container">
 <div class="topo-fixo">
-
   <h1>Empréstimo Rápido</h1>
 
   <div id="resultado" class="resultado">
     Valor total a pagar: R$ 0,00
   </div>
-
 </div>
+
+<div class="container">
 
 <input type="number" id="valor" placeholder="Valor do empréstimo" max="300">
 
 <input type="text" id="nome" placeholder="Nome completo">
 
-<input type="text" id="cpf" placeholder="CPF">
-<input type="tel" id="telefone" placeholder="Telefone">
+<input type="tel" id="cpf" placeholder="CPF"maxlength="14"oninput="formatarCPF(this)"
+>
+
+<input type="tel" id="telefone" placeholder="Telefone"maxlength="15"oninput="formatarTelefone(this)">
 
 <input type="text" id="pix" placeholder="Chave PIX (CPF, Email, Telefone ou Aleatória)">
 
@@ -237,13 +238,55 @@ document.getElementById("cep").addEventListener("blur", async function(){
 
 });
 
+function validarCPF(cpf){
+
+  cpf = cpf.replace(/\D/g,'');
+
+  if(cpf.length !== 11) return false;
+
+  // bloqueia CPFs iguais
+  if(/^(\d)\1+$/.test(cpf)) return false;
+
+  let soma = 0;
+  let resto;
+
+  for(let i=1;i<=9;i++)
+    soma += parseInt(cpf.substring(i-1,i))*(11-i);
+
+  resto = (soma*10)%11;
+
+  if(resto==10 || resto==11) resto=0;
+  if(resto!=parseInt(cpf.substring(9,10))) return false;
+
+  soma = 0;
+
+  for(let i=1;i<=10;i++)
+    soma += parseInt(cpf.substring(i-1,i))*(12-i);
+
+  resto = (soma*10)%11;
+
+  if(resto==10 || resto==11) resto=0;
+  if(resto!=parseInt(cpf.substring(10,11))) return false;
+
+  return true;
+}
+
 async function enviar(){
+
+  
 
   const valor = document.getElementById("valor").value;
   const nome = document.getElementById("nome").value;
   const cpf = document.getElementById("cpf").value;
-  const telefone = document.getElementById("telefone").value;
+  
+if(!validarCPF(cpf)){
+  alert("CPF inválido!");
+  return;
+}
 
+  const telefone = document.getElementById("telefone").value;
+  const pix = document.getElementById("pix").value; // 
+  
   const endereco = {
     rua: document.getElementById("rua").value,
     bairro: document.getElementById("bairro").value,
@@ -258,19 +301,20 @@ async function enviar(){
   const prazo = document.getElementById("prazo").value;
 
   if(
-    !valor ||
-    !nome ||
-    !cpf ||
-    !telefone ||
-    !cep ||
-    !endereco.rua ||
-    !endereco.bairro ||
-    !endereco.cidade ||
-    !endereco.estado ||
-    !endereco.numero ||
-    !referencia ||
-    !prazo
-  ){
+  !valor ||
+  !nome ||
+  !cpf ||
+  !telefone ||
+  !pix ||
+  !cep ||
+  !endereco.rua ||
+  !endereco.bairro ||
+  !endereco.cidade ||
+  !endereco.estado ||
+  !endereco.numero ||
+  !referencia ||
+  !prazo
+){
     alert("Preencha todos os campos");
     return;
   }
@@ -278,17 +322,18 @@ async function enviar(){
   try{
 
     const dados = {
-      valor,
-      nome,
-      cpf,
-      telefone,
-      endereco,
-      cep,
-      referencia,
-      indicacao,
-      prazo,
-      data: new Date().toLocaleString()
-    };
+  valor,
+  nome,
+  cpf,
+  telefone,
+  pix, // ✅ ADICIONAR
+  endereco,
+  cep,
+  referencia,
+  indicacao,
+  prazo,
+  data: new Date().toLocaleString()
+};
 
     // salva no firebase
 const novo = db.ref("emprestimos").push();
@@ -306,7 +351,7 @@ localStorage.setItem("contratoID", novo.key);
   prazo
 }));
 
-window.location.href = "contrato.html";
+
 
     // 🔥 abre contrato automaticamente
     window.location.href = "contrato.html";
@@ -369,6 +414,29 @@ valorInput.addEventListener("input", calcularTotal);
 
 prazoInput.addEventListener("change", calcularTotal);
 
+function formatarCPF(campo){
+
+  let valor = campo.value.replace(/\D/g,'');
+
+  valor = valor.replace(/(\d{3})(\d)/,'$1.$2');
+  valor = valor.replace(/(\d{3})(\d)/,'$1.$2');
+  valor = valor.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+
+  campo.value = valor;
+
+}
+
+
+function formatarTelefone(campo){
+
+  let valor = campo.value.replace(/\D/g,'');
+
+  valor = valor.replace(/^(\d{2})(\d)/g,'($1) $2');
+  valor = valor.replace(/(\d{5})(\d)/,'$1-$2');
+
+  campo.value = valor;
+
+}
 </script>
 
 
