@@ -18,7 +18,7 @@
 body{
   background:#0f172a;
   color:white;
-  padding:20px;
+  padding:140px 20px 20px;
 }
 
 .container{
@@ -84,16 +84,46 @@ button:hover{
   font-weight:bold;
   color:#22c55e;
 }
+.topo-fixo{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  background:#1e293b;
+  padding:15px;
+  text-align:center;
+  z-index:999;
+  border-bottom:1px solid #334155;
+}
+
+.topo-fixo h1{
+  margin-bottom:8px;
+}
+
+.resultado{
+  background:#0f172a;
+  border:1px solid #334155;
+  padding:10px;
+  border-radius:10px;
+  font-size:18px;
+  font-weight:bold;
+  color:#22c55e;
+}
 </style>
 </head>
 
 <body>
 
 <div class="container">
-<div id="resultado" class="resultado">
-Valor total A Pagar : R$ 0,00
+<div class="topo-fixo">
+
+  <h1>Empréstimo Rápido</h1>
+
+  <div id="resultado" class="resultado">
+    Valor total a pagar: R$ 0,00
+  </div>
+
 </div>
-<h1>Empréstimo Rápido</h1>
 
 <input type="number" id="valor" placeholder="Valor do empréstimo" max="300">
 
@@ -126,9 +156,9 @@ Valor total A Pagar : R$ 0,00
 
 <select id="prazo">
   <option value="">Escolha o prazo</option>
-  <option value="10 dias - 10%">10 dias - 10%</option>
-  <option value="20 dias - 20%">20 dias - 20%</option>
-  <option value="30 dias - 30%">30 dias - 30%</option>
+  <option value="10 dias + 10%">10 dias = 10%</option>
+  <option value="20 dias + 20%">20 dias = 20%</option>
+  <option value="30 dias + 30%">30 dias = 30%</option>
 </select>
 
 <input type="file" id="rg" accept="image/*">
@@ -261,15 +291,22 @@ async function enviar(){
     };
 
     // salva no firebase
-    await db.ref("emprestimos").push(dados);
+const novo = db.ref("emprestimos").push();
+
+await novo.set(dados);
+
+// salva ID do cliente
+localStorage.setItem("contratoID", novo.key);
 
     // 🔥 salva dados para o contrato
     localStorage.setItem("contrato", JSON.stringify({
-      nome,
-      cpf,
-      valor,
-      prazo
-    }));
+  nome,
+  cpf,
+  valor,
+  prazo
+}));
+
+window.location.href = "contrato.html";
 
     // 🔥 abre contrato automaticamente
     window.location.href = "contrato.html";
