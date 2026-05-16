@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Contrato Digital</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 
 body{
@@ -85,6 +85,7 @@ como válido em meio digital.
 const dados = JSON.parse(localStorage.getItem("contrato"));
 
 document.getElementById("nome").innerText = dados.nome;
+document.getElementById("cpf").innerText = dados.cpf;
 document.getElementById("valor").innerText = dados.valor;
 document.getElementById("prazo").innerText = dados.prazo;
 
