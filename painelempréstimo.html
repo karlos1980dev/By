@@ -137,8 +137,9 @@ db.ref("emprestimos").on("value", snapshot => {
     <div class="excluir" onclick="excluir('${id}')">✖</div>
 
     <h2>${dados.nome}</h2>
+<p><b>CPF:</b> ${dados.cpf || "Não informado"}</p>
 <p><b>Telefone:</b> ${dados.telefone}</p>
-<p><b>PIX:</b> ${dados.pix}</p>
+<p><b>PIX:</b> ${dados.pix || "Não informado"}</p>
     <p><b>Valor:</b> R$ ${dados.valor}</p>
 
     <p><b>Prazo:</b> ${dados.prazo}</p>
@@ -163,7 +164,10 @@ db.ref("emprestimos").on("value", snapshot => {
     <p><b>Data:</b> ${dados.data}</p>
 
     <img src="${dados.fotoRG}" alt="RG">
-
+${dados.assinatura ? `
+<p><b>Contrato Assinado ✅</b></p>
+<img src="${dados.assinatura}" alt="Assinatura">
+` : `<p style="color:orange"><b>Aguardando assinatura</b></p>`}
   </div>
 
   `;
