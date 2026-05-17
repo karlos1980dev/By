@@ -133,7 +133,7 @@ button:hover{
 
 <input type="tel" id="telefone" placeholder="Telefone"maxlength="15"oninput="formatarTelefone(this)">
 
-<input type="text" id="pix" placeholder="Chave PIX (CPF, Email, Telefone ou Aleatória)">
+<input type="text" id="pix" placeholder="Chave PIX: CPF, Email, Telefone ou Aleatória">
 
 <input type="text" id="cep" placeholder="CEP">
 
@@ -156,17 +156,23 @@ button:hover{
 <input type="text" id="indicacao" placeholder="Indicação (opcional)">
 
 <select id="prazo">
-  <option value="">Escolha o prazo</option>
+  <option value="">ESCOLHA O PRAZO</option>
   <option value="10 dias + 10%">10 dias = 10%</option>
   <option value="20 dias + 20%">20 dias = 20%</option>
   <option value="30 dias + 30%">30 dias = 30%</option>
-</select>
-
-<input type="file" id="rg" accept="image/*">
+</select></br></br>
+<label style="margin-left:20%"for="rg">ENVIAR DOCUMENTOS</label>
+<input
+  style="display:none"
+  type="file"
+  id="rg"
+  accept="image/*"
+  required
+>
 
 <img id="preview" class="preview">
 
-<button onclick="enviar()">ENVIAR</button>
+<button onclick="enviar()">SOLICITAR</button>
 
 </div>
 
@@ -273,18 +279,24 @@ function validarCPF(cpf){
 
 async function enviar(){
 
-  
-
   const valor = document.getElementById("valor").value;
   const nome = document.getElementById("nome").value;
   const cpf = document.getElementById("cpf").value;
-  
-if(!validarCPF(cpf)){
-  alert("CPF inválido!");
-  return;
-}
+
+  const rgArquivo = rgInput.files[0];
+
+  if(!rgArquivo){
+    alert("Envie o RG obrigatório!");
+    return;
+  }
+
+  if(!validarCPF(cpf)){
+    alert("CPF inválido!");
+    return;
+  }
 
   const telefone = document.getElementById("telefone").value;
+  
   const pix = document.getElementById("pix").value; // 
   
   const endereco = {
@@ -314,6 +326,7 @@ if(!validarCPF(cpf)){
   !endereco.numero ||
   !referencia ||
   !prazo
+
 ){
     alert("Preencha todos os campos");
     return;
