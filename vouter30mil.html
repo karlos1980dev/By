@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marcador 1 a 250</title>
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#111;
+    color:#fff;
+    text-align:center;
+    margin:10px;
+}
+
+h2{
+    margin-bottom:20px;
+}
+
+#grade{
+    display:grid;
+    grid-template-columns:repeat(10, 1fr);
+    gap:5px;
+    max-width:700px;
+    margin:auto;
+}
+
+.numero{
+    background:#fff;
+    color:#000;
+    padding:10px 0;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+    text-align:center;
+    user-select:none;
+}
+.numero:hover{
+    transform:scale(1.05);
+}
+.selecionado{
+    background:#00b300;
+    color:#fff;
+}
+#total{
+    margin:20px;
+    font-size:20px;
+}
+</style>
+</head>
+<body>
+
+<h2>30 Mil em 3 meses de 1 até 250</h2>
+
+
+<div id="total">
+    Marcados: <span id="qtd">0</span><br>
+    Soma: <span id="soma">0</span>
+</div>
+<div id="grade"></div>
+
+<script>
+const grade=document.getElementById("grade");
+
+let selecionados=JSON.parse(localStorage.getItem("marcados"))||[];
+
+for(let i=1;i<=250;i++){
+
+    const div=document.createElement("div");
+    div.className="numero";
+    div.textContent=i;
+
+    if(selecionados.includes(i)){
+        div.classList.add("selecionado");
+    }
+
+    div.onclick=()=>{
+
+        if(div.classList.contains("selecionado")){
+            div.classList.remove("selecionado");
+            selecionados=selecionados.filter(n=>n!==i);
+        }else{
+            div.classList.add("selecionado");
+            selecionados.push(i);
+        }
+
+        localStorage.setItem("marcados",JSON.stringify(selecionados));
+        atualizar();
+    }
+
+    grade.appendChild(div);
+}
+
+function atualizar() {
+
+    const quantidade = selecionados.length;
+
+    const soma = selecionados.reduce((total, numero) => total + numero, 0);
+
+    document.getElementById("qtd").textContent = quantidade;
+    document.getElementById("soma").textContent = soma;
+
+}
+atualizar();
+</script>
+
+</body>
+</html>
