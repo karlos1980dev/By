@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Contrato Digital</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
 <style>
 
 body{
@@ -90,7 +89,45 @@ como válido em meio digital e assinado eletronicamente.
 <button onclick="limpar()">Limpar</button>
 <button onclick="salvar()">Salvar Assinatura</button>
 <button onclick="window.print()">Imprimir / PDF</button>
+<div id="loading" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.85);
+color:#fff;
+z-index:9999;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+font-family:Arial;
+">
 
+<h2>Enviando contrato...</h2>
+
+<div style="
+width:80%;
+max-width:350px;
+height:22px;
+border:2px solid #fff;
+border-radius:20px;
+overflow:hidden;
+margin-top:20px;
+">
+
+<div id="barra" style="
+width:0%;
+height:100%;
+background:#00c853;
+"></div>
+
+</div>
+
+<p id="porcentagem">0%</p>
+
+</div>
 <img id="preview" class="assinatura-img">
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -112,7 +149,7 @@ document.getElementById("nome").innerText = dados.nome;
 document.getElementById("cpf").innerText = dados.cpf;
 const valorOriginal = parseFloat(dados.valor);
 
-const valorTotal = valorOriginal * 1.30;
+const valorTotal = valorOriginal * 1.35;
 
 document.getElementById("valor").innerText =
 valorOriginal.toFixed(2);
@@ -195,17 +232,47 @@ async function salvar(){
     return;
   }
 
-  // salva assinatura no firebase
   await db.ref("emprestimos/" + id).update({
-  assinatura: imagem,
-  assinado: true,
-  valorTotal: valorTotal,
-  dataAssinatura: new Date().toLocaleString()
-});
+    assinatura: imagem,
+    assinado: true,
+    valorTotal: valorTotal,
+    dataAssinatura: new Date().toLocaleString()
+  });
 
   document.getElementById("preview").src = imagem;
 
-  alert("Contrato assinado com sucesso ✅");
+  document.getElementById("loading").style.display="flex";
+
+  let progresso = 0;
+
+  const barra = document.getElementById("barra");
+  const texto = document.getElementById("porcentagem");
+
+  const intervalo = setInterval(()=>{
+
+    progresso++;
+
+    barra.style.width = progresso + "%";
+    texto.innerHTML = progresso + "%";
+
+    if(progresso >= 100){
+
+      clearInterval(intervalo);
+
+      setTimeout(()=>{
+
+        document.getElementById("loading").innerHTML = `
+          <h2>✅ Contrato enviado com sucesso!</h2>
+          <p style="margin-top:20px;font-size:18px;text-align:center">
+            Aguarde o retorno no WhatsApp.
+          </p>
+        `;
+
+      },500);
+
+    }
+
+  },30);
 
 }
 </script>
