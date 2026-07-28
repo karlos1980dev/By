@@ -146,16 +146,7 @@ db.ref("emprestimos").on("value", snapshot => {
 
     <p><b>CEP:</b> ${dados.cep}</p>
 
-    <p>
-      <b>Endereço:</b><br>
-
-      ${dados.endereco.rua || ""},
-      Nº ${dados.endereco.numero || ""}<br>
-
-      ${dados.endereco.bairro || ""}<br>
-
-      ${dados.endereco.cidade || ""} - ${dados.endereco.estado || ""}
-    </p>
+    <p> <b>Endereço:</b><br> ${dados.endereco?.rua || ""}, Nº ${dados.endereco?.numero || ""}<br> ${dados.endereco?.bairro || ""}<br> ${dados.endereco?.cidade || ""} - ${dados.endereco?.estado || ""} </p> 
 
     <p><b>Ponto de referência:</b> ${dados.referencia}</p>
 
@@ -163,11 +154,7 @@ db.ref("emprestimos").on("value", snapshot => {
 
     <p><b>Data:</b> ${dados.data}</p>
 
-    <img src="${dados.fotoRG}" alt="RG">
-${dados.assinatura ? `
-<p><b>Contrato Assinado ✅</b></p>
-<img src="${dados.assinatura}" alt="Assinatura">
-` : `<p style="color:orange"><b>Aguardando assinatura</b></p>`}
+    ${dados.fotoRG ? ` <img src="${dados.fotoRG}" alt="RG"> ` : ` <p style="color:orange"><b>RG não enviado</b></p> `} 
   </div>
 
   `;
