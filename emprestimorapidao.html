@@ -124,7 +124,7 @@ button:hover{
 
 <div class="container">
 
-<input type="number" id="valor" placeholder="Valor do empréstimo" max="3000">
+<input type="number" id="valor" placeholder="Valor do empréstimo" max="500">
 
 <input type="text" id="nome" placeholder="Nome completo">
 
@@ -349,7 +349,27 @@ async function enviar(){
     alert("Preencha todos os campos");
     return;
   }
+// converter RG para Base64
+const fotoRG = await new Promise((resolve) => {
+  const reader = new FileReader();
+  reader.onload = () => resolve(reader.result);
+  reader.readAsDataURL(rgArquivo);
+});
 
+const dados = {
+  valor,
+  nome,
+  cpf,
+  telefone,
+  pix,
+  endereco,
+  cep,
+  referencia,
+  indicacao,
+  prazo,
+  fotoRG,
+  data: new Date().toLocaleString("pt-BR")
+};
   try{
 
     const dados = {
@@ -404,41 +424,25 @@ function calcularTotal(){
 
   let valor = Number(valorInput.value);
 
-  if(valor > 3000){
-
-    valor = 3000;
-    valorInput.value = 3000;
-
-    alert("1°emprestimo limite é ate R$ 500");
-
+  if(valor > 500){
+    valor = 500;
+    valorInput.value = 500;
+    alert("1º empréstimo: limite de até R$ 500");
   }
 
   const prazo = prazoInput.value;
-
   let total = valor;
 
-  if(prazo.includes("10%")){
-
-    total = valor + (valor * 0.10);
-
+  if(prazo.includes("15%")){
+    total = valor * 1.15;
+  }else if(prazo.includes("25%")){
+    total = valor * 1.25;
+  }else if(prazo.includes("35%")){
+    total = valor * 1.35;
   }
 
-  if(prazo.includes("20%")){
-
-    total = valor + (valor * 0.20);
-
-  }
-
-  if(prazo.includes("30%")){
-
-    total = valor + (valor * 0.30);
-
-  }
-
-  resultado.innerHTML = `
-    Valor total: R$ ${total.toFixed(2)}
-  `;
-
+  resultado.innerHTML =
+    `Valor total a pagar: R$ ${total.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
 }
 
 valorInput.addEventListener("input", calcularTotal);
@@ -502,7 +506,5 @@ function confirmarGarantia(){
 }
   
 </script>
-
-
 </body>
 </html>
