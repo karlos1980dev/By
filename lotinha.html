@@ -135,9 +135,9 @@ button:disabled{
   </div>
 
   <div class="game-buttons">
-    <button onclick="navegar('https://supermania.netlify.app/supermania')">SUPER MANIA</button>
-    <button onclick="navegar('https://supermania.netlify.app/seninha')">SENINHA</button>
-    <button onclick="navegar('https://supermania.netlify.app/quininha')">QUININHA</button>
+    <button style="display:none" onclick="navegar('https://supermania.netlify.app/supermania')">SUPER MANIA</button>
+    <button style="display:none" onclick="navegar('https://supermania.netlify.app/seninha')">SENINHA</button>
+    <button style="display:none" onclick="navegar('https://supermania.netlify.app/quininha')">QUININHA</button>
   </div>
 <div id="avisoHorario" class="horario-marcacao">
   Verificando horário das marcações...
@@ -270,13 +270,13 @@ const PIX_CONFIG = {
 };
 
 const valores = {
-  17:7000,
-  18:1300,
-  19:300,
+  17:6000,
+  18:1200,
+  19:250,
   20:100,
-  21:30,
+  21:20,
   22:10,
-  23:4
+  23:5
 };
 
 const gruposValidos = [17,18,19,20,21,22,23];
