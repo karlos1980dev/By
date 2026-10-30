@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#180018">
+<title>Admin - LOTINHA</title>
+
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-database-compat.js"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#100010;color:#fff;padding:12px}
+.container{max-width:1100px;margin:auto}
+header{background:linear-gradient(135deg,#ff009f,#8c0067);padding:20px;border-radius:15px;margin-bottom:15px;box-shadow:0 5px 20px #ff009f30}
+header h1{color:#ffdd00;font-size:27px}
+header p{margin-top:7px;font-size:13px}
+.topo{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.status-conexao{font-size:12px;margin-top:12px;color:#ffdd00;overflow-wrap:anywhere}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:15px}
+.card{background:#210b21;border:1px solid #6c285f;border-radius:12px;padding:14px;min-width:0}
+.card small{display:block;color:#cbb9ca;font-size:12px}
+.card strong{display:block;margin-top:9px;color:#ffdd00;font-size:21px;overflow-wrap:anywhere}
+.painel{background:#210b21;border:1px solid #6c285f;padding:14px;border-radius:12px;margin-bottom:15px}
+h2{font-size:17px;margin-bottom:12px;color:#ffdd00}
+.filtros{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-bottom:12px}
+input,select{width:100%;min-width:0;padding:12px;border:1px solid #804070;border-radius:8px;background:#100010;color:#fff;font-size:14px;outline:none}
+input:focus,select:focus{border-color:#ff009f}
+button{border:0;border-radius:7px;padding:10px;font-weight:bold;cursor:pointer;font-size:12px}
+button:disabled{opacity:.5;cursor:wait}
+.btn-atualizar{background:#ffdd00;color:#000}
+.btn-pago{background:#00c853;color:#001b0a}
+.btn-pendente{background:#ffb300;color:#231600}
+.btn-copiar{background:#ff009f;color:white}
+.lista{display:grid;gap:12px}
+.aposta{background:#160716;border:1px solid #583052;border-radius:12px;padding:14px;min-width:0}
+.aposta-topo{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.codigo{font-size:17px;color:#ffdd00;font-weight:bold;overflow-wrap:anywhere}
+.badge{display:inline-block;padding:6px 9px;border-radius:20px;font-size:11px;font-weight:bold}
+.badge-pendente{background:#ffb300;color:#000}
+.badge-pago{background:#00c853;color:#001b0a}
+.badge-ganhou{background:#00c853;color:#001b0a}
+.badge-perdeu{background:#d50000;color:white}
+.dados{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.dado{min-width:0;overflow-wrap:anywhere}
+.dado small{display:block;color:#bbaabb;font-size:11px;margin-bottom:5px}
+.dado strong{font-size:14px;overflow-wrap:anywhere;word-break:break-word}
+.secao-cliente{border:1px solid #703064;background:#260b26;border-radius:10px;padding:12px;margin-bottom:12px}
+.secao-cliente h3{color:#ffdd00;font-size:14px;margin-bottom:12px}
+.pix-linha{display:flex;gap:7px;align-items:stretch;margin-top:6px}
+.pix-linha .pix-texto{flex:1;min-width:0;padding:10px;background:#100010;border:1px solid #583052;border-radius:7px;font-size:13px;overflow-wrap:anywhere;word-break:break-word}
+.pix-linha button{flex-shrink:0}
+.numeros{padding:10px;background:#290d29;border-radius:8px;margin-bottom:12px;line-height:1.8;overflow-wrap:anywhere;word-break:break-word}
+.acoes{display:flex;gap:7px;flex-wrap:wrap}
+.acoes button{flex:1;min-width:140px}
+.vazio{text-align:center;padding:30px;color:#d2bfd2}
+.erro{color:#ff7777}
+.aviso{font-size:12px;color:#ffd6ef;line-height:1.6;margin-top:10px}
+.rodape{text-align:center;font-size:11px;color:#a996a9;padding:15px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#ffdd00;color:#160016;padding:12px 18px;border-radius:9px;font-size:13px;font-weight:bold;z-index:9999;box-shadow:0 5px 20px #0008;display:none;max-width:90%;text-align:center}
+.resultado-admin{background:#160716;border:2px solid #ffdd00;border-radius:12px;padding:15px;margin-bottom:15px}
+.resultado-admin h2{color:#ffdd00;margin-bottom:12px}
+.resultado-admin label{display:block;margin:12px 0 6px;font-size:13px;font-weight:bold}
+.resultado-admin input,.resultado-admin textarea{width:100%;padding:12px;border:1px solid #804070;border-radius:8px;background:#100010;color:white;font-size:15px}
+.resultado-admin textarea{min-height:90px;resize:vertical}
+.resultado-admin button{width:100%;margin-top:12px;padding:14px;background:#00c853;color:#001b0a;font-weight:900}
+.resultado-atual{margin-top:12px;padding:12px;background:#290d29;border-radius:8px;color:#ffdd00;line-height:1.8;overflow-wrap:anywhere;white-space:pre-line}
+.resultado-atual strong{display:block;margin-bottom:5px}
+.conferencia-aposta{border:1px solid #6c285f}
+
+@media(max-width:700px){
+ body{padding:7px}
+ header{padding:15px}
+ header h1{font-size:23px}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .card{padding:12px}
+ .card strong{font-size:19px}
+ .filtros{grid-template-columns:1fr}
+ .dados{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+ .painel{padding:10px}
+ .aposta{padding:11px}
+ .pix-linha{flex-direction:column}
+ .pix-linha button{width:100%}
+ .acoes button{min-width:100%}
+}
+@media(max-width:350px){
+ .dados{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+ <div class="topo">
+  <div>
+   <h1>🍀 LOTINHA ADMIN</h1>
+   <p>Painel de gerenciamento de apostas</p>
+  </div>
+  <button class="btn-atualizar" id="btnAtualizar" type="button">↻ ATUALIZAR</button>
+ </div>
+ <div class="status-conexao" id="conexao">● Conectando ao Firebase...</div>
+</header>
+
+<section class="resultado-admin">
+ <h2>🎯 PUBLICAR RESULTADO LOTINHA</h2>
+
+ <label for="dataResultado">Data do sorteio</label>
+ <input type="date" id="dataResultado">
+
+ <label for="extracaoResultado">Extração</label>
+ <input type="text" id="extracaoResultado" value="21:00" readonly>
+
+ <label for="numerosResultado">15 números sorteados (01 a 25)</label>
+ <textarea id="numerosResultado" placeholder="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15"></textarea>
+
+ <button id="btnSalvarResultado" type="button">💾 PUBLICAR RESULTADO</button>
+
+ <div class="resultado-atual">
+  <strong>RESULTADO DA DATA SELECIONADA</strong>
+  <div id="resultadoAtual">Nenhum resultado cadastrado.</div>
+ </div>
+
+ <div class="resultado-atual">
+  <strong>CONFERÊNCIA GERAL</strong>
+  <div id="resumoConferencia">Aguardando resultado.</div>
+ </div>
+</section>
+
+<section class="grid">
+ <div class="card">
+  <small>Total de apostas</small>
+  <strong id="totalApostas">0</strong>
+ </div>
+
+ <div class="card">
+  <small>Aguardando pagamento</small>
+  <strong id="totalPendentes">0</strong>
+ </div>
+
+ <div class="card">
+  <small>Pagamentos confirmados</small>
+  <strong id="totalPagos">0</strong>
+ </div>
+
+ <div class="card">
+  <small>Valor recebido confirmado</small>
+  <strong id="valorRecebido">R$ 0,00</strong>
+ </div>
+</section>
+
+<section class="painel">
+ <h2>🔎 Buscar apostas e clientes</h2>
+
+ <div class="filtros">
+  <input id="busca" type="search" placeholder="Nome, Pix, telefone, código ou número..." autocomplete="off">
+
+  <select id="filtroStatus">
+   <option value="TODOS">Todos os pagamentos</option>
+   <option value="PENDENTE">Aguardando pagamento</option>
+   <option value="PAGO">Pagamento confirmado</option>
+  </select>
+ </div>
+
+ <div id="resumoFiltro" style="font-size:12px;color:#cbb9ca">
+  Carregando apostas...
+ </div>
+
+ <div class="aviso">
+  Os dados pessoais exibidos são os que estiverem gravados no Firebase. Se o nome, telefone ou Pix não estiverem cadastrados na aposta, será necessário salvar esses campos também na página principal.
+ </div>
+</section>
+
+<section class="painel">
+ <h2>📋 Apostas registradas</h2>
+ <div id="listaApostas" class="lista">
+  <div class="vazio">Carregando dados do Firebase...</div>
+ </div>
+</section>
+
+<div class="rodape">LOTINHA • Painel administrativo • Firebase Realtime Database</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* FIREBASE */
+const firebaseConfig = {
+ databaseURL:"https://loteriasmj-274f9-default-rtdb.firebaseio.com/"
+};
+
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+const db=firebase.database();
+const apostasRef=db.ref("apostas/LOTINHA");
+const resultadosRef=db.ref("resultados/LOTINHA");
+
+/* ELEMENTOS E ESTADO */
+const el=id=>document.getElementById(id);
+
+let apostas={};
+let resultadosPorData={};
+let listenerApostasAtivo=false;
+let toastTimer=null;
+
+const EXTRACAO_LOTINHA="21:00";
+
+/* UTILITÁRIOS */
+function moeda(valor){
+ return Number(valor||0).toLocaleString("pt-BR",{
+  style:"currency",
+  currency:"BRL"
+ });
+}
+
+function textoSeguro(valor){
+ return String(valor??"").replace(/[&<>"']/g,l=>({
+  "&":"&amp;",
+  "<":"&lt;",
+  ">":"&gt;",
+  '"':"&quot;",
+  "'":"&#39;"
+ }[l]));
+}
+
+function valorCampo(obj,campos){
+ for(const campo of campos){
+  const v=obj&&obj[campo];
+
+  if(v!==undefined&&v!==null&&String(v).trim()!==""){
+   if(typeof v!=="object") return String(v).trim();
+  }
+ }
+
+ return "";
+}
+
+function obterNome(a){
+ return valorCampo(a,[
+  "nome","nomeCliente","nomeCompleto","nomeApostador",
+  "apostador","clienteNome","cliente","usuarioNome"
+ ]);
+}
+
+function obterPix(a){
+ return valorCampo(a,[
+  "chavePix","pix","pixKey","chave","chaveDoPix",
+  "pixCliente","chavePixCliente","dadosPix"
+ ]);
+}
+
+function obterTipoPix(a){
+ return valorCampo(a,[
+  "tipoPix","tipoChavePix","tipoChave","pixTipo","tipoDaChave"
+ ]);
+}
+
+function obterTelefone(a){
+ return valorCampo(a,[
+  "telefone","celular","whatsapp","numeroTelefone",
+  "telefoneCliente","contato"
+ ]);
+}
+
+function obterDocumento(a){
+ return valorCampo(a,["cpf","documento","cpfCliente"]);
+}
+
+function normalizarStatus(a){
+ return String(a.statusPagamento||"PENDENTE").toUpperCase()==="PAGO"
+  ?"PAGO":"PENDENTE";
+}
+
+function dataOrdenacao(a){
+ return Number(a.criadoEm||a.timestamp||a.dataCriacao||0);
+}
+
+function mostrarToast(msg){
+ const t=el("toast");
+ t.textContent=msg;
+ t.style.display="block";
+
+ clearTimeout(toastTimer);
+
+ toastTimer=setTimeout(()=>{
+  t.style.display="none";
+ },2800);
+}
+
+function dataISOAtual(){
+ const p=new Intl.DateTimeFormat("en-CA",{
+  timeZone:"America/Sao_Paulo",
+  year:"numeric",
+  month:"2-digit",
+  day:"2-digit"
+ }).formatToParts(new Date());
+
+ const o={};
+ p.forEach(x=>o[x.type]=x.value);
+
+ return `${o.year}-${o.month}-${o.day}`;
+}
+
+function formatarDataBR(iso){
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(String(iso||"")))return "-";
+
+ const [a,m,d]=iso.split("-");
+
+ return `${d}/${m}/${a}`;
+}
+
+function normalizarNumerosResultado(texto){
+ const partes=String(texto||"")
+  .trim()
+  .split(/[\s,;.-]+/)
+  .filter(Boolean);
+
+ const nums=partes.map(x=>Number(x));
+
+ if(nums.length!==15){
+  throw new Error("Informe exatamente 15 números.");
+ }
+
+ if(nums.some(n=>!Number.isInteger(n)||n<1||n>25)){
+  throw new Error("Use somente números de 01 a 25.");
+ }
+
+ if(new Set(nums).size!==15){
+  throw new Error("Não pode repetir números no resultado.");
+ }
+
+ return nums
+  .sort((a,b)=>a-b)
+  .map(n=>String(n).padStart(2,"0"));
+}
+
+/* IDENTIFICA A DATA DA APOSTA */
+function chaveDataAposta(a){
+ const d=String(a.data||"").trim();
+
+ if(/^\d{4}-\d{2}-\d{2}$/.test(d))return d;
+
+ const m=d.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+
+ return m?`${m[3]}-${m[2]}-${m[1]}`:"";
+}
+
+/* CONFERE A APOSTA COM O RESULTADO DA MESMA DATA */
+function conferirAposta(a){
+ const data=chaveDataAposta(a);
+
+ const extracao=String(
+  a.extracao||EXTRACAO_LOTINHA
+ ).trim();
+
+ if(!data||extracao!==EXTRACAO_LOTINHA)return null;
+
+ const r=resultadosPorData[data];
+
+ if(!r||!Array.isArray(r.numeros))return null;
+
+ const sorteados=new Set(
+  r.numeros.map(n=>String(n).padStart(2,"0"))
+ );
+
+ const apostados=Array.isArray(a.numeros)
+  ?a.numeros.map(n=>String(n).padStart(2,"0"))
+  :String(a.numeros||"")
+    .split(/[\s,;.-]+/)
+    .filter(Boolean)
+    .map(n=>String(n).padStart(2,"0"));
+
+ const acertos=apostados.filter(n=>sorteados.has(n)).length;
+
+ return {
+  acertos,
+  status:acertos===15?"GANHOU":"PERDEU",
+  data
+ };
+}
+
+/* PUBLICAR RESULTADO */
+async function salvarResultado(){
+ const botao=el("btnSalvarResultado");
+
+ try{
+  const data=el("dataResultado").value;
+
+  if(!data){
+   throw new Error("Selecione a data do sorteio.");
+  }
+
+  const numeros=normalizarNumerosResultado(
+   el("numerosResultado").value
+  );
+
+  botao.disabled=true;
+  botao.textContent="PUBLICANDO...";
+
+  const registro={
+   data:formatarDataBR(data),
+   dataISO:data,
+   extracao:EXTRACAO_LOTINHA,
+   numeros,
+   atualizadoEm:firebase.database.ServerValue.TIMESTAMP
+  };
+
+  await resultadosRef.child(data).set(registro);
+
+  el("numerosResultado").value=numeros.join(" ");
+
+  mostrarToast("Resultado publicado! As apostas desta data foram conferidas.");
+
+ }catch(e){
+  mostrarToast(e.message||"Erro ao publicar resultado.");
+ }finally{
+  botao.disabled=false;
+  botao.textContent="💾 PUBLICAR RESULTADO";
+ }
+}
+
+/* MOSTRAR RESULTADO DA DATA SELECIONADA */
+function mostrarResultadoSelecionado(){
+ const data=el("dataResultado").value;
+ const r=resultadosPorData[data];
+
+ if(!r){
+  el("resultadoAtual").textContent="Nenhum resultado publicado para esta data.";
+  el("numerosResultado").value="";
+  return;
+ }
+
+ el("numerosResultado").value=Array.isArray(r.numeros)
+  ?r.numeros.join(" ")
+  :"";
+
+ el("resultadoAtual").textContent=
+  `${r.data||formatarDataBR(data)} • Extração ${r.extracao||EXTRACAO_LOTINHA}\n${(r.numeros||[]).join(" - ")}`;
+}
+
+/* RESUMO DA CONFERÊNCIA */
+function atualizarResumoConferencia(){
+ const conferidas=Object.values(apostas)
+  .filter(a=>a&&conferirAposta(a))
+  .map(a=>conferirAposta(a));
+
+ const ganhou=conferidas.filter(c=>c.status==="GANHOU").length;
+ const perdeu=conferidas.filter(c=>c.status==="PERDEU").length;
+
+ el("resumoConferencia").textContent=
+  `${conferidas.length} conferidas • ${ganhou} ganharam • ${perdeu} perderam`;
+}
+
+/* COPIAR PIX */
+async function copiarTexto(texto){
+ texto=String(texto||"").trim();
+
+ if(!texto){
+  mostrarToast("Não há informação para copiar.");
+  return;
+ }
+
+ try{
+  if(navigator.clipboard&&window.isSecureContext){
+   await navigator.clipboard.writeText(texto);
+  }else{
+   const c=document.createElement("textarea");
+
+   c.value=texto;
+   c.style.position="fixed";
+   c.style.left="-9999px";
+   c.setAttribute("readonly","");
+
+   document.body.appendChild(c);
+   c.select();
+   c.setSelectionRange(0,c.value.length);
+
+   const ok=document.execCommand("copy");
+
+   c.remove();
+
+   if(!ok)throw new Error("Falha ao copiar");
+  }
+
+  mostrarToast("Copiado com sucesso!");
+
+ }catch(e){
+  mostrarToast("Não foi possível copiar automaticamente.");
+ }
+}
+
+/* RESUMO FINANCEIRO */
+function atualizarResumo(){
+ const lista=Object.values(apostas)
+  .filter(a=>a&&typeof a==="object");
+
+ const pendentes=lista.filter(a=>normalizarStatus(a)==="PENDENTE");
+ const pagos=lista.filter(a=>normalizarStatus(a)==="PAGO");
+
+ const recebido=pagos.reduce(
+  (s,a)=>s+Number(a.valorDigitado||0),
+  0
+ );
+
+ el("totalApostas").textContent=lista.length;
+ el("totalPendentes").textContent=pendentes.length;
+ el("totalPagos").textContent=pagos.length;
+ el("valorRecebido").textContent=moeda(recebido);
+
+ atualizarResumoConferencia();
+}
+
+/* RENDERIZAR APOSTAS */
+function renderizarApostas(){
+ const lista=el("listaApostas");
+
+ const busca=el("busca").value
+  .trim()
+  .toLocaleLowerCase("pt-BR");
+
+ const filtro=el("filtroStatus").value;
+
+ const entradas=Object.entries(apostas)
+  .filter(([id,a])=>a&&typeof a==="object")
+  .sort((x,y)=>dataOrdenacao(y[1])-dataOrdenacao(x[1]));
+
+ const filtradas=entradas.filter(([id,a])=>{
+  const status=normalizarStatus(a);
+
+  if(filtro!=="TODOS"&&filtro!==status)return false;
+
+  const nums=Array.isArray(a.numeros)
+   ?a.numeros.join(" ")
+   :String(a.numeros||"");
+
+  const conteudo=[
+   id,
+   a.numeroControle,
+   obterNome(a),
+   obterPix(a),
+   obterTipoPix(a),
+   obterTelefone(a),
+   obterDocumento(a),
+   a.valorDigitado,
+   a.totalReceber,
+   a.data,
+   a.hora,
+   nums,
+   a.extracao,
+   a.nomeJogo
+  ].join(" ").toLocaleLowerCase("pt-BR");
+
+  return conteudo.includes(busca);
+ });
+
+ el("resumoFiltro").textContent=
+  `${filtradas.length} aposta(s) encontrada(s)`;
+
+ if(!filtradas.length){
+  lista.innerHTML='<div class="vazio">Nenhuma aposta encontrada.</div>';
+  return;
+ }
+
+ lista.innerHTML=filtradas.map(([id,a])=>{
+  const status=normalizarStatus(a);
+
+  const nums=Array.isArray(a.numeros)
+   ?a.numeros.join(" • ")
+   :String(a.numeros||"");
+
+  const nome=obterNome(a);
+  const pix=obterPix(a);
+  const tipoPix=obterTipoPix(a);
+  const telefone=obterTelefone(a);
+  const documento=obterDocumento(a);
+
+  const conferencia=conferirAposta(a);
+
+  const conferenciaHTML=conferencia?`
+   <div class="numeros conferencia-aposta">
+    <strong>🎯 CONFERÊNCIA DO RESULTADO • ${textoSeguro(formatarDataBR(conferencia.data))}</strong><br>
+    Acertos: <strong>${conferencia.acertos} de 15</strong><br>
+    <span class="badge ${conferencia.status==="GANHOU"?"badge-ganhou":"badge-perdeu"}">${conferencia.status}</span>
+   </div>
+  `:`
+   <div class="numeros conferencia-aposta">
+    <strong>🎯 CONFERÊNCIA</strong><br>
+    Aguardando resultado da data ${textoSeguro(a.data||"-")} • Extração ${textoSeguro(a.extracao||EXTRACAO_LOTINHA)}
+   </div>
+  `;
+
+  const badgeClass=status==="PAGO"?"badge-pago":"badge-pendente";
+
+  const statusTexto=status==="PAGO"
+   ?"PAGAMENTO CONFIRMADO"
+   :"AGUARDANDO PAGAMENTO";
+
+  return `
+  <article class="aposta">
+
+   <div class="aposta-topo">
+    <div>
+     <div class="codigo">🎫 Código: ${textoSeguro(a.numeroControle||id)}</div>
+     <div style="font-size:12px;color:#cbb9ca;margin-top:6px">
+      📅 ${textoSeguro(a.data||"Data não informada")} ${textoSeguro(a.hora||"")}
+     </div>
+    </div>
+
+    <span class="badge ${badgeClass}">${statusTexto}</span>
+   </div>
+
+   <section class="secao-cliente">
+    <h3>👤 Dados do apostador</h3>
+
+    <div class="dados">
+     <div class="dado">
+      <small>Nome do apostador</small>
+      <strong>${textoSeguro(nome||"Não informado")}</strong>
+     </div>
+
+     <div class="dado">
+      <small>Telefone / contato</small>
+      <strong>${textoSeguro(telefone||"Não informado")}</strong>
+     </div>
+
+     <div class="dado">
+      <small>CPF / documento</small>
+      <strong>${textoSeguro(documento||"Não informado")}</strong>
+     </div>
+    </div>
+
+    <div class="dado">
+     <small>Chave Pix do apostador</small>
+
+     <div class="pix-linha">
+      <div class="pix-texto">${textoSeguro(pix||"Chave Pix não cadastrada")}</div>
+
+      ${pix?`
+       <button type="button" class="btn-copiar"
+        data-acao="copiar-pix"
+        data-id="${textoSeguro(id)}">
+        📋 COPIAR PIX
+       </button>
+      `:""}
+     </div>
+    </div>
+
+    ${tipoPix?`
+     <div class="dado" style="margin-top:12px">
+      <small>Tipo da chave Pix</small>
+      <strong>${textoSeguro(tipoPix)}</strong>
+     </div>
+    `:""}
+
+    ${!nome&&!pix&&!telefone?`
+     <div class="aviso">
+      ⚠️ Nome, Pix e telefone não foram encontrados nos campos conhecidos deste registro.
+     </div>
+    `:""}
+
+   </section>
+
+   <div class="numeros">
+    <strong>🔢 Números apostados:</strong><br>
+    ${textoSeguro(nums||"Não informado")}
+   </div>
+
+   ${conferenciaHTML}
+
+   <div class="dados">
+    <div class="dado">
+     <small>Quantidade</small>
+     <strong>${textoSeguro(a.quantidade??(Array.isArray(a.numeros)?a.numeros.length:0))}</strong>
+    </div>
+
+    <div class="dado">
+     <small>Valor da aposta</small>
+     <strong>${moeda(a.valorDigitado)}</strong>
+    </div>
+
+    <div class="dado">
+     <small>Prêmio possível</small>
+     <strong>${moeda(a.totalReceber)}</strong>
+    </div>
+
+    <div class="dado">
+     <small>Extração</small>
+     <strong>${textoSeguro(a.extracao||EXTRACAO_LOTINHA)}</strong>
+    </div>
+
+    <div class="dado">
+     <small>Jogo</small>
+     <strong>${textoSeguro(a.nomeJogo||"LOTINHA")}</strong>
+    </div>
+
+    <div class="dado">
+     <small>Identificação Firebase</small>
+     <strong>${textoSeguro(id)}</strong>
+    </div>
+   </div>
+
+   <div class="acoes">
+    ${status!=="PAGO"?`
+     <button type="button" class="btn-pago"
+      data-acao="status"
+      data-status="PAGO"
+      data-id="${textoSeguro(id)}">
+      ✓ CONFIRMAR PAGAMENTO
+     </button>
+    `:`
+     <button type="button" class="btn-pendente"
+      data-acao="status"
+      data-status="PENDENTE"
+      data-id="${textoSeguro(id)}">
+      ↻ VOLTAR PARA PENDENTE
+     </button>
+    `}
+   </div>
+
+  </article>
+  `;
+ }).join("");
+}
+
+/* ALTERAR PAGAMENTO */
+async function alterarPagamento(id,novoStatus,botao){
+ const a=apostas[id];
+
+ if(!a){
+  alert("Aposta não encontrada.");
+  return;
+ }
+
+ if(!["PAGO","PENDENTE"].includes(novoStatus)){
+  alert("Status inválido.");
+  return;
+ }
+
+ if(novoStatus==="PAGO"){
+  const ok=confirm(
+   "Confirma que recebeu o Pix desta aposta?\n\n"+
+   "Apostador: "+(obterNome(a)||"Não informado")+"\n"+
+   "Código: "+(a.numeroControle||id)+"\n"+
+   "Valor: "+moeda(a.valorDigitado)+"\n\n"+
+   "Confirme somente após verificar o recebimento."
+  );
+
+  if(!ok)return;
+
+ }else if(!confirm("Deseja voltar esta aposta para pendente?")){
+  return;
+ }
+
+ if(botao)botao.disabled=true;
+
+ try{
+  await apostasRef.child(id).update({
+   statusPagamento:novoStatus,
+   atualizadoEm:firebase.database.ServerValue.TIMESTAMP
+  });
+
+  mostrarToast(
+   novoStatus==="PAGO"
+    ?"Pagamento confirmado."
+    :"Aposta voltou para pendente."
+  );
+
+ }catch(e){
+  alert("Erro ao atualizar: "+e.message);
+
+ }finally{
+  if(botao)botao.disabled=false;
+ }
+}
+
+/* CLIQUES NOS BOTÕES DAS APOSTAS */
+el("listaApostas").addEventListener("click",event=>{
+ const b=event.target.closest("button[data-acao]");
+
+ if(!b)return;
+
+ const acao=b.dataset.acao;
+ const id=b.dataset.id;
+
+ if(acao==="copiar-pix"){
+  const a=apostas[id];
+
+  if(!a){
+   mostrarToast("Aposta não encontrada.");
+   return;
+  }
+
+  copiarTexto(obterPix(a));
+ }
+
+ if(acao==="status"){
+  alterarPagamento(id,b.dataset.status,b);
+ }
+});
+
+/* FIREBASE - APOSTAS */
+function receberApostas(snapshot){
+ apostas=snapshot.val()||{};
+
+ el("conexao").textContent=
+  "● Firebase conectado • Atualização em tempo real";
+
+ atualizarResumo();
+ renderizarApostas();
+}
+
+function carregarApostas(){
+ el("conexao").textContent="● Atualizando informações...";
+
+ if(listenerApostasAtivo){
+  apostasRef.off("value",receberApostas);
+ }
+
+ listenerApostasAtivo=true;
+
+ apostasRef.on("value",receberApostas,error=>{
+  el("conexao").innerHTML=
+   '<span class="erro">● Erro: '+textoSeguro(error.message)+'</span>';
+
+  el("listaApostas").innerHTML=
+   '<div class="vazio">Não foi possível carregar as apostas. Verifique a conexão e as regras de acesso do Firebase.</div>';
+
+  el("resumoFiltro").textContent="Falha ao carregar os dados.";
+ });
+}
+
+/* FIREBASE - RESULTADOS */
+function receberResultados(snapshot){
+ resultadosPorData=snapshot.val()||{};
+
+ mostrarResultadoSelecionado();
+ atualizarResumo();
+ renderizarApostas();
+}
+
+/* EVENTOS E INICIALIZAÇÃO */
+el("dataResultado").value=dataISOAtual();
+el("extracaoResultado").value=EXTRACAO_LOTINHA;
+
+el("dataResultado").addEventListener(
+ "change",
+ mostrarResultadoSelecionado
+);
+
+el("btnSalvarResultado").addEventListener(
+ "click",
+ salvarResultado
+);
+
+el("btnAtualizar").addEventListener(
+ "click",
+ carregarApostas
+);
+
+el("busca").addEventListener(
+ "input",
+ renderizarApostas
+);
+
+el("filtroStatus").addEventListener(
+ "change",
+ renderizarApostas
+);
+
+resultadosRef.on("value",receberResultados,error=>{
+ el("resultadoAtual").textContent=
+  "Erro ao carregar resultados: "+error.message;
+});
+
+carregarApostas();
+</script>
+</body>
+</html>
