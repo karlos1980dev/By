@@ -87,6 +87,24 @@ button:disabled{opacity:.5;cursor:wait}
 @media(max-width:350px){
  .dados{grid-template-columns:1fr}
 }
+.btn-excluir{
+  background:#d50000;
+  color:#fff;
+  width:38px;
+  height:38px;
+  padding:0;
+  border-radius:9px;
+  font-size:23px;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+
+.btn-excluir:hover{
+  background:#ff1744;
+}
 </style>
 </head>
 
@@ -748,6 +766,13 @@ function renderizarApostas(){
       <article class="aposta">
 
         <div class="aposta-topo">
+            <button type="button"
+  class="btn-excluir"
+  data-acao="excluir"
+  data-id="${textoSeguro(id)}"
+  title="Excluir aposta">
+  ×
+</button>
           <div>
             <div class="codigo">
               🎫 Código: ${textoSeguro(a.numeroControle || id)}
@@ -931,15 +956,58 @@ async function alterarPagamento(id,novoStatus,botao){
   if(botao)botao.disabled=false;
  }
 }
+/* EXCLUIR APOSTA DO FIREBASE */
+async function excluirAposta(id,botao){
+
+  const aposta = apostas[id];
+
+  if(!aposta){
+    mostrarToast("Aposta não encontrada.");
+    return;
+  }
+
+  const confirmar = confirm(
+    "⚠️ DESEJA EXCLUIR ESTA APOSTA?\n\n"+
+    "Cliente: "+(obterNome(aposta)||"Não informado")+"\n"+
+    "Código: "+(aposta.numeroControle||id)+"\n"+
+    "Valor: "+moeda(aposta.valorCobrancaPix||aposta.valorTotal||0)+"\n\n"+
+    "Esta ação excluirá permanentemente o card e seus dados do Firebase."
+  );
+
+  if(!confirmar)return;
+
+  if(botao)botao.disabled=true;
+
+  try{
+
+    await apostasRef.child(id).remove();
+
+    mostrarToast("Aposta excluída com sucesso!");
+
+  }catch(erro){
+
+    console.error("Erro ao excluir:",erro);
+
+    mostrarToast("Erro ao excluir aposta: "+erro.message);
+
+    if(botao)botao.disabled=false;
+  }
+}
 
 /* CLIQUES NOS BOTÕES DAS APOSTAS */
 el("listaApostas").addEventListener("click",event=>{
+
  const b=event.target.closest("button[data-acao]");
 
  if(!b)return;
 
  const acao=b.dataset.acao;
  const id=b.dataset.id;
+
+ if(acao==="excluir"){
+  excluirAposta(id,b);
+  return;
+ }
 
  if(acao==="copiar-pix"){
   const a=apostas[id];
@@ -950,11 +1018,14 @@ el("listaApostas").addEventListener("click",event=>{
   }
 
   copiarTexto(obterPix(a));
+  return;
  }
 
  if(acao==="status"){
   alterarPagamento(id,b.dataset.status,b);
+  return;
  }
+
 });
 
 /* FIREBASE - APOSTAS */
