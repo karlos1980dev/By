@@ -223,7 +223,10 @@ let resultadosPorData={};
 let listenerApostasAtivo=false;
 let toastTimer=null;
 
-const EXTRACAO_LOTINHA="21:00";
+function extracaoPorData(dataISO){
+ const data=new Date(dataISO+"T12:00:00Z");
+ return data.getUTCDay()===6?"11:00":"21:00";
+}
 
 /* UTILITÁRIOS */
 function moeda(valor){
@@ -367,63 +370,61 @@ function chaveDataAposta(a){
 
 /* CONFERE A APOSTA COM O RESULTADO DA MESMA DATA */
 function conferirAposta(a){
-  const data = chaveDataAposta(a);
 
-  const extracao = String(
-    a.extracao || EXTRACAO_LOTINHA
-  ).trim();
+ const data=chaveDataAposta(a);
 
-  if(!data || extracao !== EXTRACAO_LOTINHA) return null;
+ if(!data)return null;
 
-  const r = resultadosPorData[data];
+ const horarioEsperado=extracaoPorData(data);
 
-  if(!r || !Array.isArray(r.numeros)) return null;
+ const extracao=String(
+  a.extracao||horarioEsperado
+ ).trim();
 
-  const sorteados = new Set(
-    r.numeros.map(n => String(n).padStart(2,"0"))
+ if(extracao!==horarioEsperado)return null;
+
+ const r=resultadosPorData[data];
+
+ if(!r||!Array.isArray(r.numeros))return null;
+
+ const sorteados=new Set(
+  r.numeros.map(n=>String(n).padStart(2,"0"))
+ );
+
+ const jogos=Array.isArray(a.jogos)
+  ?a.jogos
+  :[{numeros:a.numeros||[]}];
+
+ const conferencias=jogos.map((jogo,index)=>{
+
+  const numeros=(jogo.numeros||[]).map(
+   n=>String(n).padStart(2,"0")
   );
 
-  const jogos = Array.isArray(a.jogos)
-    ? a.jogos
-    : [{
-        numeros: Array.isArray(a.numeros)
-          ? a.numeros
-          : String(a.numeros || "")
-              .split(/[\s,;.-]+/)
-              .filter(Boolean)
-      }];
-
-  const conferencias = jogos.map((jogo,index) => {
-
-    const numeros = (jogo.numeros || []).map(
-      n => String(n).padStart(2,"0")
-    );
-
-    const acertos = numeros.filter(
-      n => sorteados.has(n)
-    ).length;
-
-    return {
-      jogo: index + 1,
-      numeros,
-      acertos,
-      status: acertos === 15 ? "GANHOU" : "PERDEU"
-    };
-  });
+  const acertos=numeros.filter(
+   n=>sorteados.has(n)
+  ).length;
 
   return {
-    data,
-    jogos: conferencias,
-    quantidade: conferencias.length,
-    ganhadores: conferencias.filter(
-      j => j.status === "GANHOU"
-    ).length,
-    perdedores: conferencias.filter(
-      j => j.status === "PERDEU"
-    ).length
+   jogo:index+1,
+   numeros,
+   acertos,
+   status:acertos>=15?"GANHOU":"PERDEU"
   };
-}
+ });
 
+ return {
+  data,
+  jogos:conferencias,
+  quantidade:conferencias.length,
+  ganhadores:conferencias.filter(
+   j=>j.status==="GANHOU"
+  ).length,
+  perdedores:conferencias.filter(
+   j=>j.status==="PERDEU"
+  ).length
+ };
+}
 /* PUBLICAR RESULTADO */
 async function salvarResultado(){
  const botao=el("btnSalvarResultado");
@@ -445,7 +446,7 @@ async function salvarResultado(){
   const registro={
    data:formatarDataBR(data),
    dataISO:data,
-   extracao:EXTRACAO_LOTINHA,
+   extracao:extracaoPorData(data),
    numeros,
    atualizadoEm:firebase.database.ServerValue.TIMESTAMP
   };
@@ -480,7 +481,7 @@ function mostrarResultadoSelecionado(){
   :"";
 
  el("resultadoAtual").textContent=
-  `${r.data||formatarDataBR(data)} • Extração ${r.extracao||EXTRACAO_LOTINHA}\n${(r.numeros||[]).join(" - ")}`;
+  `${r.data||formatarDataBR(data)} • Extração ${r.extracao||extracaoPorData(data)}\n${(r.numeros||[]).join(" - ")}`;
 }
 
 /* RESUMO DA CONFERÊNCIA */
@@ -742,18 +743,17 @@ function renderizarApostas(){
         </div>
       `;
 
-    }else{
+     }else{
 
       conferenciaHTML = `
         <div class="numeros conferencia-aposta">
           <strong>🎯 CONFERÊNCIA</strong><br>
           Aguardando resultado da data
           ${textoSeguro(a.data || "-")}
-          • Extração ${textoSeguro(a.extracao || EXTRACAO_LOTINHA)}
+          • Extração ${textoSeguro(a.extracao || extracaoPorData(chaveDataAposta(a)))}
         </div>
       `;
     }
-
     const badgeClass = status === "PAGO"
       ? "badge-pago"
       : "badge-pendente";
@@ -868,7 +868,7 @@ function renderizarApostas(){
 
           <div class="dado">
             <small>Extração</small>
-            <strong>${textoSeguro(a.extracao || EXTRACAO_LOTINHA)}</strong>
+            <strong>${textoSeguro(a.extracao || extracaoPorData(chaveDataAposta(a)))}</strong>
           </div>
 
           <div class="dado">
@@ -1070,12 +1070,21 @@ function receberResultados(snapshot){
 
 /* EVENTOS E INICIALIZAÇÃO */
 el("dataResultado").value=dataISOAtual();
-el("extracaoResultado").value=EXTRACAO_LOTINHA;
 
-el("dataResultado").addEventListener(
- "change",
- mostrarResultadoSelecionado
-);
+function atualizarCampoExtracao(){
+ const data=el("dataResultado").value;
+
+ el("extracaoResultado").value=data
+  ?extracaoPorData(data)
+  :"";
+}
+
+atualizarCampoExtracao();;
+
+el("dataResultado").addEventListener("change",()=>{
+ atualizarCampoExtracao();
+ mostrarResultadoSelecionado();
+});
 
 el("btnSalvarResultado").addEventListener(
  "click",
