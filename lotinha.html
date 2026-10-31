@@ -1658,7 +1658,9 @@ valoresDiv.innerHTML = `
   💵 Valor por jogo: <strong style="color:#ffdd00">${reais(valorJogo)}</strong>
   🏆 Prêmio por jogo: <strong style="color:#00ff88">${reais(premio)}</strong>
   🎲 Quantidade de jogos: <strong>${jogos.length}</strong>
-  💳 Total pago: <strong>${reais(aposta.valorCobrancaPix ?? aposta.valorTotal)}</strong>`;
+  💳 Total pago: <strong>${reais(aposta.valorCobrancaPix ?? aposta.valorTotal)}</strong>
+  🏆 Prêmio total possível: <strong style="color:#00ff88">${reais(aposta.totalReceber)}</strong>
+  `;
 
 dadosDiv.appendChild(valoresDiv);
 
