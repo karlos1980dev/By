@@ -91,6 +91,7 @@ button{cursor:pointer}
   border: 1px solid #69f0ae;
 }
 .horario-marcacao{
+display:none;
   margin:10px 0;
   padding:12px;
   border:2px solid #ffdd00;
@@ -167,6 +168,40 @@ button:disabled{
   color:#ffdd00;
   font-size:12px;
   white-space:nowrap;
+}
+
+.btn-ajudar{
+    width:100%;
+    padding:10px 12px;
+}
+
+.btn-ajudar .ajudar{
+    width:100%;
+    padding:13px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(135deg,#ff00cc,#9900ff);
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    letter-spacing:1px;
+    cursor:pointer;
+    box-shadow:0 0 10px #ff00cc;
+    animation:brilhoAjudar 1.5s infinite alternate;
+}
+
+@keyframes brilhoAjudar{
+    from{box-shadow:0 0 5px #ff00cc;}
+    to{box-shadow:0 0 18px #ff00cc,0 0 25px #9900ff;}
+}
+.btn-ajudar .ajudar{
+    text-decoration:none !important;
+    color:#fff !important;
+    display:block;
+    width:100%;
+    text-align:center;
+    border:none;
+    outline:none;
 }
 </style>
 
@@ -249,8 +284,8 @@ button:disabled{
     <div class="bloco">
       <h3>👤 Dados do cliente</h3>
       <div class="linha-info">Nome: <strong id="menuNome">-</strong></div>
-      <div class="linha-info">Telefone: <span id="menuTelefone">-</span></div>
-      <div class="linha-info">Pix do cliente: <span id="menuPixCliente">-</span></div>
+      <div style="display:none;" class="linha-info">Telefone: <span id="menuTelefone">-</span></div>
+      <div class="linha-info">Chave Pix: <span id="menuPixCliente">-</span></div>
       <button style="display:none"class="btn-principal btn-secundario" onclick="abrirPerfil()">Editar cadastro</button>
     </div>
 
@@ -272,6 +307,11 @@ button:disabled{
       <h3>📋 Minhas apostas</h3>
       <div id="listaApostas" class="vazio">Abra o menu para carregar suas apostas.</div>
     </div>
+    <div class="menu-item btn-ajudar">
+    <a class="ajudar" href="https://chat.whatsapp.com/Grz5pXtO9IL5GeWwe3yBRp?s=cl&p=a&mlu=4&ilr=4&iam=2" target="_blank">
+        ❤️ AJUDAR
+    </a>
+</div>
   </aside>
 </div>
 
@@ -285,8 +325,8 @@ button:disabled{
     <label for="nomeCliente">Seu nome completo</label>
     <input id="nomeCliente" maxlength="80" placeholder="Digite seu nome" autocomplete="name">
 
-    <label for="telefoneCliente">Telefone (opcional)</label>
-    <input id="telefoneCliente" type="tel" maxlength="25" placeholder="DDD + telefone" autocomplete="tel">
+    <label style="display:none"for="telefoneCliente">Telefone (opcional)</label>
+    <input style="display:none"id="telefoneCliente" type="tel" maxlength="25" placeholder="DDD + telefone" autocomplete="tel">
 
     <label for="pixCliente">Sua chave Pix (opcional)</label>
     <input id="pixCliente" maxlength="150" placeholder="CPF, telefone, e-mail ou chave aleatória">
@@ -304,7 +344,7 @@ button:disabled{
     <button class="btn-principal" onclick="salvarPerfil()">SALVAR CADASTRO</button>
     <button id="cancelarPerfil" class="btn-principal btn-secundario" onclick="fecharPerfil()">Cancelar</button>
 
-    <p>A chave Pix cadastrada aqui pertence ao cliente. O pagamento da aposta será gerado com a chave Pix do recebedor configurada no sistema.</p>
+    
   </div>
 </div>
 
@@ -782,6 +822,12 @@ function salvarPerfil() {
     return;
   }
 
+  if (!pix) {
+    toast("Informe sua chave Pix para continuar.");
+    $("pixCliente").focus();
+    return;
+  }
+
   perfil = {
     nome,
     telefone,
@@ -799,22 +845,18 @@ function salvarPerfil() {
       "lotinha_clientId",
       clientId
     );
+
   } catch (erro) {
     toast("Não foi possível salvar o cadastro.");
     return;
   }
 
   atualizarDadosPerfil();
+
   $("perfilOverlay").style.display = "none";
 
-  toast("Cadastro salvo neste aparelho.");
-
-  /*
-    As apostas antigas não são alteradas automaticamente.
-    Os dados do cadastro serão gravados em cada nova aposta.
-  */
+  toast("Cadastro salvo com sucesso!");
 }
-
 /* =================================
    MONTAR OS BOTÕES DE QUANTIDADE
 ================================= */
