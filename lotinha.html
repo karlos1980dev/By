@@ -391,14 +391,38 @@ const valores = {
 
 const gruposValidos = [17,18,19,20,21,22,23];
 function extracaoPorData(dataISO){
-
   const data = new Date(dataISO + "T12:00:00Z");
   const dia = data.getUTCDay();
 
-  if(dia === 0) return "11:00"; // Domingo
-  if(dia === 6) return "";      // Sábado
+  return dia === 0 ? "11:00" : "21:00";
+}
+function dataDaExtracao(){
 
-  return "21:00";
+  const horario = horarioBrasilia();
+  const hoje = dataISOBrasilia();
+
+  // Sábado: direciona para domingo.
+  if(horario.dia === "Sat"){
+
+    const data = new Date(hoje + "T12:00:00Z");
+
+    data.setUTCDate(data.getUTCDate() + 1);
+
+    return data.toISOString().slice(0,10);
+  }
+
+  return hoje;
+}
+
+function formatarDataBR(dataISO){
+
+  if(!dataISO) return "-";
+
+  const partes = dataISO.split("-");
+
+  return partes.length === 3
+    ? partes[2] + "/" + partes[1] + "/" + partes[0]
+    : dataISO;
 }
 
 const resultadoLink = "https://www.oresultado.com.br";
@@ -624,36 +648,30 @@ function horarioBrasilia(){
 function marcacaoEstaAberta(){
 
   const horario = horarioBrasilia();
+  const minutos = horario.hora * 60 + horario.minuto;
 
-  // Sábado não tem jogo.
+  // Sábado inteiro liberado.
   if(horario.dia === "Sat"){
-    return false;
+    return true;
   }
 
-  const minutos =
-    horario.hora * 60 + horario.minuto;
+  // Domingo até 10:49.
+  if(horario.dia === "Sun"){
+    return minutos >= 1 && minutos < 650;
+  }
 
-  const abertura = 1;
-
-  const fechamento = horario.dia === "Sun"
-    ? 10 * 60 + 50
-    : 20 * 60 + 50;
-
-  return minutos >= abertura &&
-         minutos < fechamento;
+  // Segunda a sexta até 20:49.
+  return minutos >= 1 && minutos < 1250;
 }
 
 function atualizarHorarioMarcacao(){
 
   const aviso = $("avisoHorario");
-  const aberto = marcacaoEstaAberta();
   const horario = horarioBrasilia();
 
+  const aberto = marcacaoEstaAberta();
   const domingo = horario.dia === "Sun";
-const sabado = horario.dia === "Sat";
-
-const encerramento = domingo ? "10:50" : "20:50";
-const extracaoHoje = domingo ? "11:00" : "21:00";
+  const sabado = horario.dia === "Sat";
 
   const botoesQuantidade =
     document.querySelectorAll("#buttonContainer button");
@@ -663,33 +681,50 @@ const extracaoHoje = domingo ? "11:00" : "21:00";
 
   const botaoAposta = $("btnGerarAposta");
 
-  if(aberto){
+  // Segunda a sexta: aviso totalmente oculto.
+  if(
+    horario.dia === "Mon" ||
+    horario.dia === "Tue" ||
+    horario.dia === "Wed" ||
+    horario.dia === "Thu" ||
+    horario.dia === "Fri"
+  ){
 
-    aviso.className = "horario-marcacao aberto";
+    aviso.style.display = "none";
+
+  }else{
+
+    aviso.style.display = "block";
 
     if(sabado){
 
-  aviso.innerHTML =
-    "🔴 SÁBADO SEM EXTRAÇÃO<br>" +
-    "Não haverá jogos neste dia.<br>" +
-    "Reabertura domingo às 00:01.";
+      aviso.className = "horario-marcacao aberto";
 
-}else if(domingo){
+      aviso.innerHTML =
+        "🟢 MARCAÇÕES LIBERADAS!<br>" +
+        "📅 OS JOGOS DE HOJE SERÃO PARA AMANHÃ!<br>" +
+        "🎯 EXTRAÇÃO: DOMINGO ÀS 11:00.";
 
-  aviso.innerHTML =
-    "🔴 MARCAÇÕES ENCERRADAS<br>" +
-    "🎯 Extração de domingo às 11:00.<br>" +
-    "Reabertura segunda-feira às 00:01.";
+    }else if(aberto && domingo){
 
-}else{
+      aviso.className = "horario-marcacao aberto";
 
-  aviso.innerHTML =
-    "🔴 MARCAÇÕES ENCERRADAS<br>" +
-    "🎯 Extração às 21:00.<br>" +
-    "Reabertura amanhã às 00:01.";
-}
+      aviso.innerHTML =
+        "🟢 MARCAÇÕES LIBERADAS!<br>" +
+        "🎯 EXTRAÇÃO DE HOJE: DOMINGO ÀS 11:00.<br>" +
+        "⏰ ENCERRAMENTO ÀS 10:50.";
+
+    }else{
+
+      aviso.className = "horario-marcacao fechado";
+
+      aviso.innerHTML =
+        "🔴 MARCAÇÕES ENCERRADAS!<br>" +
+        "🎯 PRÓXIMA EXTRAÇÃO: AMANHÃ ÀS 21:00.";
+    }
   }
 
+  // Mantém o bloqueio dos jogos conforme o horário.
   botoesQuantidade.forEach(btn=>{
     btn.disabled = !aberto;
   });
@@ -1154,6 +1189,8 @@ function gerarControle() {
   try{
 
     const horario = agoraFormatado();
+    const dataExtracao = dataDaExtracao();
+const horarioExtracao = extracaoPorData(dataExtracao);
 
     const jogos = [];
 
@@ -1243,14 +1280,15 @@ function gerarControle() {
       status: "AGUARDANDO PAGAMENTO",
       statusPagamento: "PENDENTE",
 
-      data: horario.data,
+      data: formatarDataBR(dataExtracao),
+dataISO: dataExtracao,
       hora: horario.hora,
       dataHora: horario.dataHora,
 
       criadoEm: horario.timestamp,
       timestamp: horario.timestamp,
 
-      extracao: extracaoPorData(dataISOBrasilia()),
+      extracao: horarioExtracao,
 
       numeroControle: controle,
 
@@ -1625,8 +1663,9 @@ function renderizarApostas(dados) {
 
     } else {
       resultadoDiv.textContent =
-        "🎯 Resultado: aguardando sorteio de " +
-        (aposta.data || "-") + " às 21:00.";
+      "🎯 Resultado: aguardando sorteio de " +
+(aposta.data || "-") +
+" às " + (aposta.extracao || "-") + ".";
     }
 
     // STATUS DO PAGAMENTO
