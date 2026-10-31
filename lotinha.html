@@ -1196,28 +1196,24 @@ const horarioExtracao = extracaoPorData(dataExtracao);
 
     let premioTotal = 0;
 
-    for(let i = 0; i < quantidadeJogos; i++){
+for(let i = 0; i < quantidadeJogos; i++){
 
-      // Se for somente um jogo, mantém os números escolhidos.
-      // Com 2 ou mais, gera todos aleatoriamente.
+  const dezenas = quantidadeJogos === 1
+    ? numerosManuais
+    : gerarNumerosAleatorios(quantidade);
 
-      const dezenas = quantidadeJogos === 1
-        ? numerosManuais
-        : gerarNumerosAleatorios(quantidade);
+  const premio = valores[quantidade];
 
-      const premio = valor * valores[quantidade];
+  jogos.push({
+    numeroJogo: i + 1,
+    numeros: dezenas,
+    quantidade: dezenas.length,
+    valorDigitado: valor,
+    premioPossivel: premio
+  });
 
-      jogos.push({
-        numeroJogo: i + 1,
-        numeros: dezenas,
-        quantidade: dezenas.length,
-        valorDigitado: valor,
-        premioPossivel: premio
-      });
-
-      premioTotal += premio;
-    }
-
+  premioTotal += premio;
+}
     let controle = "";
     let ref = null;
 
@@ -1635,7 +1631,10 @@ function renderizarApostas(dados) {
     valoresDiv.textContent =
       "Valor por jogo: " + reais(aposta.valorDigitado) + "\n" +
       "Total pago: " + reais(aposta.valorCobrancaPix) + "\n" +
-      "Possível prêmio total: " + reais(aposta.totalReceber);
+   "Possível prêmio total: " +
+reais(
+  (Number(aposta.totalReceber) || 0)
+);
 
     valoresDiv.style.marginTop = "8px";
     dadosDiv.appendChild(valoresDiv);
