@@ -224,8 +224,11 @@ let listenerApostasAtivo=false;
 let toastTimer=null;
 
 function extracaoPorData(dataISO){
- const data=new Date(dataISO+"T12:00:00Z");
- return data.getUTCDay()===6?"11:00":"21:00";
+ const data = new Date(dataISO + "T12:00:00Z");
+
+ return data.getUTCDay() === 0
+   ? "11:00"
+   : "21:00";
 }
 
 /* UTILITÁRIOS */
@@ -331,7 +334,28 @@ function formatarDataBR(iso){
 
  return `${d}/${m}/${a}`;
 }
+function dataInicialResultado(){
 
+ const hoje = dataISOAtual();
+
+ const partes = hoje.split("-").map(Number);
+
+ const data = new Date(Date.UTC(
+   partes[0],
+   partes[1] - 1,
+   partes[2],
+   12
+ ));
+
+ const dia = data.getUTCDay();
+
+ // Sábado: selecionar domingo.
+ if(dia === 6){
+   data.setUTCDate(data.getUTCDate() + 1);
+ }
+
+ return data.toISOString().slice(0,10);
+}
 function normalizarNumerosResultado(texto){
  const partes=String(texto||"")
   .trim()
@@ -563,9 +587,14 @@ function atualizarResumo(){
  const pagos=lista.filter(a=>normalizarStatus(a)==="PAGO");
 
  const recebido=pagos.reduce(
-  (s,a)=>s+Number(a.valorDigitado||0),
+  (s,a)=>s+Number(
+    a.valorCobrancaPix ??
+    a.valorTotal ??
+    a.valorDigitado ??
+    0
+  ),
   0
- );
+);
 
  el("totalApostas").textContent=lista.length;
  el("totalPendentes").textContent=pendentes.length;
@@ -1069,7 +1098,7 @@ function receberResultados(snapshot){
 }
 
 /* EVENTOS E INICIALIZAÇÃO */
-el("dataResultado").value=dataISOAtual();
+el("dataResultado").value=dataInicialResultado();
 
 function atualizarCampoExtracao(){
  const data=el("dataResultado").value;
