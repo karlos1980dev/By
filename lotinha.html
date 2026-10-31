@@ -395,8 +395,12 @@ function extracaoPorData(dataISO){
   const data = new Date(dataISO + "T12:00:00Z");
   const dia = data.getUTCDay();
 
-  return dia === 6 ? "11:00" : "21:00";
+  if(dia === 0) return "11:00"; // Domingo
+  if(dia === 6) return "";      // Sábado
+
+  return "21:00";
 }
+
 const resultadoLink = "https://www.oresultado.com.br";
 
 let db = null;
@@ -621,8 +625,8 @@ function marcacaoEstaAberta(){
 
   const horario = horarioBrasilia();
 
-  // Mantém a restrição de domingo já existente.
-  if(horario.dia === "Sun"){
+  // Sábado não tem jogo.
+  if(horario.dia === "Sat"){
     return false;
   }
 
@@ -630,10 +634,13 @@ function marcacaoEstaAberta(){
     horario.hora * 60 + horario.minuto;
 
   const abertura = 1;
-  const fechamento = 20 * 60 + 50;
+
+  const fechamento = horario.dia === "Sun"
+    ? 10 * 60 + 50
+    : 20 * 60 + 50;
 
   return minutos >= abertura &&
-         minutos <= fechamento;
+         minutos < fechamento;
 }
 
 function atualizarHorarioMarcacao(){
@@ -642,10 +649,11 @@ function atualizarHorarioMarcacao(){
   const aberto = marcacaoEstaAberta();
   const horario = horarioBrasilia();
 
-  const sabado = horario.dia === "Sat";
+  const domingo = horario.dia === "Sun";
+const sabado = horario.dia === "Sat";
 
-  const encerramento = sabado ? "10:50" : "20:50";
-  const extracaoHoje = sabado ? "11:00" : "21:00";
+const encerramento = domingo ? "10:50" : "20:50";
+const extracaoHoje = domingo ? "11:00" : "21:00";
 
   const botoesQuantidade =
     document.querySelectorAll("#buttonContainer button");
@@ -659,44 +667,27 @@ function atualizarHorarioMarcacao(){
 
     aviso.className = "horario-marcacao aberto";
 
-    aviso.innerHTML =
-      "🟢 MARCAÇÕES LIBERADAS<br>" +
-      "⏰ Encerramento às " + encerramento + "<br>" +
-      "🎯 Extração às " + extracaoHoje;
+    if(sabado){
 
-  }else{
+  aviso.innerHTML =
+    "🔴 SÁBADO SEM EXTRAÇÃO<br>" +
+    "Não haverá jogos neste dia.<br>" +
+    "Reabertura domingo às 00:01.";
 
-    aviso.className = "horario-marcacao fechado";
+}else if(domingo){
 
-    if(horario.dia === "Sun"){
+  aviso.innerHTML =
+    "🔴 MARCAÇÕES ENCERRADAS<br>" +
+    "🎯 Extração de domingo às 11:00.<br>" +
+    "Reabertura segunda-feira às 00:01.";
 
-      aviso.innerHTML =
-        "🔴 MARCAÇÕES FECHADAS<br>" +
-        "Apostas indisponíveis aos domingos.<br>" +
-        "Volte na segunda-feira às 00:01.";
+}else{
 
-    }else if(
-      horario.hora === 0 &&
-      horario.minuto === 0
-    ){
-
-      aviso.innerHTML =
-        "🔴 MARCAÇÕES FECHADAS<br>" +
-        "⏰ Liberação às 00:01.";
-
-    }else if(sabado){
-
-      aviso.innerHTML =
-        "🔴 MARCAÇÕES ENCERRADAS<br>" +
-        "🎯 Extração de sábado às 11:00.<br>" +
-        "Reabertura segunda-feira às 00:01.";
-
-    }else{
-
-      aviso.innerHTML =
-        "🔴 MARCAÇÕES ENCERRADAS 20:50<br>" +
-        "⏰ Reabertura hoje às 00:01.";
-    }
+  aviso.innerHTML =
+    "🔴 MARCAÇÕES ENCERRADAS<br>" +
+    "🎯 Extração às 21:00.<br>" +
+    "Reabertura amanhã às 00:01.";
+}
   }
 
   botoesQuantidade.forEach(btn=>{
