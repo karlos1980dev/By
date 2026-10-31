@@ -261,7 +261,7 @@ button:disabled{
     <div class="resultado" id="resultado">Possível prêmio: R$ 0,00</div>
   </div>
 
-  <button class="btn-principal" id="btnGerarAposta" onclick="enviarAposta()">📲 GERAR APOSTA E PIX</button>
+  <button class="btn-principal" id="btnGerarAposta" onclick="enviarAposta()">📲 APOSTA E GERAR PIX</button>
  <div style="text-align:center;"><p><p><b>A SORTE E SUA A GARANTIA E NOSSA 
   JOGOU ,PAGOU, GANHOU ,PIX NA HORA</p></p>
   </div>
@@ -390,7 +390,13 @@ const valores = {
 };
 
 const gruposValidos = [17,18,19,20,21,22,23];
-const extracao = "21:00";
+function extracaoPorData(dataISO){
+
+  const data = new Date(dataISO + "T12:00:00Z");
+  const dia = data.getUTCDay();
+
+  return dia === 6 ? "11:00" : "21:00";
+}
 const resultadoLink = "https://www.oresultado.com.br";
 
 let db = null;
@@ -498,9 +504,15 @@ function conferirResultadoCliente(aposta){
 
   const data = dataISOAposta(aposta);
 
-  if(!data || String(aposta.extracao || "21:00") !== "21:00"){
-    return null;
-  }
+  if(!data) return null;
+
+  const horarioEsperado = extracaoPorData(data);
+
+  const horarioAposta = String(
+    aposta.extracao || horarioEsperado
+  );
+
+  if(horarioAposta !== horarioEsperado) return null;
 
   const resultado = resultadosLotinha[data];
 
@@ -512,12 +524,9 @@ function conferirResultadoCliente(aposta){
     resultado.numeros.map(n => String(n).padStart(2,"0"))
   );
 
-  // Compatibilidade com apostas antigas.
   const jogos = Array.isArray(aposta.jogos)
     ? aposta.jogos
-    : [{
-        numeros: aposta.numeros || []
-      }];
+    : [{numeros: aposta.numeros || []}];
 
   const conferencias = jogos.map((jogo,index) => {
 
@@ -530,21 +539,20 @@ function conferirResultadoCliente(aposta){
     ).length;
 
     return {
-      jogo: index + 1,
-      acertos: acertos,
-      status: acertos === 15 ? "GANHOU" : "PERDEU"
+      jogo:index + 1,
+      acertos,
+      status:acertos >= 15 ? "GANHOU" : "PERDEU"
     };
   });
 
   return {
-    jogos: conferencias,
-    quantidade: conferencias.length,
-    ganhadores: conferencias.filter(
+    jogos:conferencias,
+    quantidade:conferencias.length,
+    ganhadores:conferencias.filter(
       j => j.status === "GANHOU"
     ).length
   };
 }
-
 function carregarResultadoLotinha(){
   if(!db) return;
 
@@ -559,13 +567,15 @@ function carregarResultadoLotinha(){
 
     if(!resultadoHoje){
       campo.textContent = "Resultado de hoje ainda não publicado.";
-      data.textContent = "Extração: 21:00";
+      data.textContent =
+  "Extração: " + extracaoPorData(dataHoje);
     }else{
       campo.textContent = resultadoHoje.numeros.join(" - ");
 
       data.textContent =
         "Data: " + (resultadoHoje.data || dataHoje) +
-        " • Extração: " + (resultadoHoje.extracao || "21:00");
+    " • Extração: " +
+(resultadoHoje.extracao || extracaoPorData(dataHoje));
     }
 
     renderizarApostas(apostasCliente);
@@ -632,6 +642,11 @@ function atualizarHorarioMarcacao(){
   const aberto = marcacaoEstaAberta();
   const horario = horarioBrasilia();
 
+  const sabado = horario.dia === "Sat";
+
+  const encerramento = sabado ? "10:50" : "20:50";
+  const extracaoHoje = sabado ? "11:00" : "21:00";
+
   const botoesQuantidade =
     document.querySelectorAll("#buttonContainer button");
 
@@ -646,8 +661,8 @@ function atualizarHorarioMarcacao(){
 
     aviso.innerHTML =
       "🟢 MARCAÇÕES LIBERADAS<br>" +
-      "⏰ Encerramento às 20:50<br>" +
-      "🌙 Reabertura hoje às 00:01";
+      "⏰ Encerramento às " + encerramento + "<br>" +
+      "🎯 Extração às " + extracaoHoje;
 
   }else{
 
@@ -669,6 +684,13 @@ function atualizarHorarioMarcacao(){
         "🔴 MARCAÇÕES FECHADAS<br>" +
         "⏰ Liberação às 00:01.";
 
+    }else if(sabado){
+
+      aviso.innerHTML =
+        "🔴 MARCAÇÕES ENCERRADAS<br>" +
+        "🎯 Extração de sábado às 11:00.<br>" +
+        "Reabertura segunda-feira às 00:01.";
+
     }else{
 
       aviso.innerHTML =
@@ -677,24 +699,21 @@ function atualizarHorarioMarcacao(){
     }
   }
 
-  // Bloqueia quantidade.
   botoesQuantidade.forEach(btn=>{
     btn.disabled = !aberto;
   });
 
-  // Bloqueia seleção dos números.
   botoesNumeros.forEach(btn=>{
     btn.disabled = !aberto;
   });
 
-  // Bloqueia geração de apostas.
   botaoAposta.disabled = !aberto || salvando;
 
   botaoAposta.textContent = !aberto
     ? "🔒 MARCAÇÕES ENCERRADAS"
     : salvando
       ? "REGISTRANDO APOSTA..."
-      : "📲 GERAR APOSTA E PIX";
+      : "📲 APOSTA E GERAR PIX";
 }
 
 function reais(valor) {
@@ -1240,7 +1259,7 @@ function gerarControle() {
       criadoEm: horario.timestamp,
       timestamp: horario.timestamp,
 
-      extracao: extracao,
+      extracao: extracaoPorData(dataISOBrasilia()),
 
       numeroControle: controle,
 
