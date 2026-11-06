@@ -261,7 +261,7 @@ button:disabled{
     <div class="resultado" id="resultado">Possível prêmio: R$ 0,00</div>
   </div>
 
-  <button class="btn-principal" id="btnGerarAposta" onclick="enviarAposta()">📲 APOSTA E GERAR PIX</button>
+  <button class="btn-principal" id="btnGerarAposta" onclick="enviarAposta()">📲 APOSTA E REGISTRA</button>
  <div style="text-align:center;"><p><p><b>A SORTE E SUA A GARANTIA E NOSSA 
   JOGOU ,PAGOU, GANHOU ,PIX NA HORA</p></p>
   </div>
@@ -374,7 +374,7 @@ const firebaseConfig = {
 
 /* CHAVE PIX DO RECEBEDOR */
 const PIX_CONFIG = {
-  chave: "ce3a2d70-48ee-4c0d-b3ec-7184969521ac",
+  chave: "6f360f91-71c7-40da-b610-5a70ba3213dd",
   nome: "MULTIJOGO",
   cidade: "SALVADOR"
 };
@@ -401,11 +401,21 @@ function dataDaExtracao(){
   const horario = horarioBrasilia();
   const hoje = dataISOBrasilia();
 
+  const minutos = horario.hora * 60 + horario.minuto;
+
+  // Depois das 21:30: direciona para amanhã.
+  if(minutos >= 1290){
+
+    const data = new Date(hoje + "T12:00:00Z");
+    data.setUTCDate(data.getUTCDate() + 1);
+
+    return data.toISOString().slice(0,10);
+  }
+
   // Sábado: direciona para domingo.
   if(horario.dia === "Sat"){
 
     const data = new Date(hoje + "T12:00:00Z");
-
     data.setUTCDate(data.getUTCDate() + 1);
 
     return data.toISOString().slice(0,10);
@@ -513,7 +523,9 @@ function dataISOBrasilia(){
 }
 
 function dataISOAposta(aposta){
-  const data = String(aposta.data || "").trim();
+  const data = String(
+    aposta.dataISO || aposta.data || ""
+  ).trim();
 
   if(/^\d{4}-\d{2}-\d{2}$/.test(data)){
     return data;
@@ -530,12 +542,13 @@ function dataISOAposta(aposta){
 
 function conferirResultadoCliente(aposta){
 
-  const data = dataISOAposta(aposta);
-
+  const data = aposta.dataExtracao || dataISOAposta(aposta);
+  
   if(!data) return null;
 
-  const horarioEsperado = extracaoPorData(data);
-
+  const horarioEsperado = aposta.extracao ||
+  extracaoPorData(data);
+  
   const horarioAposta = String(
     aposta.extracao || horarioEsperado
   );
@@ -650,7 +663,17 @@ function marcacaoEstaAberta(){
   const horario = horarioBrasilia();
   const minutos = horario.hora * 60 + horario.minuto;
 
-  // Sábado inteiro liberado.
+  // Bloqueia das 20:50 até 21:29, inclusive aos sábados.
+  if(minutos >= 1250 && minutos < 1290){
+    return false;
+  }
+
+  // Libera novamente às 21:30.
+  if(minutos >= 1290){
+    return true;
+  }
+
+  // Sábado durante o dia.
   if(horario.dia === "Sat"){
     return true;
   }
@@ -669,9 +692,14 @@ function atualizarHorarioMarcacao(){
   const aviso = $("avisoHorario");
   const horario = horarioBrasilia();
 
+  const minutos = horario.hora * 60 + horario.minuto;
+
   const aberto = marcacaoEstaAberta();
+
   const domingo = horario.dia === "Sun";
   const sabado = horario.dia === "Sat";
+
+  const madrugadaNoturna = minutos >= 1290;
 
   const botoesQuantidade =
     document.querySelectorAll("#buttonContainer button");
@@ -681,8 +709,17 @@ function atualizarHorarioMarcacao(){
 
   const botaoAposta = $("btnGerarAposta");
 
-  // Segunda a sexta: aviso totalmente oculto.
-  if(
+  if(madrugadaNoturna){
+
+    aviso.style.display = "block";
+    aviso.className = "horario-marcacao aberto";
+
+    aviso.innerHTML =
+      "🌙 MARCAÇÕES LIBERADAS!<br>" +
+      "🎯 ATENÇÃO: OS JOGOS FEITO HOJE VÃO CONCORRER AMANHÃ!<br>" +
+      "⏰ EXTRAÇÃO ÀS 21:00.";
+
+  }else if(
     horario.dia === "Mon" ||
     horario.dia === "Tue" ||
     horario.dia === "Wed" ||
@@ -701,7 +738,7 @@ function atualizarHorarioMarcacao(){
       aviso.className = "horario-marcacao aberto";
 
       aviso.innerHTML =
-        "⚠️ ATENÇÃO AQUI⚠️!<br>" +
+        "⚠️ ATENÇÃO!<br>" +
         "📅 OS JOGOS DE HOJE SERÃO PARA AMANHÃ!<br>" +
         "🎯 EXTRAÇÃO: DOMINGO ÀS 11:00.";
 
@@ -710,7 +747,7 @@ function atualizarHorarioMarcacao(){
       aviso.className = "horario-marcacao aberto";
 
       aviso.innerHTML =
-        "⚠️ ATENÇÃO AQUI⚠️!<br>" +
+        "⚠️ ATENÇÃO!<br>" +
         "🎯 EXTRAÇÃO DE HOJE: DOMINGO ÀS 11:00.<br>" +
         "⏰ ENCERRAMENTO ÀS 10:50.";
 
@@ -724,7 +761,6 @@ function atualizarHorarioMarcacao(){
     }
   }
 
-  // Mantém o bloqueio dos jogos conforme o horário.
   botoesQuantidade.forEach(btn=>{
     btn.disabled = !aberto;
   });
@@ -739,7 +775,7 @@ function atualizarHorarioMarcacao(){
     ? "🔒 MARCAÇÕES ENCERRADAS"
     : salvando
       ? "REGISTRANDO APOSTA..."
-      : "📲 APOSTA E GERAR PIX";
+      : "📲 APOSTA E VALIDAR";
 }
 
 function reais(valor) {
@@ -1189,8 +1225,19 @@ function gerarControle() {
   try{
 
     const horario = agoraFormatado();
-    const dataExtracao = dataDaExtracao();
-const horarioExtracao = extracaoPorData(dataExtracao);
+    const horarioAtual = horarioBrasilia();
+
+const minutosAtual =
+  horarioAtual.hora * 60 + horarioAtual.minuto;
+
+const periodoNoturno = minutosAtual >= 1290;
+
+const dataExtracao = dataDaExtracao();
+
+const horarioExtracao = periodoNoturno
+  ? "21:00"
+  : extracaoPorData(dataExtracao);
+  
 
     const jogos = [];
 
@@ -1276,8 +1323,14 @@ for(let i = 0; i < quantidadeJogos; i++){
       status: "AGUARDANDO PAGAMENTO",
       statusPagamento: "PENDENTE",
 
-      data: formatarDataBR(dataExtracao),
-dataISO: dataExtracao,
+      // Data em que o cliente fez a aposta.
+data: horario.data,
+dataISO: dataISOBrasilia(),
+
+// Data da extração para a qual a aposta concorre.
+dataExtracao: dataExtracao,
+dataExtracaoBR: formatarDataBR(dataExtracao),
+
       hora: horario.hora,
       dataHora: horario.dataHora,
 
