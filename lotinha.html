@@ -621,33 +621,41 @@ function extracaoPorData(dataISO){
 function dataDaExtracao(){
 
   const horario = horarioBrasilia();
-  const hoje = dataISOBrasilia();
+
+  const agora = new Date();
+
+  const partes = new Intl.DateTimeFormat("en-CA",{
+    timeZone:"America/Sao_Paulo",
+    year:"numeric",
+    month:"2-digit",
+    day:"2-digit"
+  }).formatToParts(agora);
+
+  const obj = {};
+  partes.forEach(p => obj[p.type] = p.value);
+
+  const data = new Date(
+    `${obj.year}-${obj.month}-${obj.day}T12:00:00`
+  );
 
   const minutos = horario.hora * 60 + horario.minuto;
 
-  const data = new Date(hoje + "T12:00:00Z");
-
-  // Depois das 21:30: amanhã.
-  if(minutos >= 1290){
-    data.setUTCDate(data.getUTCDate() + 1);
-    return data.toISOString().slice(0,10);
-  }
-
-  // Sábado: jogos para domingo.
-  if(horario.dia === "Sat"){
-    data.setUTCDate(data.getUTCDate() + 1);
-    return data.toISOString().slice(0,10);
-  }
-
-  // Domingo a partir das 11:30: jogos para segunda.
+  // Domingo depois das 11:30: próxima extração é segunda.
   if(horario.dia === "Sun" && minutos >= 690){
-    data.setUTCDate(data.getUTCDate() + 1);
-    return data.toISOString().slice(0,10);
+    data.setDate(data.getDate() + 1);
   }
 
-  return hoje;
-}
+  // Depois das 21:30: próxima extração é amanhã.
+  else if(minutos >= 1290){
+    data.setDate(data.getDate() + 1);
+  }
 
+  const ano = data.getFullYear();
+  const mes = String(data.getMonth() + 1).padStart(2,"0");
+  const dia = String(data.getDate()).padStart(2,"0");
+
+  return `${ano}-${mes}-${dia}`;
+}
 function formatarDataBR(dataISO){
 
   if(!dataISO) return "-";
@@ -1978,7 +1986,9 @@ function renderizarApostas(dados) {
     dadosDiv.textContent =
       "Nome: " + (aposta.nome || aposta.nomeCliente || "-") + "\n" +
       "Telefone: " + (aposta.telefone || "Não informado") + "\n" +
-      "Data: " + (aposta.data || "-") + "\n" +
+      "Data da aposta: " + (aposta.data || "-") + "\n" +
+"Data da extração: " +
+formatarDataBR(aposta.dataExtracao || dataISOAposta(aposta)) + "\n" +
       "Hora: " + (aposta.hora || "-") + "\n" +
       "Extração: " + (aposta.extracao || "-") + "\n" +
       "Quantidade de jogos: " + jogos.length + "\n";
