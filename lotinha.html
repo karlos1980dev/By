@@ -207,6 +207,91 @@ button:disabled{
     border:none;
     outline:none;
 }
+.modal-aposta {
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:2000;
+  background:#000e;
+  padding:15px;
+  align-items:center;
+  justify-content:center;
+  overflow-y:auto;
+}
+
+.modal-aposta.aberto {
+  display:flex;
+}
+
+.modal-aposta-conteudo {
+  width:100%;
+  max-width:380px;
+  background:#1c1020;
+  border:2px solid #ffdd00;
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 0 25px #ff00a555;
+}
+
+.modal-aposta-conteudo h2 {
+  color:#ffdd00;
+  text-align:center;
+  margin:0 0 15px;
+}
+
+.modal-aposta-conteudo label {
+  display:block;
+  margin:12px 0 6px;
+  font-weight:bold;
+  font-size:13px;
+}
+
+.modal-aposta-conteudo input {
+  width:100%;
+  padding:14px;
+  background:#08060a;
+  color:white;
+  border:2px solid #ffdd00;
+  border-radius:9px;
+  font-size:20px;
+  text-align:center;
+}
+
+.resumo-aposta-modal {
+  background:#08060a;
+  border:1px solid #ffdd00;
+  border-radius:10px;
+  padding:13px;
+  margin-top:15px;
+  line-height:2;
+  font-size:13px;
+}
+
+.resumo-aposta-modal strong {
+  color:#00ff88;
+}
+
+.btn-confirmar-modal {
+  width:100%;
+  padding:14px;
+  margin-top:15px;
+  background:#00c853;
+  color:white;
+  border:0;
+  border-radius:10px;
+  font-size:16px;
+  font-weight:900;
+}
+
+.btn-cancelar-modal {
+  width:100%;
+  padding:12px;
+  margin-top:8px;
+  background:#38283d;
+  color:white;
+  border:0;
+  border-radius:10px;
+}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
@@ -249,8 +334,9 @@ button:disabled{
     Total: <strong>R$ 0,00</strong>
   </div>
 </div>
-<div class="input-valor">
-    <input type="number" id="valorAposta" placeholder="Valor da aposta" min="0.01" step="0.01" inputmode="decimal">
+<div class="input-valor" style="display:none">
+  <input type="number" id="valorAposta" min="0.01" step="0.01">
+</div>
   </div>
   <div class="titulo-jogo">ESCOLHA A QUANTIDADE</div>
   <div class="button-container" id="buttonContainer"></div>
@@ -421,7 +507,73 @@ button:disabled{
     
   </div>
 </div>
+<!-- MODAL VALOR DA APOSTA -->
+<div id="modalAposta" class="modal-aposta"
+     onclick="fecharModalApostaFora(event)">
 
+  <div class="modal-aposta-conteudo">
+
+    <h2>🍀 CONFIRMAR APOSTA</h2>
+
+    <p style="text-align:center">
+      Digite quanto deseja apostar por jogo.
+    </p>
+
+    <label for="valorModal">VALOR POR JOGO (R$)</label>
+
+    <input
+      type="number"
+      id="valorModal"
+      min="0.01"
+      max="100000"
+      step="0.01"
+      inputmode="decimal"
+      placeholder="Ex: 1,00"
+      oninput="atualizarResumoModal()"
+    >
+
+    <div class="resumo-aposta-modal">
+
+      <div>🔢 Quantidade de dezenas:
+        <strong id="modalDezenas">0</strong>
+      </div>
+
+      <div>🎲 Quantidade de jogos:
+        <strong id="modalQuantidadeJogos">1</strong>
+      </div>
+
+      <div>💵 Valor por jogo:
+        <strong id="modalValorJogo">R$ 0,00</strong>
+      </div>
+
+      <div>🏆 Prêmio possível por jogo:
+        <strong id="modalPremioJogo">R$ 0,00</strong>
+      </div>
+
+      <div>🏆 Prêmio total possível:
+        <strong id="modalPremioTotal">R$ 0,00</strong>
+      </div>
+
+      <div style="border-top:1px solid #ffdd00;padding-top:8px">
+        💳 TOTAL A PAGAR:
+        <strong id="modalTotalPagar">R$ 0,00</strong>
+      </div>
+
+    </div>
+
+    <button class="btn-confirmar-modal"
+            id="btnConfirmarModal"
+            onclick="confirmarAposta()">
+      CONFIRMAR APOSTA
+    </button>
+
+    <button class="btn-cancelar-modal"
+            onclick="fecharModalAposta()">
+      VOLTAR
+    </button>
+
+  </div>
+</div>
 <!-- MODAL PIX -->
 <div id="modalPix" class="modal-pix" onclick="fecharModalPixFora(event)">
   <div class="modal-pix-conteudo">
@@ -1116,37 +1268,48 @@ inputValor.addEventListener("input", () => {
 });
 
 function executarJogo(tipo) {
-  const valor = Number(inputValor.value);
-if(!marcacaoEstaAberta()){
-  atualizarHorarioMarcacao();
-  toast("Marcações encerradas! Volte às 00:01.");
-  return;
-}
-  if (!Number.isFinite(valor) || valor <= 0) {
-    toast("Digite o valor da aposta primeiro.");
-    inputValor.focus();
+
+  if(!marcacaoEstaAberta()){
+    atualizarHorarioMarcacao();
+    toast("Marcações encerradas!");
     return;
   }
 
+  // Limpa os números anteriores
   document.querySelectorAll(".number-button").forEach(btn => {
     btn.classList.remove("selecionado");
   });
 
+  // Gera a quantidade escolhida
   const sorteados = new Set();
 
-  while (sorteados.size < tipo) {
+  while(sorteados.size < tipo){
     sorteados.add(
       String(Math.floor(Math.random() * 25) + 1)
-        .padStart(2, "0")
+        .padStart(2,"0")
     );
   }
 
+  // Marca os números gerados
   sorteados.forEach(numero => {
     $("num" + numero).classList.add("selecionado");
   });
 
   atualizarContador();
+
+  // Abre o modal para digitar o valor
+  $("valorModal").value = inputValor.value || "";
+
+  atualizarResumoModal();
+
+  $("modalAposta").classList.add("aberto");
+
+  document.body.style.overflow = "hidden";
+
+  $("valorModal").focus();
 }
+
+  
 
 /* =================================
    PIX BR CODE
@@ -1236,12 +1399,89 @@ function gerarControle() {
   return String(Math.floor(100000 + Math.random() * 900000));
 }
 
-/* =================================
-   REGISTRAR APOSTA
-   CAMINHO COMPATÍVEL COM ADMIN:
-   apostas/LOTINHA/ID_DA_APOSTA
-================================= */
-/* ================================= REGISTRAR APOSTA CAMINHO: apostas/LOTINHA/CODIGO ================================= */ async function enviarAposta(){
+// ABRIR MODAL AO CLICAR EM APOSTAR
+function enviarAposta(){
+
+  if(!perfil || !perfil.nome){
+    abrirPerfil();
+    toast("Cadastre seu nome antes de apostar.");
+    return;
+  }
+
+  if(!marcacaoEstaAberta()){
+    atualizarHorarioMarcacao();
+    toast("Marcações encerradas!");
+    return;
+  }
+
+  const quantidade = numerosSelecionados().length;
+
+  if(!gruposValidos.includes(quantidade)){
+    toast("Selecione entre 17 e 23 dezenas.");
+    return;
+  }
+
+  $("valorModal").value = inputValor.value || "";
+
+  atualizarResumoModal();
+
+  $("modalAposta").classList.add("aberto");
+  document.body.style.overflow = "hidden";
+
+  $("valorModal").focus();
+}
+
+
+// ATUALIZAR RESUMO DO MODAL
+function atualizarResumoModal(){
+
+  const quantidade = numerosSelecionados().length;
+  const valor = Number($("valorModal").value) || 0;
+
+  const premioMultiplicador = valores[quantidade] || 0;
+
+  const premioJogo = valor * premioMultiplicador;
+  const premioTotal = premioJogo * quantidadeJogos;
+  const totalPagar = valor * quantidadeJogos;
+
+  $("modalDezenas").textContent = quantidade;
+
+  $("modalQuantidadeJogos").textContent =
+    quantidadeJogos;
+
+  $("modalValorJogo").textContent =
+    reais(valor);
+
+  $("modalPremioJogo").textContent =
+    reais(premioJogo);
+
+  $("modalPremioTotal").textContent =
+    reais(premioTotal);
+
+  $("modalTotalPagar").textContent =
+    reais(totalPagar);
+
+  inputValor.value = valor > 0 ? valor : "";
+
+  atualizarContador();
+  atualizarResumoJogos();
+}
+
+
+// FECHAR MODAL
+function fecharModalAposta(){
+
+  $("modalAposta").classList.remove("aberto");
+  document.body.style.overflow = "";
+}
+
+function fecharModalApostaFora(event){
+
+  if(event.target.id === "modalAposta"){
+    fecharModalAposta();
+  }
+}
+/* ================================= REGISTRAR APOSTA CAMINHO: apostas/LOTINHA/CODIGO ================================= */ async function confirmarAposta(){
 
   if(salvando) return;
 
@@ -1416,7 +1656,9 @@ dataExtracaoBR: formatarDataBR(dataExtracao),
 
     await ref.set(aposta);
 
-    apostaAtual = {
+fecharModalAposta();
+
+apostaAtual = {
       ...aposta,
       firebaseId: controle
     };
