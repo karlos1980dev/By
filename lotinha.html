@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -1787,43 +1788,42 @@ valoresDiv.innerHTML = `
 dadosDiv.appendChild(valoresDiv);
 
 // CONFERÊNCIA DO RESULTADO
+// CONFERÊNCIA DO RESULTADO
 const resultadoDiv = document.createElement("div");
 resultadoDiv.className = "linha-info";
 
-// Só confere apostas com pagamento confirmado.
+const conferencia =
+  conferirResultadoCliente(aposta);
+
 const pagamentoEstaPago =
-  String(aposta.statusPagamento || "").trim().toUpperCase() === "PAGO";
+  String(aposta.statusPagamento || "")
+    .trim()
+    .toUpperCase() === "PAGO";
 
-if (pagamentoConfirmado) {
-
-  const conferencia = conferirResultadoCliente(aposta);
+if (pagamentoEstaPago && conferencia) {
 
   resultadoDiv.style.marginTop = "10px";
   resultadoDiv.style.padding = "10px";
   resultadoDiv.style.borderRadius = "8px";
   resultadoDiv.style.background = "#064d2b";
 
-  if (conferencia) {
+  resultadoDiv.textContent =
+    "🎯 CONFERÊNCIA DOS JOGOS\n" +
+    conferencia.jogos.map(j =>
+      "Jogo " + j.jogo + ": " +
+      j.acertos + "/15 acertos - " + j.status
+    ).join("\n") +
+    "\n🏆 Jogos premiados: " +
+    conferencia.ganhadores;
 
-    resultadoDiv.textContent =
-      "🎯 CONFERÊNCIA DOS JOGOS\n" +
-      conferencia.jogos.map(j =>
-        "Jogo " + j.jogo + ": " +
-        j.acertos + "/15 acertos - " + j.status
-      ).join("\n") +
-      "\n🏆 Jogos premiados: " +
-      conferencia.ganhadores;
+} else if (pagamentoEstaPago) {
 
-  } else {
-
-    resultadoDiv.textContent =
-      "🎯 PAGAMENTO CONFIRMADO!\n" +
-      "⏳ Aguardando publicação do resultado.";
-  }
+  resultadoDiv.textContent =
+    "⏳ Aguardando publicação do resultado.";
 
 } else {
 
-  // Não exibe conferência para pagamentos pendentes.
+  // Esconde somente a conferência.
   resultadoDiv.style.display = "none";
 }
     // STATUS DO PAGAMENTO
