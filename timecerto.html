@@ -1,0 +1,1697 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101522">
+<title>TIME CERTO</title>
+
+<style>
+
+:root{
+  --bg:#0c1220;
+  --panel:#172238;
+  --gold:#f5c451;
+  --green:#18c889;
+  --muted:#aab7ca;
+  --red:#ff6678;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  width:100%;
+  min-height:100%;
+  overflow-x:hidden;
+}
+
+body{
+  margin:0;
+  width:100%;
+  min-height:100vh;
+  padding-top:125px;
+  padding-bottom:100px;
+  background:radial-gradient(circle at top,#1c2941,#0c1220 65%);
+  color:#fff;
+  font-family:Arial,sans-serif;
+  overflow-x:hidden;
+}
+
+button,input,textarea{
+  font-family:inherit;
+}
+
+header{
+  position:fixed;
+  z-index:1000;
+  top:0;
+  left:0;
+  right:0;
+  background:#101a2c;
+  border-bottom:1px solid #39465d;
+  padding:9px 12px;
+}
+
+.header-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+}
+
+.logo{
+  color:var(--gold);
+  font-size:23px;
+  font-weight:900;
+  letter-spacing:3px;
+}
+
+.menu-area{
+  position:relative;
+}
+
+.menu-button{
+  background:#263751;
+  color:white;
+  border:1px solid #52627b;
+  border-radius:9px;
+  padding:9px 12px;
+  font-size:20px;
+}
+
+.dropdown{
+  display:none;
+  position:absolute;
+  right:0;
+  top:45px;
+  width:210px;
+  background:#1b2940;
+  border:1px solid #52627b;
+  border-radius:12px;
+  padding:7px;
+  box-shadow:0 10px 30px #0009;
+}
+
+.dropdown.show{
+  display:block;
+}
+
+.dropdown button{
+  width:100%;
+  padding:13px 12px;
+  text-align:left;
+  background:transparent;
+  border:0;
+  color:white;
+  border-radius:8px;
+  font-weight:bold;
+}
+
+.header-stats{
+  display:grid;
+  grid-template-columns:1.2fr 1fr 1fr;
+  gap:6px;
+  margin-top:8px;
+}
+
+.stat{
+  min-width:0;
+  background:#0c1626;
+  border:1px solid #34445d;
+  border-radius:9px;
+  padding:6px 4px;
+  text-align:center;
+}
+
+.stat small{
+  display:block;
+  color:var(--muted);
+  font-size:10px;
+}
+
+.stat strong{
+  display:block;
+  color:var(--gold);
+  font-size:13px;
+  margin-top:3px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.player-top strong{
+  color:var(--green);
+}
+
+main{
+  width:100%;
+  max-width:1400px;
+  margin:0 auto;
+  padding:10px;
+}
+
+.panel{
+  width:100%;
+   background:linear-gradient(145deg,#1b2940,#141e30);
+  border:1px solid #33435d;
+  border-radius:15px;
+  padding:12px;
+  margin-bottom:12px;
+  box-shadow:0 8px 25px #0003;
+}
+
+.heading{
+  font-weight:800;
+  color:var(--gold);
+  font-size:16px;
+  margin:0 0 12px;
+}
+
+.muted{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.counter{
+  font-size:23px;
+  color:var(--gold);
+  font-weight:900;
+}
+
+/* GRADE DOS ESCUDOS */
+
+.teams{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:8px;
+  width:100%;
+}
+
+.team{
+  position:relative;
+  min-width:0;
+  min-height:105px;
+  padding:9px 5px;
+  border:2px solid #34445d;
+  border-radius:12px;
+  background:#26344c;
+  text-align:center;
+  cursor:pointer;
+  user-select:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+}
+
+.team img{
+  display:block;
+  width:100%;
+  max-width:75px;
+  height:65px;
+  object-fit:contain;
+  object-position:center;
+  pointer-events:none;
+}
+
+.team span{
+  display:block;
+  width:100%;
+  font-size:10px;
+  font-weight:700;
+  line-height:1.2;
+  overflow-wrap:anywhere;
+  text-align:center;
+}
+
+.team.selected{
+  border-color:var(--gold);
+  background:#493d20;
+  box-shadow:0 0 13px #f5c45155;
+}
+
+.team.selected:after{
+  content:"✓";
+  position:absolute;
+  right:4px;
+  top:4px;
+  width:19px;
+  height:19px;
+  line-height:19px;
+  border-radius:50%;
+  background:var(--green);
+  color:#062015;
+  font-weight:bold;
+}
+
+.times{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+}
+
+.slot{
+  border:1px solid #465773;
+  background:#26344c;
+  color:white;
+  border-radius:10px;
+  padding:13px 4px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.slot.active{
+  background:var(--gold);
+  color:#191919;
+  border-color:var(--gold);
+}
+
+.status{
+  font-size:12px;
+  color:var(--muted);
+  text-align:center;
+  margin-top:10px;
+}
+
+.history-panel{
+  display:none;
+}
+
+.history-panel.show{
+  display:block;
+}
+
+.history-item{
+  border-top:1px solid #34435b;
+  padding:10px 0;
+  font-size:12px;
+  line-height:1.6;
+}
+
+.playerline{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  background:#101a2b;
+  padding:12px;
+  border-radius:11px;
+  margin-bottom:12px;
+}
+
+.playerline strong{
+  color:var(--gold);
+}
+
+.change-name{
+  background:#30415c;
+  border:0;
+  color:white;
+  padding:10px;
+  border-radius:8px;
+}
+
+.field{
+  width:100%;
+  padding:13px;
+  border-radius:10px;
+  border:1px solid #43536d;
+  background:#0e1829;
+  color:#fff;
+  font-size:16px;
+  margin-top:6px;
+  outline:none;
+}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.metric{
+  background:#101a2b;
+  border-radius:12px;
+  padding:12px;
+  text-align:center;
+}
+
+.metric small{
+  color:var(--muted);
+}
+
+.metric strong{
+  display:block;
+  color:var(--green);
+  font-size:20px;
+  margin-top:5px;
+}
+
+.btn{
+  width:100%;
+  border:0;
+  border-radius:11px;
+  padding:15px;
+  font-weight:900;
+  font-size:15px;
+  cursor:pointer;
+  margin-top:10px;
+}
+
+.primary{
+  background:linear-gradient(135deg,#ffdc78,#e9aa27);
+  color:#171717;
+}
+
+.secondary{
+  background:#30415c;
+  color:#fff;
+}
+
+.btn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+.notice{
+  padding:11px;
+  border-radius:10px;
+  background:#332d1d;
+  color:#ffe3a1;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.pixbox{
+  display:none;
+  text-align:center;
+}
+
+.pixbox.show{
+  display:block;
+}
+
+.qr{
+  display:inline-block;
+  background:#fff;
+  padding:12px;
+  border-radius:12px;
+  margin:10px auto;
+}
+
+.pixcode{
+  width:100%;
+  min-height:85px;
+  background:#0c1626;
+  color:#dce6f5;
+  border:1px solid #40516d;
+  border-radius:9px;
+  padding:10px;
+  font-size:11px;
+  word-break:break-all;
+}
+
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  background:#050914ed;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:12px;
+  z-index:9999;
+}
+
+.modal-backdrop.show{
+  display:flex;
+}
+
+.name-modal,
+.bet-modal{
+  width:100%;
+  max-width:500px;
+  background:linear-gradient(145deg,#1d2b43,#111b2c);
+  border:1px solid #52627b;
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 20px 70px #0009;
+}
+
+.name-modal h2{
+  text-align:center;
+  color:var(--gold);
+}
+
+.name-modal p{
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.bet-modal{
+  max-height:90vh;
+  overflow-y:auto;
+}
+
+.bet-modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.close-bet{
+  background:#a52e40;
+  color:white;
+  border:0;
+  border-radius:8px;
+  padding:10px 14px;
+  font-weight:bold;
+}
+
+.bottom-bar{
+  position:fixed;
+  z-index:1001;
+  left:0;
+  right:0;
+  bottom:0;
+  background:#101a2c;
+  border-top:1px solid #465773;
+  padding:9px 12px calc(9px + env(safe-area-inset-bottom));
+  box-shadow:0 -8px 25px #0006;
+}
+
+.bottom-inner{
+  width:100%;
+  max-width:900px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:1fr 1.3fr;
+  gap:9px;
+  align-items:center;
+}
+
+.bottom-inner input{
+  width:100%;
+  min-width:0;
+  padding:13px 10px;
+  border:1px solid #52627b;
+  border-radius:10px;
+  background:#0c1626;
+  color:white;
+  font-size:17px;
+  font-weight:bold;
+}
+
+.bottom-inner button{
+  border:0;
+  border-radius:10px;
+  padding:15px 8px;
+  background:linear-gradient(135deg,#ffdc78,#e9aa27);
+  color:#171717;
+  font-weight:900;
+  font-size:14px;
+}
+
+.bottom-inner button:disabled{
+  opacity:.55;
+}
+
+/* CELULARES PEQUENOS */
+
+@media(max-width:380px){
+  body{
+    padding-top:132px;
+    padding-bottom:95px;
+  }
+
+  .teams{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:5px;
+  }
+
+  .team{
+    min-height:91px;
+    padding:6px 2px;
+  }
+
+  .team img{
+    height:52px;
+  }
+
+  .team span{
+    font-size:9px;
+  }
+
+  .times{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+
+  .logo{
+    font-size:19px;
+  }
+}
+
+/* CELULARES GRANDES */
+
+@media(min-width:381px) and (max-width:600px){
+  .teams{
+    grid-template-columns:repeat(5,minmax(0,1fr));
+  }
+
+  .team{
+    min-height:100px;
+  }
+}
+
+/* TABLETS */
+
+@media(min-width:601px){
+  body{
+    padding-top:130px;
+  }
+
+  main{
+    padding:16px;
+  }
+
+  .teams{
+    grid-template-columns:repeat(7,minmax(0,1fr));
+    gap:12px;
+  }
+
+  .team{
+    min-height:125px;
+    padding:12px 6px;
+  }
+
+  .team img{
+    max-width:90px;
+    height:82px;
+  }
+
+  .team span{
+    font-size:11px;
+  }
+
+  .times{
+    grid-template-columns:repeat(6,minmax(0,1fr));
+  }
+}
+
+/* COMPUTADORES */
+
+@media(min-width:1000px){
+  main{
+    max-width:1400px;
+  }
+
+  .teams{
+    grid-template-columns:repeat(10,minmax(0,1fr));
+    gap:12px;
+  }
+
+  .team{
+    min-height:135px;
+  }
+
+  .team img{
+    max-width:100px;
+    height:90px;
+  }
+
+  .team span{
+    font-size:11px;
+  }
+
+  .times{
+    grid-template-columns:repeat(8,minmax(0,1fr));
+  }
+}
+.results-title{
+  color:var(--gold);
+  font-size:16px;
+  font-weight:900;
+  margin:0 0 10px;
+}
+
+.results-textarea{
+  width:100%;
+  min-height:120px;
+  resize:vertical;
+  padding:13px;
+  border:1px solid #40516d;
+  border-radius:11px;
+  background:#0c1626;
+  color:#18c889;
+  font-family:monospace;
+  font-size:13px;
+  line-height:1.7;
+  outline:none;
+  white-space:pre;
+  overflow:auto;
+}
+
+.results-status{
+  text-align:center;
+  color:var(--muted);
+  font-size:11px;
+  margin-top:8px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-top">
+      
+    <div class="logo">TIME CERTO</div>
+    
+    <div class="menu-area">
+      <button class="menu-button" id="menuButton" type="button">☰</button>
+      <div class="dropdown" id="dropdown">
+        <button type="button" id="betMenu">💰 SUA APOSTA</button>
+        <button type="button" id="historyMenu">📋 Minhas apostas</button>
+        <button style="display:none"type="button" id="changeNameMenu">👤 Alterar nome</button>
+        <button type="button" id="clearMenu">🧹 Limpar seleção</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-stats">
+    <div class="stat player-top">
+      <small>JOGADOR</small>
+      <strong id="playerDisplay">Nome não informado</strong>
+    </div>
+    <div class="stat">
+      <small>TIMES</small>
+      <strong><span id="count">0</span>/10</strong>
+    </div>
+    <div class="stat">
+      <small>VALOR</small>
+      <strong id="topValue">R$ 1,00</strong>
+    </div>
+  </div>
+</header>
+
+<!-- MODAL DO NOME -->
+<div class="modal-backdrop" id="nameModal">
+  <div class="name-modal">
+    <h2>IDENTIFIQUE-SE</h2>
+    <p>Informe seu nome para começar a jogar.</p>
+    <input class="field" id="playerNameInput"
+      maxlength="70" placeholder="Nome do jogador">
+    <button class="btn primary" id="saveName" type="button">
+      SALVAR E CONTINUAR
+    </button>
+    <div id="nameError" class="status"></div>
+  </div>
+</div>
+
+<!-- MODAL SUA APOSTA E PIX -->
+<div class="modal-backdrop" id="betModal">
+  <div class="bet-modal">
+
+    <div class="bet-modal-header">
+      <h2 class="heading" style="margin:0">💰 SUA APOSTA</h2>
+      <button class="close-bet" id="closeBet" type="button">
+        FECHAR ✕
+      </button>
+    </div>
+
+    <div class="playerline">
+      <div>
+        <span class="muted">JOGADOR</span><br>
+        <strong id="playerDisplayPanel">Nome não informado</strong>
+      </div>
+      <button style="di:none:none" class="change-name" id="changeName" type="button">
+        ALTERAR NOME
+      </button>
+    </div>
+
+    <div class="row">
+      <div class="metric">
+        <small>VALOR DIGITADO</small>
+        <strong id="amountDisplay">R$ 1,00</strong>
+      </div>
+      <div class="metric">
+        <small>PRÊMIO POTENCIAL (35x)</small>
+        <strong id="prizeValue">R$ 35,00</strong>
+      </div>
+    </div>
+
+    <div class="metric" style="margin-top:10px">
+      <small>VALOR A PAGAR</small>
+      <strong id="payValue">R$ 1,00</strong>
+    </div>
+
+    <button class="btn secondary" id="clear" type="button">
+      LIMPAR SELEÇÃO
+    </button>
+
+    <!-- PIX -->
+    <section class="panel pixbox" id="pixPanel" style="margin-top:15px">
+      <h2 class="heading">PAGAMENTO VIA PIX</h2>
+      <div id="qr" class="qr"></div>
+      <div class="muted" id="pixAmount"></div>
+      <label for="pixPayload">PIX COPIA E COLA</label>
+      <textarea class="pixcode" id="pixPayload" readonly></textarea>
+      <button class="btn primary" id="copyPix" type="button">
+        COPIAR CÓDIGO PIX
+      </button>
+      <div class="status" id="copyStatus"></div>
+      <div class="notice" style="margin-top:12px">
+        Sua aposta fica PENDENTE até a confirmação do pagamento.
+        A geração do Pix não confirma o recebimento.
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<main>
+
+  <section class="panel">
+  <h2 class="results-title">🏆 RESULTADOS DO TIME CERTO</h2>
+
+  <textarea
+    id="resultsTextarea"
+    class="results-textarea"
+    readonly
+    placeholder="Aguardando resultados do Firebase..."
+  ></textarea>
+
+  <div class="results-status" id="resultsStatus">
+    Conectando ao Firebase...
+  </div>
+</section>
+
+  <section class="panel">
+    <h2 class="heading">⚽ ESCOLHA ATÉ 10 TIMES</h2>
+    <div class="teams" id="teams"></div>
+  </section>
+
+  <section class="panel">
+    <h2 class="heading">🕒 HORÁRIOS DISPONÍVEIS</h2>
+    <div class="times" id="slots"></div>
+    <div class="status" id="slotInfo">Carregando horários...</div>
+  </section>
+
+  <section class="panel history-panel" id="historyPanel">
+    <h2 class="heading">📋 MINHAS APOSTAS</h2>
+    <div id="history"></div>
+  </section>
+
+</main>
+
+<!-- BARRA FIXA INFERIOR -->
+<div class="bottom-bar">
+  <div class="bottom-inner">
+    <input
+      id="amount"
+      type="number"
+      min="1"
+      max="1000"
+      step="0.01"
+      value="1.00"
+      inputmode="decimal"
+      aria-label="Valor da aposta"
+    >
+    <button id="createBet" type="button">
+      APOSTAR • PIX
+    </button>
+  </div>
+</div>
+
+
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAGOy5lPtqjSTtZpyFX7xtGGy3P2nYA77U",
+  authDomain: "placarexato-97966.firebaseapp.com",
+  databaseURL: "https://placarexato-97966-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "placarexato-97966",
+  storageBucket: "placarexato-97966.firebasestorage.app",
+  messagingSenderId: "942191850183",
+  appId: "1:942191850183:web:9870fab0d09044b11004e2"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+
+
+const BETS_PATH = "palpites";
+const PIX_KEY = "6f360f91-71c7-40da-b610-5a70ba3213dd";
+const PIX_NAME = "MULTIJOGO";
+const PIX_CITY = "SALVADOR";
+/* RESULTADOS DIRETAMENTE DO FIREBASE */
+
+const RESULTS_PATH = "timeCerto/resultados";
+
+function mostrarResultados(dados){
+
+  const textarea = $("resultsTextarea");
+  const status = $("resultsStatus");
+
+  if(!dados || typeof dados !== "object"){
+    textarea.value = "AGUARDANDO O PRIMEIRO RESULTADO...";
+    status.textContent = "Nenhum resultado publicado ainda.";
+    return;
+  }
+
+  const lista = [];
+
+  Object.keys(dados).forEach(data=>{
+
+    const resultadosDoDia = dados[data];
+
+    if(!resultadosDoDia || typeof resultadosDoDia !== "object") return;
+
+    Object.keys(resultadosDoDia).forEach(horarioKey=>{
+
+      const resultado = resultadosDoDia[horarioKey];
+
+      if(!resultado || typeof resultado !== "object") return;
+
+      const numero = Number(resultado.numero);
+      const time = resultado.time || resultado.nome || "TIME NÃO INFORMADO";
+
+      const horario = resultado.horario ||
+        horarioKey.replace("-",":");
+
+      const dataResultado = resultado.data || data;
+
+      if(!Number.isInteger(numero)) return;
+
+      lista.push({
+        data:dataResultado,
+        horario,
+        numero,
+        time
+      });
+
+    });
+
+  });
+
+  lista.sort((a,b)=>{
+
+    const chaveA = a.data+" "+a.horario;
+    const chaveB = b.data+" "+b.horario;
+
+    return chaveB.localeCompare(chaveA);
+
+  });
+
+  if(!lista.length){
+    textarea.value = "AGUARDANDO RESULTADOS...";
+    status.textContent = "Nenhum resultado encontrado.";
+    return;
+  }
+
+  textarea.value = lista.map(r=>{
+
+    const numero = String(r.numero).padStart(2,"0");
+
+    return (
+      r.data+" — "+r.horario+"\n"+
+      numero+" — "+r.time
+    );
+
+  }).join("\n\n");
+
+  status.textContent =
+    lista.length+" resultado(s) recebido(s) do Firebase.";
+
+}
+
+/* ESCUTA EM TEMPO REAL */
+db.ref(RESULTS_PATH).on("value",snapshot=>{
+
+  mostrarResultados(snapshot.val());
+
+},error=>{
+
+  console.error("Erro ao carregar resultados:",error);
+
+  $("resultsStatus").textContent =
+    "Erro ao conectar com os resultados do Firebase.";
+
+});
+const teamNames = [
+  // BRASILEIRO - SÉRIE A (1–20)
+  "ATHLETICO PR",
+  "ATLÉTICO MG",
+  "BAHIA",
+  "BOTAFOGO",
+  "RB BRAGANTINO",
+  "CHAPECOENSE",
+  "CORINTHIANS",
+  "CORITIBA",
+  "CRUZEIRO",
+  "FLAMENGO",
+  "FLUMINENSE",
+  "GRÊMIO",
+  "INTERNACIONAL",
+  "MIRASSOL",
+  "PALMEIRAS",
+  "REMO",
+  "SANTOS",
+  "SÃO PAULO",
+  "VASCO",
+  "VITÓRIA",
+
+  // BRASILEIRO - SÉRIE B (21–40)
+  "AMÉRICA MG",
+  "ATHLETIC MG",
+  "ATLÉTICO GO",
+  "AVAÍ",
+  "BOTAFOGO SP",
+  "CEARÁ",
+  "CRB",
+  "CRICIÚMA",
+  "CUIABÁ",
+  "FORTALEZA",
+  "GOIÁS",
+  "JUVENTUDE",
+  "LONDRINA",
+  "NÁUTICO",
+  "NOVORIZONTINO",
+  "OPERÁRIO PR",
+  "PONTE PRETA",
+  "SÃO BERNARDO",
+  "SPORT",
+  "VILA NOVA",
+
+  // INGLATERRA (41–44)
+  "ARSENAL",
+  "CHELSEA",
+  "LIVERPOOL",
+  "MANCHESTER UNITED",
+
+  // ESPANHA (45–47)
+  "ATLÉTICO DE MADRID",
+  "BARCELONA",
+  "REAL MADRID",
+
+  // ITÁLIA (48–49)
+  "INTERNAZIONALE",
+  "JUVENTUS",
+
+  // FRANÇA (50)
+  "PSG"
+];
+
+const $ = id => document.getElementById(id);
+const chosen = new Set();
+
+let selectedSlot = "";
+let userClearedSlot = false;
+let currentBet = null;
+let configBlocked = false;
+let configMessage = "";
+let playerName = localStorage.getItem("timeCertoPlayerName") || "";
+let currentDateKey = new Date().toDateString();
+
+const brl = n => Number(n || 0).toLocaleString("pt-BR", {
+  style:"currency",
+  currency:"BRL"
+});
+
+/* NOME DO JOGADOR */
+function updatePlayerDisplay(){
+  const nome = playerName || "Nome não informado";
+  $("playerDisplay").textContent = nome;
+  $("playerDisplayPanel").textContent = nome;
+}
+
+function abrirModalNome(){
+  $("playerNameInput").value = playerName;
+  $("nameError").textContent = "";
+  $("nameModal").classList.add("show");
+  $("dropdown").classList.remove("show");
+}
+
+function salvarNome(){
+  const nome = $("playerNameInput").value.trim();
+
+  if(!nome){
+    $("nameError").textContent = "Digite seu nome.";
+    return;
+  }
+
+  playerName = nome;
+  localStorage.setItem("timeCertoPlayerName",nome);
+  updatePlayerDisplay();
+  $("nameModal").classList.remove("show");
+}
+
+$("saveName").onclick = salvarNome;
+$("changeName").onclick = abrirModalNome;
+$("changeNameMenu").onclick = abrirModalNome;
+
+$("playerNameInput").addEventListener("keydown",e=>{
+  if(e.key === "Enter") salvarNome();
+});
+
+/* MENU */
+$("menuButton").onclick = e=>{
+  e.stopPropagation();
+  $("dropdown").classList.toggle("show");
+};
+
+$("betMenu").onclick = ()=>{
+  $("dropdown").classList.remove("show");
+  updatePlayerDisplay();
+  updateValues();
+  $("betModal").classList.add("show");
+};
+
+$("closeBet").onclick = ()=>{
+  $("betModal").classList.remove("show");
+};
+
+$("betModal").addEventListener("click",e=>{
+  if(e.target === $("betModal")){
+    $("betModal").classList.remove("show");
+  }
+});
+
+document.addEventListener("click",e=>{
+  if(!e.target.closest(".menu-area")){
+    $("dropdown").classList.remove("show");
+  }
+});
+
+/* CONTADOR */
+function updateCount(){
+  $("count").textContent = chosen.size;
+  updateValues();
+}
+
+
+/* TIMES */
+function renderTeams(){
+  const root = $("teams");
+  root.innerHTML = "";
+
+  teamNames.forEach((name,i)=>{
+    const el = document.createElement("div");
+    el.className = "team";
+    el.dataset.number = i+1;
+
+    const img = document.createElement("img");
+    const escudos = {
+  1: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794519241/atletico-paranaense.png",
+  2: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784507594/atletico-mineiro.png",
+  3: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778197838/bahia.jpg",
+  4: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794522877/botafo.jpg",
+  5: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794523405/bragantino.png",
+    6: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784512917/chapecoense.png",
+  7: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794523484/corinthians.png",
+  8: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778197703/coritiba.jpg",
+  9: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198371/cruzeiro.png",
+  10: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784513564/flamengo.png",
+  11: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778195735/fluminense.jpg",
+  12: "https://res.cloudinary.com/dtw3turzb/image/upload/v1786830843/gremio.png",
+  13: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198189/internacional.jpg",
+  14: "https://res.cloudinary.com/dtw3turzb/image/upload/v1786831074/mirassol.png",
+  15: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784513469/palmeiras.png",
+  16: "https://res.cloudinary.com/dtw3turzb/image/upload/v1786926638/remo.png",
+  17: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778195807/santos.jpg",
+  18: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784513002/sao-paulo.png",
+  19: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794524604/vasco.png",
+  20: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198343/vitoria.png",
+  21: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784508008/america-mg.png",
+  22: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794524959/athletic-mg.png",
+  23: "https://res.cloudinary.com/dtw3turzb/image/upload/v1786746932/atletico-goianiense.png",
+  24: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784507675/avai.png",
+  25: "https://res.cloudinary.com/dtw3turzb/image/upload/v1787081047/botafogo-sp.png",
+  26: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198001/ceara.png",
+  27: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198031/crb.jpg",
+  28: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198777/criciuma.jpg",
+  29: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198491/cuiaba.jpg",
+  30: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784508115/fortaleza.png",
+  31: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778197882/goias.png",
+  32: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778197334/juventude.jpg",
+  33: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784513960/londrina.png",
+  34: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784513173/nautico.png",
+  35: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784507748/novo-horizontino.png",
+  36: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198743/operario.png",
+  37: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778197963/ponte-preta.png",
+  38: "https://res.cloudinary.com/dtw3turzb/image/upload/v1786636721/sao-bernardo.png",
+  39: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198657/sport-recife.jpg",
+  40: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198422/vila-nova.jpg",
+  41: "https://res.cloudinary.com/dtw3turzb/image/upload/v1788145764/arsenal.png",
+  42: "https://res.cloudinary.com/dtw3turzb/image/upload/v1788052987/chelsea.png",
+  43: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794526766/liverpool.jpg",
+  44: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794526804/mancheste-united.png",
+  45: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794526879/atletico-de-madrid.webp",
+  46: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794526928/barcelonasportingclubbarcelona-sporting-club-logo.png",
+  47: "https://res.cloudinary.com/dtw3turzb/image/upload/v1787701694/real-madrid.png",
+  48: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794527212/internazionale.png",
+  49: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794527240/juventus.png",
+  50: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794527271/psg.png"
+  // Continue até o time 50
+};
+
+img.src = escudos[i + 1] || `${i + 1}.jpeg`;
+    img.alt = name;
+    img.loading = "lazy";
+
+    const span = document.createElement("span");
+    span.textContent = `${String(i+1).padStart(2,"0")} • ${name}`;
+
+    el.append(img,span);
+
+    el.onclick = ()=>{
+      const number = i+1;
+
+      if(chosen.has(number)){
+        chosen.delete(number);
+        el.classList.remove("selected");
+      }else{
+        if(chosen.size >= 10){
+          alert("Limite de 10 times.");
+          return;
+        }
+
+        chosen.add(number);
+        el.classList.add("selected");
+      }
+
+      updateCount();
+    };
+
+    root.appendChild(el);
+  });
+}
+
+/* HORÁRIOS */
+/* HORÁRIOS — TODOS OS DIAS, SOMENTE HOJE */
+
+function businessDay(){
+  return true;
+}
+
+function getTodayKey(){
+  const d = new Date();
+  const ano = d.getFullYear();
+  const mes = String(d.getMonth()+1).padStart(2,"0");
+  const dia = String(d.getDate()).padStart(2,"0");
+
+  return `${ano}-${mes}-${dia}`;
+}
+
+function getAvailableSlots(){
+  const agora = new Date();
+  const slots = [];
+
+  for(let hora = 0; hora < 24; hora++){
+    const horario = String(hora).padStart(2,"0") + ":00";
+
+    const dataHorario = new Date(
+      agora.getFullYear(),
+      agora.getMonth(),
+      agora.getDate(),
+      hora, 0, 0, 0
+    );
+
+    if(dataHorario >= agora){
+      slots.push(horario);
+    }
+  }
+
+  return slots;
+}
+
+function renderSlots(){
+  const root = $("slots");
+  root.innerHTML = "";
+
+  const hoje = getTodayKey();
+
+  if(hoje !== currentDateKey){
+    currentDateKey = hoje;
+    selectedSlot = "";
+    userClearedSlot = false;
+  }
+
+  const available = getAvailableSlots();
+
+  if(selectedSlot && !available.includes(selectedSlot)){
+    selectedSlot = "";
+    userClearedSlot = false;
+  }
+
+  if(!selectedSlot && !userClearedSlot && available.length){
+    selectedSlot = available[0];
+  }
+
+  available.forEach(value=>{
+    const b = document.createElement("button");
+
+    b.type = "button";
+    b.className = "slot" +
+      (selectedSlot === value ? " active" : "");
+
+    b.textContent = value;
+
+    b.onclick = ()=>{
+      if(selectedSlot === value){
+        selectedSlot = "";
+        userClearedSlot = true;
+      }else{
+        selectedSlot = value;
+        userClearedSlot = false;
+      }
+
+      renderSlots();
+    };
+
+    root.appendChild(b);
+  });
+
+  if(configBlocked){
+    $("slotInfo").textContent =
+      configMessage || "Marcações temporariamente encerradas.";
+  }else if(!available.length){
+    $("slotInfo").textContent =
+      "Todas as extrações de hoje encerradas. Aguarde a meia-noite.";
+  }else if(selectedSlot){
+    $("slotInfo").textContent =
+      "HORÁRIO ESCOLHIDO: " + selectedSlot;
+  }else{
+    $("slotInfo").textContent =
+      "Escolha um horário disponível.";
+  }
+}
+/* CONFIGURAÇÃO DO ADMIN */
+db.ref("timeCerto/configuracao").on("value",snap=>{
+  const cfg = snap.val() || {};
+
+  configBlocked = cfg.bloqueado === true;
+  configMessage = cfg.mensagem || "";
+
+  $("createBet").disabled = configBlocked;
+  $("createBet").textContent = configBlocked
+    ? "MARCAÇÕES BLOQUEADAS"
+    : "APOSTAR • PIX";
+
+  renderSlots();
+});
+
+/* VALORES */
+function updateValues(){
+  const valorPorTime = Math.max(0, Number($("amount").value) || 0);
+  const quantidadeTimes = chosen.size;
+  const valorTotal = valorPorTime * quantidadeTimes;
+
+  $("amountDisplay").textContent = brl(valorPorTime);
+  $("payValue").textContent = brl(valorTotal);
+  $("prizeValue").textContent = brl(valorPorTime * 35);
+  $("topValue").textContent = brl(valorPorTime);
+}
+$("amount").addEventListener("input",updateValues);
+
+/* PIX */
+function tlv(id,value){
+  const v = String(value);
+  return id+String(v.length).padStart(2,"0")+v;
+}
+
+function crc16(str){
+  let crc = 0xFFFF;
+
+  for(let i=0;i<str.length;i++){
+    crc ^= str.charCodeAt(i)<<8;
+
+    for(let j=0;j<8;j++){
+      crc = (crc&0x8000)
+        ? ((crc<<1)^0x1021)
+        : (crc<<1);
+
+      crc &= 0xFFFF;
+    }
+  }
+
+  return crc.toString(16).toUpperCase().padStart(4,"0");
+}
+
+
+function removerAcentos(texto){
+  return String(texto)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"");
+}
+
+function pixPayload(amount,txid){
+
+  const valor = Number(amount);
+
+  if(!Number.isFinite(valor) || valor < 0.01){
+    throw new Error("Valor Pix inválido.");
+  }
+
+  const nome = removerAcentos(PIX_NAME)
+    .substring(0,25)
+    .toUpperCase();
+
+  const cidade = removerAcentos(PIX_CITY)
+    .substring(0,15)
+    .toUpperCase();
+
+  const contaPix =
+    tlv("00","BR.GOV.BCB.PIX")+
+    tlv("01",PIX_KEY);
+
+  let payload =
+    tlv("00","01")+
+    tlv("26",contaPix)+
+    tlv("52","0000")+
+    tlv("53","986")+
+    tlv("54",valor.toFixed(2))+
+    tlv("58","BR")+
+    tlv("59",nome)+
+    tlv("60",cidade)+
+    tlv("62",tlv("05",String(txid).substring(0,25)));
+
+  const semCRC = payload+"6304";
+
+  return semCRC+crc16(semCRC);
+}
+
+
+/* HISTÓRICO LOCAL */
+function localHistoryAdd(item){
+  let arr = [];
+
+  try{
+    arr = JSON.parse(
+      localStorage.getItem("timeCertoHistory") || "[]"
+    );
+
+    if(!Array.isArray(arr)) arr = [];
+  }catch(e){
+    arr = [];
+  }
+
+  arr.unshift(item);
+
+  localStorage.setItem(
+    "timeCertoHistory",
+    JSON.stringify(arr.slice(0,20))
+  );
+
+  renderHistory();
+}
+
+function renderHistory(){
+  let arr = [];
+
+  try{
+    arr = JSON.parse(
+      localStorage.getItem("timeCertoHistory") || "[]"
+    );
+
+    if(!Array.isArray(arr)) arr = [];
+  }catch(e){
+    arr = [];
+  }
+
+  const root = $("history");
+  root.innerHTML = "";
+
+  if(!arr.length){
+    root.textContent =
+      "Nenhuma aposta registrada neste aparelho.";
+    return;
+  }
+
+  arr.forEach(item=>{
+    const div = document.createElement("div");
+    div.className = "history-item";
+
+    const title = document.createElement("strong");
+    title.textContent = item.id+" • "+item.status;
+
+    const details = document.createElement("div");
+    details.textContent =
+      item.data+" • "+brl(item.valor)+" • "+item.horario;
+
+    const teams = document.createElement("div");
+    teams.textContent = (item.times || []).join(", ");
+
+    div.append(title,details,teams);
+    root.appendChild(div);
+  });
+}
+
+function toggleHistory(){
+  const panel = $("historyPanel");
+
+  panel.classList.toggle("show");
+  $("dropdown").classList.remove("show");
+
+  if(panel.classList.contains("show")){
+    renderHistory();
+    panel.scrollIntoView({
+      behavior:"smooth",
+      block:"start"
+    });
+  }
+}
+
+$("historyMenu").onclick = toggleHistory;
+
+/* LIMPAR SELEÇÃO */
+function clearSelection(){
+  chosen.clear();
+
+  document.querySelectorAll(".team").forEach(el=>{
+    el.classList.remove("selected");
+  });
+
+  updateCount();
+
+  selectedSlot = "";
+  userClearedSlot = false;
+
+  $("amount").value = "1.00";
+  updateValues();
+
+  $("pixPanel").classList.remove("show");
+  $("qr").innerHTML = "";
+  $("pixPayload").value = "";
+  $("pixAmount").textContent = "";
+  $("copyStatus").textContent = "";
+
+  currentBet = null;
+
+  renderSlots();
+  $("dropdown").classList.remove("show");
+}
+
+$("clear").onclick = clearSelection;
+$("clearMenu").onclick = clearSelection;
+
+/* REGISTRAR APOSTA */
+$("createBet").onclick = async()=>{
+  if(configBlocked){
+    alert(
+      configMessage ||
+      "Marcações temporariamente bloqueadas pelo administrador."
+    );
+    return;
+  }
+
+  if(!playerName){
+    abrirModalNome();
+    alert("Informe seu nome para continuar.");
+    return;
+  }
+
+  const amount = Number($("amount").value);
+
+  if(!chosen.size){
+    alert("Selecione pelo menos um time.");
+    return;
+  }
+
+  if(chosen.size > 10){
+    alert("Máximo de 10 times.");
+    return;
+  }
+
+  if(!selectedSlot){
+    alert("Escolha um horário.");
+    return;
+  }
+
+  
+
+  const available = getAvailableSlots();
+
+  if(!available.includes(selectedSlot)){
+    selectedSlot = "";
+    userClearedSlot = false;
+    renderSlots();
+    alert("Esse horário já passou. Escolha outro.");
+    return;
+  }
+
+  if(!Number.isFinite(amount) || amount < 1 || amount > 1000){
+    alert("Informe um valor entre R$ 1,00 e R$ 1.000,00.");
+    return;
+  }
+
+  const id = "TC"+Date.now().toString(36).toUpperCase();
+
+  const times = [...chosen]
+    .sort((a,b)=>a-b)
+    .map(n=>({
+      numero:n,
+      nome:teamNames[n-1]
+    }));
+
+  const valorPorTime = amount;
+const quantidadeTimes = times.length;
+const valorTotal = valorPorTime * quantidadeTimes;
+
+const payload = pixPayload(valorTotal, id);
+
+  const bet = {
+  id,
+  nome: playerName,
+  valorPorTime: valorPorTime,
+  quantidadeTimes: quantidadeTimes,
+  valor: valorTotal,
+  premioPotencial: valorTotal * 35,
+  dataHorario: getTodayKey(),
+  horario: selectedSlot,
+  times,
+  status: "PENDENTE",
+  chavePix: PIX_KEY,
+  pixCopiaECola: payload,
+  criadoEm: new Date().toISOString(),
+  timestamp: Date.now()
+};
+
+  const btn = $("createBet");
+  btn.disabled = true;
+  btn.textContent = "REGISTRANDO...";
+
+  try{
+    await db.ref(BETS_PATH+"/"+id).set(bet);
+
+    currentBet = bet;
+
+    localHistoryAdd({
+  id,
+  valor: valorTotal,
+  valorPorTime: valorPorTime,
+  quantidadeTimes: quantidadeTimes,
+  horario: selectedSlot,
+  status: "PENDENTE",
+  data: new Date().toLocaleString("pt-BR"),
+  times: times.map(t => t.numero + " " + t.nome)
+});
+
+    $("pixPanel").classList.add("show");
+
+   $("pixAmount").textContent =
+  "Pague " + brl(valorTotal) + " para validar a aposta.";
+
+    $("pixPayload").value = payload;
+    $("qr").innerHTML = "";
+
+    new QRCode($("qr"),{
+      text:payload,
+      width:220,
+      height:220,
+      colorDark:"#000000",
+      colorLight:"#ffffff",
+      correctLevel:QRCode.CorrectLevel.M
+    });
+
+    $("copyStatus").textContent = "";
+
+    $("betModal").classList.add("show");
+
+    setTimeout(()=>{
+      $("pixPanel").scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+      });
+    },150);
+
+  }catch(error){
+    console.error(error);
+
+    alert(
+      "Não foi possível registrar no Firebase. "+
+      "Verifique a conexão e as regras do banco."
+    );
+
+  }finally{
+    btn.disabled = configBlocked;
+    btn.textContent = configBlocked
+      ? "MARCAÇÕES BLOQUEADAS"
+      : "APOSTAR • PIX";
+  }
+};
+
+/* COPIAR PIX */
+$("copyPix").onclick = async()=>{
+  const payload = $("pixPayload").value;
+
+  if(!payload){
+    alert("Nenhum código Pix disponível.");
+    return;
+  }
+
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(payload);
+    }else{
+      $("pixPayload").select();
+      document.execCommand("copy");
+    }
+
+    $("copyStatus").textContent =
+      "Código Pix copiado. Abra seu banco e pague.";
+
+  }catch(error){
+    $("pixPayload").select();
+
+    $("copyStatus").textContent =
+      "Selecione o código e copie manualmente.";
+  }
+};
+
+/* INICIALIZAÇÃO */
+renderTeams();
+renderSlots();
+updateValues();
+updatePlayerDisplay();
+renderHistory();
+
+if(!playerName){
+  abrirModalNome();
+}
+
+setInterval(renderSlots,10000);
+</script>
+
+</body>
+</html>
