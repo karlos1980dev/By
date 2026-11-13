@@ -1,0 +1,1617 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#081426">
+<title>TIME CERTO - ADMIN</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#081426;color:white;
+ font-family:Arial,sans-serif
+}
+header{
+ background:#101f35;padding:16px;
+ display:flex;justify-content:space-between;
+ align-items:center;border-bottom:2px solid #eabb45
+}
+h1{font-size:19px;color:#f5c451;margin:0}
+h2{font-size:17px;color:#f5c451}
+main{max-width:1100px;margin:auto;padding:12px}
+.card{
+ background:#122640;border:1px solid #29415e;
+ border-radius:13px;padding:15px;margin-bottom:14px
+}
+input,select{
+ width:100%;padding:12px;border-radius:8px;
+ border:1px solid #38516f;background:#071629;
+ color:white;margin:5px 0
+}
+button{
+ padding:11px 13px;border:0;border-radius:8px;
+ background:#f5c451;color:#142033;
+ font-weight:bold;cursor:pointer;margin:3px
+}
+button:disabled{opacity:.5;cursor:not-allowed}
+.verde{background:#16845c;color:white}
+.vermelho{background:#a12e3c;color:white}
+.azul{background:#294968;color:white}
+.grid{
+ display:grid;grid-template-columns:repeat(4,1fr);
+ gap:8px
+}
+.kpi{
+ background:#091a2e;padding:13px;border-radius:10px;
+ border:1px solid #29415e
+}
+.kpi small{color:#aabbd0}
+.kpi strong{
+ display:block;color:#f5c451;font-size:21px;
+ margin-top:6px
+}
+.tabs{display:flex;gap:5px;overflow:auto;margin:15px 0}
+.tabs button{white-space:nowrap;background:#294968;color:white}
+.tabs button.ativo{background:#f5c451;color:#142033}
+.tela{display:none}
+.tela.ativo{display:block}
+table{
+ width:100%;border-collapse:collapse;
+ min-width:850px;background:#091a2e
+}
+th,td{
+ padding:9px;text-align:left;
+ border-bottom:1px solid #29415e;font-size:12px
+}
+th{color:#f5c451;background:#142b47}
+.tablebox{overflow:auto}
+small,.info{color:#aabbd0}
+.info{
+ background:#1b3551;padding:12px;
+ border-radius:8px;font-size:13px;line-height:1.6;
+ margin:10px 0
+}
+.resultado{
+ color:#f5c451;font-size:25px;
+ font-weight:bold;margin:15px 0
+}
+.hidden{display:none!important}
+#login{
+ max-width:360px;margin:100px auto;
+ text-align:center
+}
+#login h1{font-size:26px;margin-bottom:20px}
+#toast{
+ display:none;position:fixed;bottom:20px;
+ left:50%;transform:translateX(-50%);
+ background:#203b59;border:1px solid #f5c451;
+ padding:12px;border-radius:10px;z-index:10;
+ max-width:90%;width:max-content
+}
+.status-auto{
+ font-size:16px;font-weight:bold;
+ margin:8px 0;color:#f5c451
+}
+@media(max-width:600px){
+ .grid{grid-template-columns:repeat(2,1fr)}
+ main{padding:8px}
+ .card{padding:11px}
+ header{padding:12px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login" class="card">
+ <h1>TIME CERTO</h1>
+ <p>PAINEL ADMINISTRATIVO</p>
+
+ <input id="senha" type="password"
+ placeholder="Digite a senha">
+
+ <button style="width:100%" onclick="entrar()">
+ ENTRAR NO PAINEL
+ </button>
+
+ <p id="erro" style="color:#ff7777"></p>
+</div>
+
+<!-- PAINEL -->
+<div id="painel" class="hidden">
+
+<header>
+ <div>
+  <h1>TIME CERTO ADMIN</h1>
+  <small>Gerenciamento administrativo</small>
+ </div>
+ <button class="azul" onclick="sair()">SAIR</button>
+</header>
+
+<main>
+
+<div class="grid">
+ <div class="kpi">
+  <small>Total de apostas</small>
+  <strong id="total">0</strong>
+ </div>
+ <div class="kpi">
+  <small>Valor apostado</small>
+  <strong id="valor">R$ 0,00</strong>
+ </div>
+ <div class="kpi">
+  <small>Ganhadores</small>
+  <strong id="ganhadores">0</strong>
+ </div>
+ <div class="kpi">
+  <small>Pendentes</small>
+  <strong id="pendentes">0</strong>
+ </div>
+</div>
+
+<div class="tabs">
+ <button class="ativo" onclick="abrir('apostas',this)">APOSTAS</button>
+ <button onclick="abrir('sorteio',this)">SORTEIO</button>
+ <button onclick="abrir('resultados',this)">RESULTADOS</button>
+ <button onclick="abrir('controle',this)">CONTROLE</button>
+ <button onclick="abrir('limpeza',this)">LIMPEZA</button>
+</div>
+
+<!-- APOSTAS -->
+<section id="apostas" class="tela ativo card">
+ <h2>APOSTAS REGISTRADAS</h2>
+
+ <label>Data</label>
+ <input type="date" id="filtroData">
+
+ <label>Horário</label>
+ <select id="filtroHora">
+  <option value="">Todos os horários</option>
+ </select>
+
+ <label>Pesquisar jogador ou time</label>
+ <input id="pesquisa" placeholder="Pesquisar...">
+
+ <button onclick="mostrarApostas()">PESQUISAR</button>
+
+ <p class="info" id="quantidade">Carregando apostas...</p>
+
+ <div class="tablebox">
+ <table>
+ <thead>
+ <tr>
+  <th>JOGADOR</th>
+  <th>DATA</th>
+  <th>HORÁRIO</th>
+  <th>TIME</th>
+  <th>NÚMERO</th>
+  <th>VALOR</th>
+  <th>PRÊMIO</th>
+  <th>PAGAMENTO</th>
+  <th>RESULTADO</th>
+  <th>AÇÃO</th>
+ </tr>
+ </thead>
+ <tbody id="listaApostas"></tbody>
+ </table>
+ </div>
+</section>
+
+<!-- SORTEIO -->
+<section id="sorteio" class="tela card">
+
+ <h2>SORTEAR E PUBLICAR</h2>
+
+ <!-- CONTROLE AUTOMÁTICO -->
+ <div class="info">
+  <b>SORTEIO AUTOMÁTICO — 24 HORAS</b>
+
+  <p id="statusAutomatico" class="status-auto">
+   CARREGANDO CONFIGURAÇÃO...
+  </p>
+
+  <button class="verde"
+   onclick="configurarSorteioAutomatico(true)">
+   ATIVAR AUTOMÁTICO
+  </button>
+
+  <button class="vermelho"
+   onclick="configurarSorteioAutomatico(false)">
+   DESATIVAR AUTOMÁTICO
+  </button>
+
+  <p>
+   Sorteios programados de 00:00 até 23:00,
+   de hora em hora, no horário de Brasília.
+  </p>
+
+  <p id="proximoAutomatico">
+   Próxima extração: aguardando...
+  </p>
+
+  <p id="ultimaAutomatica">
+   Última verificação: aguardando...
+  </p>
+ </div>
+
+ <label>Data do sorteio</label>
+ <input type="date" id="dataSorteio">
+
+ <label>Horário</label>
+ <select id="horaSorteio"></select>
+
+ <label>Time sorteado</label>
+ <select id="timeSorteado"></select>
+
+ <div class="resultado" id="preview">
+  SELECIONE O TIME
+ </div>
+
+ <button onclick="sortear()">SORTEAR TIME</button>
+
+ <button class="azul" onclick="conferir()">
+ CONFERIR APOSTAS
+ </button>
+
+ <button class="verde" onclick="publicar()">
+ PUBLICAR RESULTADO
+ </button>
+
+ <div class="info" id="conferencia">
+  Selecione o resultado para conferir.
+ </div>
+
+ <h2>GANHADORES</h2>
+
+ <div class="tablebox">
+ <table>
+ <thead>
+ <tr>
+  <th>JOGADOR</th>
+  <th>TIME</th>
+  <th>NÚMERO</th>
+  <th>VALOR</th>
+  <th>PRÊMIO POTENCIAL</th>
+ </tr>
+ </thead>
+ <tbody id="listaGanhadores"></tbody>
+ </table>
+ </div>
+
+</section>
+
+<!-- RESULTADOS -->
+<section id="resultados" class="tela card">
+ <h2>RESULTADOS PUBLICADOS</h2>
+
+ <div class="tablebox">
+ <table>
+ <thead>
+ <tr>
+  <th>DATA</th>
+  <th>HORÁRIO</th>
+  <th>NÚMERO</th>
+  <th>TIME</th>
+  <th>PUBLICADO EM</th>
+  <th>AÇÃO</th>
+ </tr>
+ </thead>
+ <tbody id="listaResultados"></tbody>
+ </table>
+ </div>
+</section>
+
+<!-- CONTROLE -->
+<section id="controle" class="tela card">
+ <h2>CONTROLE DAS APOSTAS</h2>
+
+ <label>Mensagem para os jogadores</label>
+ <input id="mensagem"
+ placeholder="Apostas temporariamente encerradas">
+
+ <button class="vermelho" onclick="bloquear(true)">
+ BLOQUEAR APOSTAS
+ </button>
+
+ <button class="verde" onclick="bloquear(false)">
+ LIBERAR APOSTAS
+ </button>
+
+ <p class="info" id="situacao">
+ Carregando configuração...
+ </p>
+</section>
+
+<!-- LIMPEZA -->
+<section id="limpeza" class="tela card">
+ <h2>LIMPEZA DE HISTÓRICO</h2>
+
+ <p class="info">
+ Atenção! As exclusões são permanentes.
+ </p>
+
+ <h3>Apagar todas as apostas</h3>
+ <button class="vermelho" onclick="limparApostas()">
+ APAGAR TODAS AS APOSTAS
+ </button>
+
+ <hr style="border-color:#29415e;margin:20px 0">
+
+ <h3>Apagar todos os resultados</h3>
+ <button class="vermelho" onclick="limparResultados()">
+ APAGAR TODOS OS RESULTADOS
+ </button>
+</section>
+
+</main>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-database-compat.js"></script>
+
+<script>
+
+/* =================================
+   CONFIGURAÇÕES
+================================= */
+
+const SENHA_ADMIN = "12345";
+
+const firebaseConfig = {
+ projectId: "placarexato-97966",
+ databaseURL: "https://placarexato-97966-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+
+const FUSO_HORARIO = "America/Sao_Paulo";
+
+const CAMINHO_CONFIG =
+ "timeCerto/configuracao";
+
+const CAMINHO_RESULTADOS =
+ "timeCerto/resultados";
+
+/* =================================
+   50 TIMES
+================================= */
+
+const times = [
+"ATHLETICO PR","ATLÉTICO MG","BAHIA","BOTAFOGO",
+"RB BRAGANTINO","CHAPECOENSE","CORINTHIANS",
+"CORITIBA","CRUZEIRO","FLAMENGO","FLUMINENSE",
+"GRÊMIO","INTERNACIONAL","MIRASSOL","PALMEIRAS",
+"REMO","SANTOS","SÃO PAULO","VASCO","VITÓRIA",
+"AMÉRICA MG","ATHLETIC MG","ATLÉTICO GO","AVAÍ",
+"BOTAFOGO SP","CEARÁ","CRB","CRICIÚMA","CUIABÁ",
+"FORTALEZA","GOIÁS","JUVENTUDE","LONDRINA",
+"NÁUTICO","NOVORIZONTINO","OPERÁRIO PR",
+"PONTE PRETA","SÃO BERNARDO","SPORT","VILA NOVA",
+"ARSENAL","CHELSEA","LIVERPOOL","MANCHESTER UNITED",
+"ATLÉTICO DE MADRID","BARCELONA","REAL MADRID",
+"INTERNAZIONALE","JUVENTUS","PSG"
+];
+
+/* =================================
+   VARIÁVEIS
+================================= */
+
+let db;
+let apostas = {};
+let resultados = {};
+
+let sorteioAutomaticoAtivo = false;
+let verificacaoAutomatica = null;
+let processandoAutomatico = false;
+let inicializado = false;
+
+let ultimaVerificacao = "";
+let ultimaMensagemAutomatica = "";
+
+const $ = id => document.getElementById(id);
+
+/* =================================
+   FUNÇÕES GERAIS
+================================= */
+
+function dinheiro(v){
+ return Number(v||0).toLocaleString("pt-BR",{
+  style:"currency",
+  currency:"BRL"
+ });
+}
+
+function escapar(v){
+ return String(v??"").replace(/[&<>"']/g,c=>({
+  "&":"&amp;",
+  "<":"&lt;",
+  ">":"&gt;",
+  '"':"&quot;",
+  "'":"&#39;"
+ }[c]));
+}
+
+function aviso(msg){
+ $("toast").textContent=msg;
+ $("toast").style.display="block";
+
+ clearTimeout(window.toastTimer);
+
+ window.toastTimer=setTimeout(()=>{
+  $("toast").style.display="none";
+ },4000);
+}
+
+function hojeSP(){
+ const partes=new Intl.DateTimeFormat("en-CA",{
+  timeZone:FUSO_HORARIO,
+  year:"numeric",
+  month:"2-digit",
+  day:"2-digit"
+ }).formatToParts(new Date());
+
+ const p={};
+
+ partes.forEach(x=>p[x.type]=x.value);
+
+ return p.year+"-"+p.month+"-"+p.day;
+}
+
+function partesSP(timestamp){
+
+ const partes=new Intl.DateTimeFormat("en-GB",{
+  timeZone:FUSO_HORARIO,
+  year:"numeric",
+  month:"2-digit",
+  day:"2-digit",
+  hour:"2-digit",
+  minute:"2-digit",
+  second:"2-digit",
+  hourCycle:"h23"
+ }).formatToParts(new Date(timestamp));
+
+ const p={};
+
+ partes.forEach(x=>p[x.type]=x.value);
+
+ return p;
+}
+
+function formatarDataHoraSP(timestamp){
+
+ const p=partesSP(timestamp);
+
+ return {
+  data:p.year+"-"+p.month+"-"+p.day,
+  hora:p.hour+":00"
+ };
+}
+
+function proximaHoraSP(){
+
+ const agora=Date.now();
+ const p=partesSP(agora);
+
+ const minutos=Number(p.minute);
+ const segundos=Number(p.second);
+
+ const ms=new Date(agora).getMilliseconds();
+
+ const faltam=
+  ((60-minutos)*60*1000)-
+  (segundos*1000)-
+  ms;
+
+ return agora+faltam;
+}
+
+function formatarHorarioCompleto(timestamp){
+
+ if(!timestamp)return "Não definido";
+
+ return new Intl.DateTimeFormat("pt-BR",{
+  timeZone:FUSO_HORARIO,
+  dateStyle:"short",
+  timeStyle:"short"
+ }).format(new Date(timestamp));
+}
+
+/* =================================
+   LOGIN
+================================= */
+
+function entrar(){
+
+ if($("senha").value===SENHA_ADMIN){
+
+  sessionStorage.setItem("TC_ADMIN","1");
+
+  $("login").classList.add("hidden");
+  $("painel").classList.remove("hidden");
+
+  iniciar();
+
+ }else{
+
+  $("erro").textContent="Senha incorreta!";
+
+ }
+}
+
+$("senha").addEventListener("keydown",e=>{
+ if(e.key==="Enter")entrar();
+});
+
+function sair(){
+
+ sessionStorage.removeItem("TC_ADMIN");
+
+ location.reload();
+}
+
+/* =================================
+   ABAS
+================================= */
+
+function abrir(nome,botao){
+
+ document.querySelectorAll(".tela")
+ .forEach(x=>x.classList.remove("ativo"));
+
+ $(nome).classList.add("ativo");
+
+ document.querySelectorAll(".tabs button")
+ .forEach(x=>x.classList.remove("ativo"));
+
+ botao.classList.add("ativo");
+
+ if(nome==="apostas")mostrarApostas();
+
+ if(nome==="resultados")mostrarResultados();
+
+ if(nome==="sorteio")conferir();
+}
+
+/* =================================
+   INICIALIZAÇÃO
+================================= */
+
+function iniciar(){
+
+ if(inicializado)return;
+
+ inicializado=true;
+
+ try{
+
+  if(!firebase.apps.length){
+   firebase.initializeApp(firebaseConfig);
+  }
+
+  db=firebase.database();
+
+  const horas=Array.from({length:24},(_,i)=>
+   String(i).padStart(2,"0")+":00"
+  );
+
+  $("horaSorteio").innerHTML=horas.map(h=>
+   `<option value="${h}">${h}</option>`
+  ).join("");
+
+  $("filtroHora").innerHTML=
+   '<option value="">Todos os horários</option>'+
+   horas.map(h=>
+    `<option value="${h}">${h}</option>`
+   ).join("");
+
+  $("timeSorteado").innerHTML=times.map((t,i)=>
+   `<option value="${i+1}">${String(i+1).padStart(2,"0")} - ${t}</option>`
+  ).join("");
+
+  $("dataSorteio").value=hojeSP();
+  $("filtroData").value=hojeSP();
+
+  $("timeSorteado").onchange=atualizarPreview;
+  $("dataSorteio").onchange=conferir;
+  $("horaSorteio").onchange=conferir;
+  $("pesquisa").oninput=mostrarApostas;
+
+  atualizarPreview();
+
+  /* APOSTAS */
+
+  db.ref("palpites").on("value",s=>{
+
+   apostas=s.val()||{};
+
+   estatisticas();
+   mostrarApostas();
+
+   if($("sorteio").classList.contains("ativo")){
+    conferir();
+   }
+
+  },e=>aviso("Erro ao ler apostas: "+e.message));
+
+  /* RESULTADOS */
+
+  db.ref(CAMINHO_RESULTADOS).on("value",s=>{
+
+   resultados=s.val()||{};
+
+   estatisticas();
+   mostrarResultados();
+   mostrarApostas();
+
+   if($("sorteio").classList.contains("ativo")){
+    conferir();
+   }
+
+  },e=>aviso("Erro ao ler resultados: "+e.message));
+
+  /* CONFIGURAÇÃO */
+
+  db.ref(CAMINHO_CONFIG).on("value",s=>{
+
+   const c=s.val()||{};
+
+   $("mensagem").value=c.mensagem||"";
+
+   $("situacao").textContent=c.bloqueado?
+    "APOSTAS BLOQUEADAS":
+    "APOSTAS LIBERADAS";
+
+   sorteioAutomaticoAtivo=
+    c.sorteioAutomatico===true;
+
+   atualizarStatusAutomatico(c);
+
+   if(sorteioAutomaticoAtivo){
+    verificarHorarioAutomatico();
+   }
+
+  },e=>aviso("Erro na configuração: "+e.message));
+
+  iniciarVerificacaoAutomatica();
+
+ }catch(e){
+
+  inicializado=false;
+
+  aviso("Erro Firebase: "+e.message);
+ }
+}
+
+/* =================================
+   SORTEIO AUTOMÁTICO
+================================= */
+
+function atualizarStatusAutomatico(c){
+
+ c=c||{};
+
+ $("statusAutomatico").textContent=
+  sorteioAutomaticoAtivo?
+  "🟢 SORTEIO AUTOMÁTICO ATIVADO":
+  "🔴 SORTEIO AUTOMÁTICO DESATIVADO";
+
+ $("proximoAutomatico").textContent=
+  "Próxima extração: "+
+  formatarHorarioCompleto(
+   Number(c.sorteioAutomaticoProximo||0)
+  );
+
+ $("ultimaAutomatica").textContent=
+  ultimaVerificacao?
+  "Última verificação: "+ultimaVerificacao:
+  "Última verificação: aguardando...";
+}
+
+/* ATIVAR OU DESATIVAR */
+
+async function configurarSorteioAutomatico(ativar){
+
+ if(!db){
+  aviso("Firebase ainda não conectado.");
+  return;
+ }
+
+ if(ativar){
+
+  if(!confirm(
+   "ATIVAR os sorteios automáticos de hora em hora, durante 24 horas?"
+  ))return;
+
+ }else{
+
+  if(!confirm(
+   "DESATIVAR os sorteios automáticos?"
+  ))return;
+
+ }
+
+ try{
+
+  if(ativar){
+
+   const proxima=proximaHoraSP();
+
+   await db.ref(CAMINHO_CONFIG).update({
+
+    sorteioAutomatico:true,
+
+    sorteioAutomaticoProximo:proxima,
+
+    sorteioAutomaticoAtivadoEm:
+     new Date().toISOString(),
+
+    atualizadoEm:new Date().toISOString()
+
+   });
+
+   aviso(
+    "Sorteio automático ativado. Próximo horário: "+
+    formatarHorarioCompleto(proxima)
+   );
+
+  }else{
+
+   await db.ref(CAMINHO_CONFIG).update({
+
+    sorteioAutomatico:false,
+
+    atualizadoEm:new Date().toISOString()
+
+   });
+
+   aviso("Sorteio automático desativado.");
+
+  }
+
+ }catch(e){
+
+  aviso("Erro ao configurar: "+e.message);
+
+ }
+}
+
+/* NÚMERO ALEATÓRIO SEM VIÉS DE MÓDULO */
+
+function numeroAleatorio(){
+
+ const limite=Math.floor(4294967296/50)*50;
+
+ const arr=new Uint32Array(1);
+
+ do{
+  crypto.getRandomValues(arr);
+ }while(arr[0]>=limite);
+
+ return (arr[0]%50)+1;
+}
+
+/* INICIALIZAR PRÓXIMO HORÁRIO SE NÃO EXISTIR */
+
+async function obterProximoHorario(){
+
+ const ref=db.ref(
+  CAMINHO_CONFIG+"/sorteioAutomaticoProximo"
+ );
+
+ const s=await ref.once("value");
+
+ let proximo=Number(s.val()||0);
+
+ if(!proximo){
+
+  const calculado=proximaHoraSP();
+
+  const tx=await ref.transaction(atual=>{
+
+   if(atual!==null)return;
+
+   return calculado;
+  });
+
+  if(tx.committed){
+
+   proximo=calculado;
+
+  }else{
+
+   const novamente=await ref.once("value");
+
+   proximo=Number(novamente.val()||0);
+  }
+ }
+
+ return proximo;
+}
+
+/* PROCESSAR UM HORÁRIO */
+
+async function processarHorarioAutomatico(timestamp){
+
+ const d=formatarDataHoraSP(timestamp);
+
+ const numero=numeroAleatorio();
+
+ const dados={
+
+  data:d.data,
+
+  horario:d.hora,
+
+  numero:numero,
+
+  time:times[numero-1],
+
+  publicadoEm:new Date().toISOString(),
+
+  timestamp:Date.now(),
+
+  automatico:true
+
+ };
+
+ const chaveHora=d.hora.replace(":","-");
+
+ const caminho=
+  `${CAMINHO_RESULTADOS}/${d.data}/${chaveHora}`;
+
+ const tx=await db.ref(caminho).transaction(atual=>{
+
+  // Nunca substituir um resultado existente.
+  if(atual!==null)return;
+
+  return dados;
+ });
+
+ if(tx.committed){
+
+  ultimaMensagemAutomatica=
+   "Publicado: "+d.data+" às "+d.hora+
+   " — "+numero+" "+dados.time;
+
+  aviso(
+   "RESULTADO AUTOMÁTICO: "+
+   numero+" - "+dados.time+
+   " ("+d.hora+")"
+  );
+
+ }else{
+
+  ultimaMensagemAutomatica=
+   "Horário já publicado: "+d.data+" "+d.hora;
+
+ }
+
+ // Avança o agendamento somente se o horário
+ // ainda for exatamente o próximo da fila.
+ const refProximo=db.ref(
+  CAMINHO_CONFIG+"/sorteioAutomaticoProximo"
+ );
+
+ await refProximo.transaction(atual=>{
+
+  if(Number(atual)!==Number(timestamp))return;
+
+  return timestamp+3600000;
+
+ });
+
+ return tx.committed;
+}
+
+/* VERIFICAR E PROCESSAR HORÁRIOS */
+
+async function verificarHorarioAutomatico(){
+
+ if(!db)return;
+
+ if(!sorteioAutomaticoAtivo)return;
+
+ if(processandoAutomatico)return;
+
+ processandoAutomatico=true;
+
+ try{
+
+  const agora=Date.now();
+
+  let proximo=await obterProximoHorario();
+
+  if(!proximo||proximo>agora){
+
+   atualizarProximoNaTela(proximo);
+
+   return;
+  }
+
+  /*
+   * Processa horários vencidos.
+   * Limite de 24 por ciclo para evitar
+   * sobrecarregar o Firebase após longos períodos offline.
+   */
+
+  let quantidade=0;
+
+  while(
+   proximo<=Date.now() &&
+   quantidade<24 &&
+   sorteioAutomaticoAtivo
+  ){
+
+   await processarHorarioAutomatico(proximo);
+
+   quantidade++;
+
+   const s=await db.ref(
+    CAMINHO_CONFIG+"/sorteioAutomaticoProximo"
+   ).once("value");
+
+   const novo=Number(s.val()||0);
+
+   if(novo<=proximo){
+
+    throw new Error(
+     "Não foi possível avançar o horário automático."
+    );
+   }
+
+   proximo=novo;
+  }
+
+  if(quantidade>0){
+
+   ultimaVerificacao=
+    new Date().toLocaleTimeString("pt-BR");
+
+   if(ultimaMensagemAutomatica){
+
+    $("ultimaAutomatica").textContent=
+     ultimaMensagemAutomatica;
+   }
+
+  }
+
+  atualizarProximoNaTela(proximo);
+
+ }catch(e){
+
+  console.error(e);
+
+  aviso(
+   "Erro no automático: "+e.message
+  );
+
+ }finally{
+
+  processandoAutomatico=false;
+ }
+}
+
+function atualizarProximoNaTela(timestamp){
+
+ if(!timestamp)return;
+
+ $("proximoAutomatico").textContent=
+  "Próxima extração: "+
+  formatarHorarioCompleto(timestamp);
+}
+
+/* VERIFICAÇÃO PERIÓDICA */
+
+function iniciarVerificacaoAutomatica(){
+
+ if(verificacaoAutomatica)return;
+
+ // Verifica a cada 5 segundos.
+ verificacaoAutomatica=setInterval(()=>{
+
+  verificarHorarioAutomatico();
+
+ },5000);
+
+ // Verifica imediatamente ao retornar à página.
+ document.addEventListener(
+  "visibilitychange",
+  ()=>{
+   if(!document.hidden){
+    verificarHorarioAutomatico();
+   }
+  }
+ );
+
+ window.addEventListener(
+  "online",
+  ()=>{
+   verificarHorarioAutomatico();
+  }
+ );
+
+}
+
+/* =================================
+   LEITURA DAS APOSTAS
+================================= */
+
+function lista(){
+
+ return Object.entries(apostas).map(([id,b])=>({
+  id,
+  b:b||{}
+ }));
+
+}
+
+function dataAposta(b){
+
+ if(b.dataHorario){
+  return String(b.dataHorario).slice(0,10);
+ }
+
+ if(b.data){
+  return String(b.data).slice(0,10);
+ }
+
+ let d=b.criadoEm?
+  new Date(b.criadoEm):
+  b.timestamp?
+  new Date(Number(b.timestamp)):
+  null;
+
+ if(!d||isNaN(d))return "";
+
+ return d.getFullYear()+"-"+
+ String(d.getMonth()+1).padStart(2,"0")+"-"+
+ String(d.getDate()).padStart(2,"0");
+}
+
+function horaAposta(b){
+
+ return String(b.horario||b.hora||"").slice(0,5);
+
+}
+
+function numeros(b){
+
+ let v=b.times??b.time??b.numero??[];
+
+ if(!Array.isArray(v))v=[v];
+
+ return v.map(x=>{
+
+  let n=Number(
+   typeof x==="object"&&x!==null?
+   (x.numero??x.number??x.id):
+   x
+  );
+
+  let nome=
+   typeof x==="object"&&x!==null?
+   (x.nome||x.time):
+   "";
+
+  return {
+   n,
+   nome:nome||times[n-1]||String(x)
+  };
+
+ }).filter(x=>
+  Number.isInteger(x.n)&&
+  x.n>=1&&
+  x.n<=50
+ );
+}
+
+function resultado(data,hora){
+
+ const chave=String(hora||"")
+  .replace(":","-")
+  .slice(0,5);
+
+ return resultados?.[data]?.[chave]||null;
+}
+
+function ganhou(b){
+
+ const r=resultado(
+  dataAposta(b),
+  horaAposta(b)
+ );
+
+ return !!r&&numeros(b).some(
+  x=>x.n===Number(r.numero)
+ );
+}
+
+/* =================================
+   ESTATÍSTICAS
+================================= */
+
+function estatisticas(){
+
+ const a=lista();
+
+ $("total").textContent=a.length;
+
+ $("valor").textContent=dinheiro(
+  a.reduce((s,x)=>
+   s+Number(x.b.valor||0),0
+  )
+ );
+
+ $("ganhadores").textContent=
+  a.filter(x=>ganhou(x.b)).length;
+
+ $("pendentes").textContent=
+  a.filter(x=>
+   String(x.b.status||"").toUpperCase()==="PENDENTE"
+  ).length;
+}
+
+/* =================================
+   MOSTRAR APOSTAS
+================================= */
+
+function mostrarApostas(){
+
+ if(!db)return;
+
+ const data=$("filtroData").value;
+ const hora=$("filtroHora").value;
+
+ const busca=$("pesquisa").value
+  .toLowerCase()
+  .trim();
+
+ const listaFiltrada=lista().filter(({b})=>{
+
+  if(data&&dataAposta(b)!==data)return false;
+
+  if(hora&&horaAposta(b)!==hora)return false;
+
+  const texto=[
+   b.nome,
+   ...numeros(b).flatMap(x=>[x.nome,x.n])
+  ].join(" ").toLowerCase();
+
+  return !busca||texto.includes(busca);
+ });
+
+ $("quantidade").textContent=
+  listaFiltrada.length+" aposta(s) encontrada(s)";
+
+ $("listaApostas").innerHTML=listaFiltrada.length?
+
+ listaFiltrada.map(({id,b})=>{
+
+  const ns=numeros(b);
+
+  const r=resultado(
+   dataAposta(b),
+   horaAposta(b)
+  );
+
+  const win=r&&ns.some(
+   x=>x.n===Number(r.numero)
+  );
+
+  return `<tr>
+
+   <td>${escapar(b.nome||"Sem nome")}</td>
+
+   <td>${escapar(dataAposta(b))}</td>
+
+   <td>${escapar(b.horario||"—")}</td>
+
+   <td>
+    ${ns.map(x=>escapar(x.nome)).join("<br>")||"—"}
+   </td>
+
+   <td>
+    ${ns.map(x=>String(x.n).padStart(2,"0")).join("<br>")||"—"}
+   </td>
+
+   <td>${dinheiro(b.valor)}</td>
+
+   <td>${dinheiro(b.premioPotencial)}</td>
+
+   <td>${escapar(b.status||"—")}</td>
+
+   <td>
+    ${!r?"AGUARDANDO":win?"GANHOU":"NÃO GANHOU"}
+   </td>
+
+   <td>
+    <button class="vermelho"
+     onclick="excluirAposta('${encodeURIComponent(id)}')">
+     EXCLUIR
+    </button>
+   </td>
+
+  </tr>`;
+
+ }).join(""):
+
+ '<tr><td colspan="10">Nenhuma aposta encontrada.</td></tr>';
+
+}
+
+/* =================================
+   SORTEIO MANUAL
+================================= */
+
+function atualizarPreview(){
+
+ const n=Number($("timeSorteado").value||1);
+
+ $("preview").textContent=
+  String(n).padStart(2,"0")+
+  " - "+times[n-1];
+}
+
+function sortear(){
+
+ const numero=numeroAleatorio();
+
+ $("timeSorteado").value=numero;
+
+ atualizarPreview();
+
+ conferir();
+}
+
+function escolha(){
+
+ const n=Number($("timeSorteado").value);
+
+ return {
+
+  data:$("dataSorteio").value,
+
+  hora:$("horaSorteio").value,
+
+  numero:n,
+
+  time:times[n-1]
+
+ };
+}
+
+/* =================================
+   CONFERÊNCIA
+================================= */
+
+function conferir(){
+
+ if(!db||!$("dataSorteio").value)return;
+
+ const d=escolha();
+
+ const mesmoHorario=lista().filter(({b})=>
+  dataAposta(b)===d.data&&
+  horaAposta(b)===d.hora
+ );
+
+ const acertaram=mesmoHorario.filter(({b})=>
+  numeros(b).some(x=>x.n===d.numero)
+ );
+
+ const publicado=resultado(d.data,d.hora);
+
+ $("conferencia").innerHTML=
+
+  `<b>${mesmoHorario.length}</b> aposta(s) neste horário.<br>
+
+   <b>${acertaram.length}</b> aposta(s) acertariam
+   ${String(d.numero).padStart(2,"0")} -
+   ${escapar(d.time)}.`+
+
+  (publicado?
+
+   `<br>Resultado já publicado:
+   ${publicado.numero} - ${escapar(publicado.time||"")}`:
+
+   "<br>Este horário ainda não possui resultado publicado."
+  );
+
+ $("listaGanhadores").innerHTML=acertaram.length?
+
+ acertaram.map(({b})=>`
+
+  <tr>
+
+   <td>${escapar(b.nome||"Sem nome")}</td>
+
+   <td>${escapar(d.time)}</td>
+
+   <td>${d.numero}</td>
+
+   <td>${dinheiro(b.valor)}</td>
+
+   <td>${dinheiro(b.premioPotencial)}</td>
+
+  </tr>
+
+ `).join(""):
+
+ '<tr><td colspan="5">Nenhuma aposta acertaria esse resultado.</td></tr>';
+
+}
+
+/* =================================
+   PUBLICAÇÃO MANUAL
+================================= */
+
+async function publicar(){
+
+ const d=escolha();
+
+ if(!d.data||!d.hora||!d.numero){
+
+  aviso("Selecione data, horário e time.");
+
+  return;
+ }
+
+ const caminho=
+  `${CAMINHO_RESULTADOS}/${d.data}/${d.hora.replace(":","-")}`;
+
+ if(!confirm(
+  `Publicar ${d.numero} - ${d.time} em ${d.data} às ${d.hora}?`
+ ))return;
+
+ try{
+
+  const tx=await db.ref(caminho).transaction(atual=>{
+
+   if(atual!==null)return;
+
+   return {
+
+    data:d.data,
+
+    horario:d.hora,
+
+    numero:d.numero,
+
+    time:d.time,
+
+    publicadoEm:new Date().toISOString(),
+
+    timestamp:Date.now(),
+
+    automatico:false
+
+   };
+
+  });
+
+  if(!tx.committed){
+
+   aviso("Já existe resultado publicado neste horário.");
+
+   return;
+  }
+
+  aviso("Resultado publicado com sucesso!");
+
+  conferir();
+
+ }catch(e){
+
+  aviso("Erro ao publicar: "+e.message);
+
+ }
+}
+
+/* =================================
+   RESULTADOS
+================================= */
+
+function mostrarResultados(){
+
+ if(!db)return;
+
+ const listaResultados=[];
+
+ Object.keys(resultados).forEach(data=>{
+
+  Object.keys(resultados[data]||{}).forEach(hora=>{
+
+   listaResultados.push({
+
+    data,
+
+    hora,
+
+    r:resultados[data][hora]||{}
+
+   });
+
+  });
+
+ });
+
+ listaResultados.sort((a,b)=>
+  (b.data+b.hora).localeCompare(a.data+a.hora)
+ );
+
+ $("listaResultados").innerHTML=listaResultados.length?
+
+ listaResultados.map(x=>`
+
+  <tr>
+
+   <td>${escapar(x.data)}</td>
+
+   <td>
+    ${escapar(x.r.horario||x.hora.replace("-",":"))}
+   </td>
+
+   <td>
+    ${String(x.r.numero??"—").padStart(2,"0")}
+   </td>
+
+   <td>
+    ${escapar(x.r.time||times[Number(x.r.numero)-1]||"—")}
+   </td>
+
+   <td>${escapar(x.r.publicadoEm||"—")}</td>
+
+   <td>
+    <button class="vermelho"
+     onclick="excluirResultado('${x.data}','${x.hora}')">
+     EXCLUIR
+    </button>
+   </td>
+
+  </tr>
+
+ `).join(""):
+
+ '<tr><td colspan="6">Nenhum resultado publicado.</td></tr>';
+
+}
+
+/* =================================
+   EXCLUSÕES
+================================= */
+
+async function excluirAposta(encoded){
+
+ const id=decodeURIComponent(encoded);
+
+ if(!confirm("Excluir esta aposta permanentemente?"))return;
+
+ try{
+
+  await db.ref("palpites/"+id).remove();
+
+  aviso("Aposta excluída.");
+
+ }catch(e){
+
+  aviso(e.message);
+
+ }
+}
+
+async function excluirResultado(data,hora){
+
+ if(!confirm("Excluir este resultado?"))return;
+
+ try{
+
+  await db.ref(
+   `${CAMINHO_RESULTADOS}/${data}/${hora}`
+  ).remove();
+
+  aviso("Resultado excluído.");
+
+ }catch(e){
+
+  aviso(e.message);
+
+ }
+}
+
+async function limparApostas(){
+
+ if(!confirm("Apagar TODAS as apostas?"))return;
+
+ if(!confirm(
+  "Confirma novamente? Esta ação não pode ser desfeita."
+ ))return;
+
+ try{
+
+  await db.ref("palpites").remove();
+
+  aviso("Todas as apostas foram apagadas.");
+
+ }catch(e){
+
+  aviso(e.message);
+
+ }
+}
+
+async function limparResultados(){
+
+ if(!confirm("Apagar TODOS os resultados?"))return;
+
+ if(!confirm(
+  "Confirma novamente? Esta ação não pode ser desfeita."
+ ))return;
+
+ try{
+
+  await db.ref(CAMINHO_RESULTADOS).remove();
+
+  aviso("Todos os resultados foram apagados.");
+
+ }catch(e){
+
+  aviso(e.message);
+
+ }
+}
+
+/* =================================
+   BLOQUEIO DAS APOSTAS
+================================= */
+
+async function bloquear(valor){
+
+ try{
+
+  await db.ref(CAMINHO_CONFIG).update({
+
+   bloqueado:valor,
+
+   mensagem:$("mensagem").value.trim()||
+    (valor?
+     "Apostas temporariamente encerradas":
+     ""
+    ),
+
+   atualizadoEm:new Date().toISOString()
+
+  });
+
+  aviso(
+   valor?
+   "Apostas bloqueadas.":
+   "Apostas liberadas."
+  );
+
+ }catch(e){
+
+  aviso("Erro: "+e.message);
+
+ }
+}
+
+/* =================================
+   RESTAURAR SESSÃO
+================================= */
+
+if(sessionStorage.getItem("TC_ADMIN")==="1"){
+
+ $("login").classList.add("hidden");
+
+ $("painel").classList.remove("hidden");
+
+ iniciar();
+
+}
+
+</script>
+</body>
+</html>
