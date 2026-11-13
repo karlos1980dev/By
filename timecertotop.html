@@ -1583,22 +1583,34 @@ function getTodayKey(){
   return `${ano}-${mes}-${dia}`;
 }
 
+
 function getAvailableSlots(){
+
   const agora = new Date();
   const slots = [];
 
   for(let hora = 0; hora < 24; hora++){
-    const horario = String(hora).padStart(2,"0") + ":00";
 
-    const dataHorario = new Date(
-      agora.getFullYear(),
-      agora.getMonth(),
-      agora.getDate(),
-      hora, 0, 0, 0
-    );
+    for(let minuto of [0,30]){
 
-    if(dataHorario >= agora){
-      slots.push(horario);
+      const horario =
+        String(hora).padStart(2,"0") + ":" +
+        String(minuto).padStart(2,"0");
+
+      const dataHorario = new Date(
+        agora.getFullYear(),
+        agora.getMonth(),
+        agora.getDate(),
+        hora,
+        minuto,
+        0,
+        0
+      );
+
+      if(dataHorario > agora){
+        slots.push(horario);
+      }
+
     }
   }
 
