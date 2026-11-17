@@ -1704,14 +1704,32 @@ db.ref("timeCerto/configuracao").on("value",snap=>{
 
 /* VALORES */
 function updateValues(){
-  const valorPorTime = Math.max(0, Number($("amount").value) || 0);
-  const quantidadeTimes = chosen.size;
-  const valorTotal = valorPorTime * quantidadeTimes;
 
-  $("amountDisplay").textContent = brl(valorPorTime);
+  const valorPorCombinacao =
+    Number($("amount").value) || 0;
+
+  const quantidadeTimes = chosen.size;
+  const quantidadeHorarios = selectedSlots.size;
+
+  const quantidadeCombinacoes =
+    quantidadeTimes * quantidadeHorarios;
+
+  const valorTotal =
+    valorPorCombinacao * quantidadeCombinacoes;
+
+  // Campo VALOR: total a pagar
+  $("topValue").textContent = brl(valorTotal);
+
+  // Total no pagamento
   $("payValue").textContent = brl(valorTotal);
-  $("prizeValue").textContent = brl(valorPorTime * 35);
-  $("topValue").textContent = brl(valorPorTime);
+
+  // Valor individual
+  $("amountDisplay").textContent =
+    brl(valorPorCombinacao);
+
+  // Prêmio por cada acerto
+  $("prizeValue").textContent =
+    brl(valorPorCombinacao * 35);
 }
 $("amount").addEventListener("input",updateValues);
 
