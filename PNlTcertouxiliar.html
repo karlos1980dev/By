@@ -1,0 +1,561 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101522">
+<title>TIME CERTO - ADMIN</title>
+
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-database-compat.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#0b1020;color:#fff;
+ font-family:Arial,Helvetica,sans-serif;
+}
+header{
+ background:#151e32;padding:18px 14px;
+ border-bottom:1px solid #29344d;
+ position:sticky;top:0;z-index:10;
+}
+header h1{margin:0;color:#40e0b0;font-size:22px}
+header p{margin:6px 0 0;color:#9eabc3;font-size:12px}
+.container{max-width:1200px;margin:auto;padding:14px}
+.card{
+ background:#151e32;border:1px solid #29344d;
+ border-radius:13px;padding:15px;margin-bottom:14px;
+}
+h2{font-size:17px;margin:0 0 14px;color:#40e0b0}
+.stats{
+ display:grid;grid-template-columns:repeat(2,1fr);
+ gap:10px;margin-bottom:14px;
+}
+.stat{
+ background:#151e32;border:1px solid #29344d;
+ border-radius:12px;padding:13px;
+}
+.stat small{color:#9eabc3;font-size:11px}
+.stat strong{display:block;font-size:22px;margin-top:7px}
+input,select,textarea{
+ width:100%;padding:12px;margin:5px 0 12px;
+ border:1px solid #35435e;border-radius:8px;
+ background:#0c1426;color:#fff;font-size:14px;
+}
+label{font-size:12px;color:#b7c3d9}
+button{
+ border:0;border-radius:8px;padding:10px 13px;
+ font-weight:bold;cursor:pointer;font-size:12px;
+ margin:3px;
+}
+.btn-green{background:#20c997;color:#071b18}
+.btn-blue{background:#2775e8;color:#fff}
+.btn-red{background:#e34b5c;color:#fff}
+.btn-yellow{background:#e5b942;color:#201800}
+.btn-gray{background:#35435e;color:#fff}
+.tabs{
+ display:flex;gap:7px;overflow-x:auto;
+ margin-bottom:14px;padding-bottom:5px;
+}
+.tabs button{white-space:nowrap;background:#202c43;color:#fff}
+.tabs button.active{background:#20c997;color:#071b18}
+.section{display:none}
+.section.active{display:block}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:650px}
+th,td{
+ padding:11px 9px;text-align:left;
+ border-bottom:1px solid #29344d;font-size:12px;
+ vertical-align:top;
+}
+th{color:#40e0b0;background:#101a2d}
+td{color:#e1e8f5}
+.tag{
+ display:inline-block;padding:5px 8px;
+ border-radius:20px;font-size:10px;font-weight:bold;
+}
+.pending{background:#604b18;color:#ffe08a}
+.paid{background:#14543e;color:#8dffd0}
+.rejected{background:#5b2631;color:#ffabb6}
+.muted{color:#91a1bc;font-size:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions{min-width:130px}
+.notice{
+ background:#332b16;border:1px solid #76602b;
+ padding:11px;border-radius:8px;color:#ffdf91;
+ font-size:12px;margin-bottom:14px;
+}
+.empty{padding:20px;text-align:center;color:#91a1bc}
+@media(min-width:700px){
+ .stats{grid-template-columns:repeat(4,1fr)}
+ .container{padding:22px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <h1>⚽ TIME CERTO</h1>
+ <p>PAINEL ADMINISTRATIVO • CONTROLE DO SISTEMA</p>
+</header>
+
+<div class="container">
+
+<div class="notice">
+ Painel sem login. Não compartilhe o endereço. Proteja as regras do Firebase para impedir alterações não autorizadas.
+</div>
+
+<div class="stats">
+ <div class="stat"><small>TOTAL DE APOSTAS</small><strong id="totalApostas">0</strong></div>
+ <div class="stat"><small>VALOR REGISTRADO</small><strong id="totalValor">R$ 0,00</strong></div>
+ <div class="stat"><small>PENDENTES</small><strong id="totalPendentes">0</strong></div>
+ <div class="stat"><small>PAGAS</small><strong id="totalPagas">0</strong></div>
+</div>
+
+<div class="tabs">
+ <button class="active" onclick="abrirAba('apostas',this)">APOSTAS</button>
+ <button onclick="abrirAba('resultados',this)">RESULTADOS</button>
+ <button onclick="abrirAba('saques',this)">SAQUES</button>
+ <button onclick="abrirAba('config',this)">CONFIGURAÇÕES</button>
+</div>
+
+<!-- APOSTAS -->
+<section id="apostas" class="section active">
+ <div class="card">
+  <h2>📋 Apostas registradas</h2>
+  <input id="busca" placeholder="Buscar por nome, ID, data ou horário..." oninput="renderApostas()">
+  <div class="row">
+   <select id="filtroStatus" onchange="renderApostas()">
+    <option value="">Todos os pagamentos</option>
+    <option value="PENDENTE">Pendentes</option>
+    <option value="PAGO">Pagos</option>
+    <option value="REJEITADO">Rejeitados</option>
+   </select>
+   <input type="date" id="filtroData" onchange="renderApostas()">
+  </div>
+  <div class="table-wrap">
+   <table>
+    <thead>
+     <tr>
+      <th>JOGADOR</th>
+      <th>DATA / HORÁRIO</th>
+      <th>TIMES</th>
+      <th>VALOR</th>
+      <th>PRÊMIO</th>
+      <th>PAGAMENTO</th>
+      <th>AÇÕES</th>
+     </tr>
+    </thead>
+    <tbody id="listaApostas"></tbody>
+   </table>
+  </div>
+ </div>
+</section>
+
+<!-- RESULTADOS -->
+<section id="resultados" class="section">
+ <div class="card">
+  <h2>🏆 Publicar resultado</h2>
+
+  <label>Data da extração</label>
+  <input type="date" id="resultadoData">
+
+  <label>Horário da extração</label>
+  <input type="time" id="resultadoHorario" step="1800">
+
+  <div class="row">
+   <div>
+    <label>Número do time</label>
+    <input type="number" id="resultadoNumero" min="1" max="50" placeholder="Ex.: 10">
+   </div>
+   <div>
+    <label>Nome do time</label>
+    <input id="resultadoTime" placeholder="Nome do time">
+   </div>
+  </div>
+
+  <button class="btn-green" onclick="publicarResultado()">PUBLICAR RESULTADO</button>
+  <p class="muted">O resultado será gravado no histórico do TIME CERTO e utilizado na conferência das apostas.</p>
+ </div>
+
+ <div class="card">
+  <h2>📚 Histórico de resultados</h2>
+  <div class="table-wrap">
+   <table>
+    <thead>
+     <tr><th>DATA</th><th>HORÁRIO</th><th>NÚMERO</th><th>TIME</th><th>AÇÃO</th></tr>
+    </thead>
+    <tbody id="listaResultados"></tbody>
+   </table>
+  </div>
+ </div>
+</section>
+
+<!-- SAQUES -->
+<section id="saques" class="section">
+ <div class="card">
+  <h2>💰 Solicitações de saque</h2>
+  <div class="table-wrap">
+   <table>
+    <thead>
+     <tr>
+      <th>JOGADOR</th>
+      <th>PIX</th>
+      <th>VALOR</th>
+      <th>EXTRAÇÃO</th>
+      <th>STATUS</th>
+      <th>AÇÕES</th>
+     </tr>
+    </thead>
+    <tbody id="listaSaques"></tbody>
+   </table>
+  </div>
+ </div>
+</section>
+
+<!-- CONFIGURAÇÕES -->
+<section id="config" class="section">
+ <div class="card">
+  <h2>⚙️ Controle das apostas</h2>
+
+  <label>Mensagem exibida aos jogadores</label>
+  <textarea id="mensagemBloqueio" rows="3" placeholder="Ex.: Apostas temporariamente encerradas."></textarea>
+
+  <label>Status do sistema</label>
+  <select id="statusBloqueio">
+   <option value="false">APOSTAS LIBERADAS</option>
+   <option value="true">APOSTAS BLOQUEADAS</option>
+  </select>
+
+  <button class="btn-green" onclick="salvarConfiguracao()">SALVAR CONFIGURAÇÃO</button>
+  <p class="muted">O aplicativo deverá consultar timeCerto/configuracao para respeitar esse bloqueio.</p>
+ </div>
+</section>
+
+</div>
+
+<script>
+const firebaseConfig = {
+ apiKey: "AIzaSyAGOy5lPtqjSTtZpyFX7xtGGy3P2nYA77U",
+ authDomain: "placarexato-97966.firebaseapp.com",
+ databaseURL: "https://placarexato-97966-default-rtdb.asia-southeast1.firebasedatabase.app",
+ projectId: "placarexato-97966",
+ storageBucket: "placarexato-97966.firebasestorage.app",
+ messagingSenderId: "942191850183",
+ appId: "1:942191850183:web:9870fab0d09044b11004e2"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const BETS_PATH = "palpites";
+const RESULTS_PATH = "timeCerto/resultados";
+const CONFIG_PATH = "timeCerto/configuracao";
+const WITHDRAW_PATH = "solicitacoesSaque";
+
+let apostas = {};
+let resultados = {};
+let saques = {};
+let configuracao = {};
+
+const $ = id => document.getElementById(id);
+
+function escapeHTML(value){
+ return String(value ?? "").replace(/[&<>"']/g, c => ({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+function dinheiro(value){
+ return Number(value || 0).toLocaleString("pt-BR",{
+  style:"currency",currency:"BRL"
+ });
+}
+
+function dataHoje(){
+ const d = new Date();
+ return [
+  d.getFullYear(),
+  String(d.getMonth()+1).padStart(2,"0"),
+  String(d.getDate()).padStart(2,"0")
+ ].join("-");
+}
+
+function abrirAba(id,botao){
+ document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+ document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+ $(id).classList.add("active");
+ botao.classList.add("active");
+}
+
+function obterTimes(aposta){
+ const lista = aposta.times ?? aposta.time ?? aposta.numero ?? [];
+ if(Array.isArray(lista)){
+  return lista.map(t=>{
+   if(typeof t === "object" && t !== null){
+    return `${t.numero ?? t.id ?? ""} ${t.nome ?? t.time ?? ""}`.trim();
+   }
+   return String(t);
+  }).join(", ");
+ }
+ return String(lista);
+}
+
+function obterData(aposta){
+ return aposta.data ?? aposta.dataHorario ?? "";
+}
+
+function obterHorario(aposta){
+ return aposta.horario ?? aposta.hora ?? "";
+}
+
+function statusTag(status){
+ const s = String(status || "PENDENTE").toUpperCase();
+ let classe = "pending";
+ if(s === "PAGO") classe = "paid";
+ if(s === "REJEITADO") classe = "rejected";
+ return `<span class="tag ${classe}">${escapeHTML(s)}</span>`;
+}
+
+function atualizarResumo(){
+ const lista = Object.values(apostas);
+ const total = lista.length;
+ const valor = lista.reduce((s,a)=>s+Number(a.valor || 0),0);
+ const pendentes = lista.filter(a=>(a.status || "PENDENTE").toUpperCase()==="PENDENTE").length;
+ const pagas = lista.filter(a=>(a.status || "").toUpperCase()==="PAGO").length;
+
+ $("totalApostas").textContent = total;
+ $("totalValor").textContent = dinheiro(valor);
+ $("totalPendentes").textContent = pendentes;
+ $("totalPagas").textContent = pagas;
+}
+
+function renderApostas(){
+ const busca = $("busca").value.trim().toLowerCase();
+ const filtro = $("filtroStatus").value;
+ const dataFiltro = $("filtroData").value;
+
+ const lista = Object.entries(apostas).filter(([id,a])=>{
+  const texto = [
+   id,a.nome,a.jogadorId,obterData(a),obterHorario(a),obterTimes(a)
+  ].join(" ").toLowerCase();
+
+  const status = String(a.status || "PENDENTE").toUpperCase();
+
+  return (!busca || texto.includes(busca)) &&
+   (!filtro || status===filtro) &&
+   (!dataFiltro || String(obterData(a)).includes(dataFiltro));
+ });
+
+ lista.sort((a,b)=>Number(b[1].timestamp || 0)-Number(a[1].timestamp || 0));
+
+ $("listaApostas").innerHTML = lista.length ? lista.map(([id,a])=>{
+  const status = String(a.status || "PENDENTE").toUpperCase();
+  return `
+   <tr>
+    <td>
+     <b>${escapeHTML(a.nome || "Sem nome")}</b>
+     <br><small>${escapeHTML(id)}</small>
+    </td>
+    <td>${escapeHTML(obterData(a))}<br>${escapeHTML(obterHorario(a))}</td>
+    <td>${escapeHTML(obterTimes(a))}</td>
+    <td>${dinheiro(a.valor)}</td>
+    <td>${dinheiro(a.premioPotencial)}</td>
+    <td>${statusTag(status)}</td>
+    <td class="actions">
+     <button class="btn-green" onclick="alterarPagamento('${id}','PAGO')">PAGO</button>
+     <button class="btn-yellow" onclick="alterarPagamento('${id}','PENDENTE')">PENDENTE</button>
+     <button class="btn-red" onclick="alterarPagamento('${id}','REJEITADO')">REJEITAR</button>
+     <button class="btn-gray" onclick="excluirAposta('${id}')">EXCLUIR</button>
+    </td>
+   </tr>`;
+ }).join("") : `<tr><td colspan="7" class="empty">Nenhuma aposta encontrada.</td></tr>`;
+}
+
+async function alterarPagamento(id,status){
+ if(!confirm(`Alterar pagamento para ${status}?`)) return;
+ try{
+  await db.ref(`${BETS_PATH}/${id}`).update({
+   status:status,
+   atualizadoEm:Date.now()
+  });
+  alert("Status atualizado!");
+ }catch(e){
+  alert("Erro: "+e.message);
+ }
+}
+
+async function excluirAposta(id){
+ if(!confirm("Tem certeza que deseja excluir esta aposta?")) return;
+ try{
+  await db.ref(`${BETS_PATH}/${id}`).remove();
+  alert("Aposta excluída.");
+ }catch(e){
+  alert("Erro: "+e.message);
+ }
+}
+
+async function publicarResultado(){
+ const data = $("resultadoData").value;
+ const horario = $("resultadoHorario").value;
+ const numero = Number($("resultadoNumero").value);
+ const time = $("resultadoTime").value.trim();
+
+ if(!data || !horario || !numero || numero<1 || numero>50 || !time){
+  alert("Preencha a data, horário, número de 1 a 50 e nome do time.");
+  return;
+ }
+
+ const chaveHorario = horario.replace(":","-");
+ const caminho = `${RESULTS_PATH}/${data}/${chaveHorario}`;
+
+ if(!confirm(`Publicar o resultado ${numero} - ${time}, em ${data} às ${horario}?`)) return;
+
+ try{
+  await db.ref(caminho).set({
+   data,
+   horario,
+   numero,
+   time,
+   publicadoEm:new Date().toISOString(),
+   timestamp:Date.now(),
+   automatico:false
+  });
+  alert("Resultado publicado com sucesso!");
+  $("resultadoNumero").value="";
+  $("resultadoTime").value="";
+ }catch(e){
+  alert("Erro ao publicar: "+e.message);
+ }
+}
+
+function renderResultados(){
+ let linhas = [];
+
+ Object.entries(resultados).forEach(([data,horarios])=>{
+  if(!horarios || typeof horarios!=="object") return;
+
+  Object.entries(horarios).forEach(([chave,r])=>{
+   if(!r || typeof r!=="object") return;
+   linhas.push({data,chave,...r});
+  });
+ });
+
+ linhas.sort((a,b)=>(b.timestamp || 0)-(a.timestamp || 0));
+
+ $("listaResultados").innerHTML = linhas.length ? linhas.map(r=>`
+  <tr>
+   <td>${escapeHTML(r.data)}</td>
+   <td>${escapeHTML(r.horario || r.chave.replace("- ",":"))}</td>
+   <td>${escapeHTML(r.numero)}</td>
+   <td>${escapeHTML(r.time)}</td>
+   <td><button class="btn-red" onclick="excluirResultado('${r.data}','${r.chave}')">EXCLUIR</button></td>
+  </tr>
+ `).join("") : `<tr><td colspan="5" class="empty">Nenhum resultado publicado.</td></tr>`;
+}
+
+async function excluirResultado(data,horario){
+ if(!confirm("Excluir este resultado?")) return;
+ try{
+  await db.ref(`${RESULTS_PATH}/${data}/${horario}`).remove();
+  alert("Resultado excluído.");
+ }catch(e){
+  alert("Erro: "+e.message);
+ }
+}
+
+function renderSaques(){
+ const lista = Object.entries(saques).sort((a,b)=>
+  Number(b[1].timestamp || 0)-Number(a[1].timestamp || 0)
+ );
+
+ $("listaSaques").innerHTML = lista.length ? lista.map(([id,s])=>{
+  const status = String(s.status || "PENDENTE").toUpperCase();
+  return `
+   <tr>
+    <td>${escapeHTML(s.nome || "Sem nome")}<br><small>${escapeHTML(s.jogadorId || "")}</small></td>
+    <td>${escapeHTML(s.chavePix || "Não informada")}</td>
+    <td>${dinheiro(s.valor)}</td>
+    <td>${escapeHTML(s.data || "")}<br>${escapeHTML(s.horario || "")}</td>
+    <td>${statusTag(status)}</td>
+    <td class="actions">
+     <button class="btn-green" onclick="alterarSaque('${id}','PAGO')">APROVAR / PAGO</button>
+     <button class="btn-red" onclick="alterarSaque('${id}','REJEITADO')">REJEITAR</button>
+    </td>
+   </tr>`;
+ }).join("") : `<tr><td colspan="6" class="empty">Nenhuma solicitação de saque.</td></tr>`;
+}
+
+async function alterarSaque(id,status){
+ if(!confirm(`Marcar solicitação como ${status}?`)) return;
+
+ try{
+  const saque = saques[id];
+  const atualizacoes = {};
+  atualizacoes[`${WITHDRAW_PATH}/${id}/status`] = status;
+  atualizacoes[`${WITHDRAW_PATH}/${id}/atualizadoEm`] = Date.now();
+
+  if(saque && saque.apostaId){
+   atualizacoes[`${BETS_PATH}/${saque.apostaId}/saqueStatus`] = status;
+   atualizacoes[`${BETS_PATH}/${saque.apostaId}/saquePago`] = status==="PAGO";
+  }
+
+  await db.ref().update(atualizacoes);
+  alert("Solicitação atualizada.");
+ }catch(e){
+  alert("Erro: "+e.message);
+ }
+}
+
+async function salvarConfiguracao(){
+ const bloqueado = $("statusBloqueio").value==="true";
+ const mensagem = $("mensagemBloqueio").value.trim();
+
+ try{
+  await db.ref(CONFIG_PATH).update({
+   bloqueado,
+   mensagem,
+   atualizadoEm:Date.now()
+  });
+  alert(bloqueado ? "Apostas bloqueadas." : "Apostas liberadas.");
+ }catch(e){
+  alert("Erro ao salvar: "+e.message);
+ }
+}
+
+function renderConfiguracao(){
+ $("statusBloqueio").value = configuracao.bloqueado ? "true" : "false";
+ $("mensagemBloqueio").value = configuracao.mensagem || "";
+}
+
+// Atualização em tempo real
+db.ref(BETS_PATH).on("value",snap=>{
+ apostas = snap.val() || {};
+ atualizarResumo();
+ renderApostas();
+},err=>alert("Erro ao carregar apostas: "+err.message));
+
+db.ref(RESULTS_PATH).on("value",snap=>{
+ resultados = snap.val() || {};
+ renderResultados();
+},err=>console.error(err));
+
+db.ref(WITHDRAW_PATH).on("value",snap=>{
+ saques = snap.val() || {};
+ renderSaques();
+},err=>console.error(err));
+
+db.ref(CONFIG_PATH).on("value",snap=>{
+ configuracao = snap.val() || {};
+ renderConfiguracao();
+},err=>console.error(err));
+
+// Inicialização
+$("resultadoData").value = dataHoje();
+</script>
+
+</body>
+</html>
