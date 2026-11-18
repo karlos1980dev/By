@@ -727,22 +727,339 @@ main{
   60%{transform:scale(1.2);opacity:1}
   100%{transform:scale(1);opacity:1}
 }
-#resultsTextarea,
-#resultsStatus {
-  display: none;
+#resultsLista,
+#resultsStatus{
+  display:none;
 }
 
-#resultsTextarea.show,
-#resultsStatus.show {
-  display: block;
+#resultsLista.show,
+#resultsStatus.show{
+  display:block;
 }
 .bottom-inner input{
   text-align:center;
+}.resultado-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  margin-bottom:9px;
+  background:#101a2b;
+  border:1px solid #394b67;
+  border-radius:12px;
 }
+
+.resultado-item img{
+  width:52px;
+  height:52px;
+  object-fit:contain;
+  flex-shrink:0;
+}
+
+.resultado-item .numero{
+  color:var(--gold);
+  font-size:25px;
+  font-weight:900;
+  min-width:32px;
+}
+
+.resultado-item .nome{
+  color:#fff;
+  font-weight:900;
+  font-size:14px;
+}
+
+.resultado-item .data{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:5px;
+}
+
+#resultsLista{
+  margin-top:12px;
+}
+.resultado-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  margin-bottom:9px;
+  background:#101a2b;
+  border:1px solid #394b67;
+  border-radius:12px;
+}
+
+.resultado-item img{
+  width:52px;
+  height:52px;
+  object-fit:contain;
+  flex-shrink:0;
+}
+
+.resultado-item .numero{
+  color:var(--gold);
+  font-size:25px;
+  font-weight:900;
+  min-width:32px;
+}
+
+.resultado-item .nome{
+  color:#fff;
+  font-weight:900;
+  font-size:14px;
+}
+
+.resultado-item .data{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:5px;
+}
+
+#resultsLista{
+  margin-top:12px;
+}
+
+.modal-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  background:rgba(0,0,0,.85);
+  backdrop-filter:blur(6px);
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+
+.modal-overlay.ativo{
+  display:flex;
+}
+
+.modal-como-jogar{
+  position:relative;
+  width:100%;
+  max-width:420px;
+  background:linear-gradient(145deg,#171d35,#0b1020);
+  border:1px solid #8b5cf6;
+  border-radius:22px;
+  padding:28px 22px;
+  text-align:center;
+  color:#fff;
+  box-shadow:0 0 35px rgba(139,92,246,.3);
+  animation:entrarModal .25s ease;
+}
+
+@keyframes entrarModal{
+  from{opacity:0;transform:scale(.9)}
+  to{opacity:1;transform:scale(1)}
+}
+
+.fechar-como-jogar{
+  position:absolute;
+  right:14px;
+  top:12px;
+  background:#303751;
+  color:#fff;
+  border:0;
+  border-radius:50%;
+  width:34px;
+  height:34px;
+  font-size:17px;
+}
+
+.icone-como-jogar{
+  font-size:48px;
+  margin-bottom:10px;
+}
+
+.modal-como-jogar h2{
+  color:#c084fc;
+  font-size:21px;
+  margin:8px 0 20px;
+}
+
+.modal-como-jogar p{
+  color:#e2e8f0;
+  font-size:15px;
+  line-height:1.6;
+  margin:12px 0;
+}
+
+.premio-como-jogar{
+  background:linear-gradient(135deg,#422006,#854d0e);
+  border:1px solid #facc15;
+  border-radius:15px;
+  padding:16px 10px;
+  margin:18px 0;
+}
+
+.premio-como-jogar span{
+  display:block;
+  color:#fde68a;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.premio-como-jogar strong{
+  display:block;
+  color:#facc15;
+  font-size:23px;
+  margin-top:7px;
+}
+
+.btn-entendi{
+  width:100%;
+  padding:15px;
+  border:0;
+  border-radius:12px;
+  background:linear-gradient(90deg,#7c3aed,#c026d3);
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  margin-top:12px;
+}
+#pixCopiaCola {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  pointer-events: none;
+}
+
+#pixPayload{
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+  pointer-events:none;
+  caret-color:transparent;
+}
+
+/* ESCUDOS PREMIUM TIME CERTO */
+
+.teams{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:9px;
+  width:100%;
+}
+
+.team{
+  position:relative;
+  min-width:0;
+  min-height:112px;
+  padding:9px 4px;
+  border:1px solid #465773;
+  border-radius:15px;
+  background:linear-gradient(145deg,#263954,#111c30);
+  text-align:center;
+  cursor:pointer;
+  user-select:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  overflow:hidden;
+  transition:transform .2s,border-color .2s,box-shadow .2s;
+}
+
+.team:active{
+  transform:scale(.94);
+}
+
+.team img{
+  display:block;
+  width:76px;
+  max-width:100%;
+  height:67px;
+  object-fit:contain;
+  object-position:center;
+  pointer-events:none;
+  filter:drop-shadow(0 4px 5px #0009);
+  transition:transform .25s,filter .25s;
+}
+
+.team span{
+  display:block;
+  width:100%;
+  color:#f1f5f9;
+  font-size:10px;
+  font-weight:800;
+  line-height:1.25;
+  overflow-wrap:anywhere;
+  text-align:center;
+}
+
+.team.selected{
+  border:2px solid #f5c451;
+  background:linear-gradient(145deg,#51421e,#26344c);
+  box-shadow:
+    0 0 7px #f5c451,
+    0 0 18px #f5c45166;
+}
+
+.team.selected img{
+  transform:scale(1.08);
+  filter:drop-shadow(0 0 8px #f5c451);
+}
+
+.team.selected span{
+  color:#ffdf82;
+}
+
+.team.selected:after{
+  content:"✓";
+  position:absolute;
+  right:5px;
+  top:5px;
+  width:20px;
+  height:20px;
+  line-height:20px;
+  border-radius:50%;
+  background:#18c889;
+  color:#062015;
+  font-weight:bold;
+  font-size:13px;
+}
+
 </style>
 </head>
 
 <body>
+
+<div class="modal-overlay" id="modalComoJogar">
+  <div class="modal-como-jogar">
+
+    <button class="fechar-como-jogar" id="fecharComoJogar">✕</button>
+
+    <div class="icone-como-jogar">🎯</div>
+
+    <h2>COMO JOGAR NA TIME CERTO</h2>
+
+    <p>
+      Já pensou em vibrar apostando no seu time ou liga do coração
+      sem ele nem estar jogando?! Aqui você pode!
+    </p>
+
+    <p>
+      No <strong>TIME CERTO</strong>, a cada 10 minutos é sorteado
+      um time/liga em uma roleta com 50 times.
+    </p>
+
+    <div class="premio-como-jogar">
+      <span>🏆 PRÊMIO MÁXIMO</span>
+      <strong>ATÉ R$ 120.000,00</strong>
+    </div>
+
+    <p>
+      O prêmio é baseado no time/liga escolhido e no valor apostado.
+    </p>
+
+    <button class="btn-entendi" id="entendiComoJogar">
+      ENTENDI!
+    </button>
+
+  </div>
+</div>
 
 <header>
   <div class="header-top">
@@ -757,6 +1074,9 @@ main{
         <button type="button" id="resumoMenu">📋 RESUMO</button>
         <button type="button" id="saqueMenu" disabled>
   💸 SAQUE
+</button>
+<button class="menu-item" id="comoJogarMenu">
+  📖 COMO JOGAR
 </button>
         <button style="display:none"type="button" id="changeNameMenu">👤 Alterar nome</button>
         <button type="button" id="clearMenu">🧹 Limpar seleção</button>
@@ -785,15 +1105,14 @@ main{
   <div class="name-modal">
     <h2>IDENTIFIQUE-SE</h2>
     <p>Informe seu nome para começar a jogar.</p>
+
     <input class="field" id="playerNameInput"
       maxlength="70" placeholder="Nome do jogador">
-      <label class="muted" for="playerPixInput">SUA CHAVE PIX PRA RECEBIMENTO</label>
-<input class="field" id="playerPixInput"
-  maxlength="120"
-  placeholder="Digite sua chave Pix">
+
     <button class="btn primary" id="saveName" type="button">
       SALVAR E CONTINUAR
     </button>
+
     <div id="nameError" class="status"></div>
   </div>
 </div>
@@ -814,7 +1133,7 @@ main{
         <span class="muted">JOGADOR</span><br>
         <strong id="playerDisplayPanel">Nome não informado</strong>
       </div>
-      <button style="di:none:none" class="change-name" id="changeName" type="button">
+      <button style="display:none" class="change-name" id="changeName" type="button">
         ALTERAR NOME
       </button>
     </div>
@@ -845,7 +1164,19 @@ main{
       <div id="qr" class="qr"></div>
       <div class="muted" id="pixAmount"></div>
       <label for="pixPayload">PIX COPIA E COLA</label>
-      <textarea class="pixcode" id="pixPayload" readonly></textarea>
+      <textarea
+  id="pixPayload"
+  class="pixcode"
+  readonly
+  oncopy="return false"
+  oncut="return false"
+  oncontextmenu="return false"
+  style="user-select:none;-webkit-user-select:none;"
+  tabindex="-1"
+  spellcheck="false"
+  autocomplete="off"
+  aria-label="Código Pix"
+></textarea>
       <button class="btn primary" id="copyPix" type="button">
         COPIAR CÓDIGO PIX
       </button>
@@ -857,7 +1188,40 @@ main{
 
   </div>
 </div>
+<div class="modal-backdrop" id="withdrawModal">
+  <div class="name-modal">
 
+    <h2 style="color:var(--gold)">💸 SOLICITAR SAQUE</h2>
+
+    <p id="withdrawDescription">
+      Informe sua chave Pix para receber seu prêmio.
+    </p>
+
+    <div class="metric">
+      <small>VALOR DO PRÊMIO</small>
+      <strong id="withdrawAmount">R$ 0,00</strong>
+    </div>
+
+    <label class="muted" for="withdrawPix">
+      SUA CHAVE PIX PARA RECEBIMENTO
+    </label>
+
+    <input class="field" id="withdrawPix"
+      maxlength="150"
+      placeholder="CPF, telefone, e-mail ou chave aleatória">
+
+    <button class="btn primary" id="confirmWithdraw" type="button">
+      CONFIRMAR SOLICITAÇÃO
+    </button>
+
+    <button class="btn secondary" id="cancelWithdraw" type="button">
+      CANCELAR
+    </button>
+
+    <div id="withdrawError" class="status"></div>
+
+  </div>
+</div>
 <main>
 <section class="panel history-panel" id="withdrawPanel">
   <h2 class="heading">💸 MEUS SAQUES</h2>
@@ -869,18 +1233,21 @@ main{
   <h2 class="results-title">🏆 RESULTADOS DO TIME CERTO</h2>
 <div class="resultado-roleta" id="resultadoRoleta">
   <div class="roleta-titulo">🏆 ÚLTIMO RESULTADO</div>
+
+  <img id="roletaEscudo"
+       src=""
+       alt="Escudo do time"
+       style="width:90px;height:90px;object-fit:contain;margin:12px auto;display:none">
+
   <div class="roleta-numero" id="roletaNumero">--</div>
+
   <div class="roleta-time" id="roletaTime">
     AGUARDANDO RESULTADO
   </div>
+
   <div class="roleta-horario" id="roletaHorario"></div>
 </div>
-  <textarea
-    id="resultsTextarea"
-    class="results-textarea"
-    readonly
-    placeholder="Aguardando resultados do Firebase..."
-  ></textarea>
+  <div id="resultsLista"></div>
 
   <div class="results-status" id="resultsStatus">
     Conectando ao Firebase...
@@ -923,7 +1290,7 @@ main{
     </button>
     
   </div>
-  <div style="text-aligh:center">
+  <div style="text-align:center">
   <p>A SORTE E SUA A GARANTIA E NOSSA</p>
 </div>
 </div>
@@ -946,7 +1313,10 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+const $ = id => document.getElementById(id);
 
+// FUNÇÃO GLOBAL PARA ACESSAR ELEMENTOS
+const chosen = new Set();
 
 
 const BETS_PATH = "palpites";
@@ -958,23 +1328,25 @@ const PIX_CITY = "SALVADOR";
 const RESULTS_PATH = "timeCerto/resultados";
 /* CONFERÊNCIA DE ACERTOS E SAQUES */
 
-function encontrarAcerto(aposta){
+function encontrarAcertos(aposta){
 
-  if(!aposta || !Array.isArray(aposta.times)) return null;
+  if(!aposta || !Array.isArray(aposta.times)) return [];
 
-  return resultadosCache.find(resultado=>{
+  const horarios = Array.isArray(aposta.horarios) && aposta.horarios.length
+    ? aposta.horarios
+    : (aposta.horario ? [aposta.horario] : []);
+
+  return resultadosCache.filter(resultado=>{
 
     if(resultado.data !== aposta.dataHorario) return false;
-
-    if(resultado.horario !== aposta.horario) return false;
+    if(!horarios.includes(resultado.horario)) return false;
 
     return aposta.times.some(time=>
       Number(time.numero) === Number(resultado.numero)
     );
 
-  }) || null;
+  });
 }
-
 
 function atualizarSaques(){
 
@@ -984,7 +1356,7 @@ function atualizarSaques(){
   if(!botao || !lista) return;
 
   const premiadas = apostasDoJogador.filter(aposta=>
-    encontrarAcerto(aposta)
+    encontrarAcertos(aposta).length > 0
   );
 
   const disponiveis = premiadas.filter(aposta=>
@@ -996,34 +1368,35 @@ function atualizarSaques(){
   lista.innerHTML = "";
 
   if(!premiadas.length){
-
     lista.textContent = "Você ainda não possui apostas premiadas.";
     return;
   }
 
   premiadas.forEach(aposta=>{
 
-    const resultado = encontrarAcerto(aposta);
+    const acertos = encontrarAcertos(aposta);
 
-    const premio = Number(aposta.valorPorTime || 0) * 35;
+    const premioPorAcerto = Number(aposta.valorPorTime || 0) * 35;
+    const premioTotal = premioPorAcerto * acertos.length;
 
     const solicitado = aposta.saqueSolicitado === true;
 
     const item = document.createElement("div");
-
     item.className = "history-item";
 
     const titulo = document.createElement("strong");
-
-    titulo.textContent =
-      "🏆 ACERTO • "+resultado.time;
+    titulo.textContent = "🏆 "+acertos.length+" COMBINAÇÃO(ÕES) PREMIADA(S)";
 
     const detalhes = document.createElement("div");
 
     detalhes.textContent =
-      "Resultado: "+resultado.numero+
-      " • Horário: "+resultado.horario+
-      " • Prêmio: "+brl(premio);
+      "Horários premiados: "+
+      acertos.map(r=>r.horario+" • "+r.time).join(" | ");
+
+    const valor = document.createElement("div");
+    valor.style.color = "var(--green)";
+    valor.style.fontWeight = "bold";
+    valor.textContent = "Prêmio total: "+brl(premioTotal);
 
     const status = document.createElement("div");
 
@@ -1031,7 +1404,7 @@ function atualizarSaques(){
       ? "SAQUE SOLICITADO • "+(aposta.saqueStatus || "PENDENTE")
       : "PRÊMIO DISPONÍVEL PARA SAQUE";
 
-    item.append(titulo,detalhes,status);
+    item.append(titulo,detalhes,valor,status);
 
     if(!solicitado){
 
@@ -1051,9 +1424,7 @@ function atualizarSaques(){
     lista.appendChild(item);
   });
 }
-
-
-async function solicitarSaque(id){
+function solicitarSaque(id){
 
   const aposta = apostasDoJogador.find(item=>item.id === id);
 
@@ -1062,72 +1433,207 @@ async function solicitarSaque(id){
     return;
   }
 
-  const resultado = encontrarAcerto(aposta);
+  const resultados = encontrarAcertos(aposta);
 
-  if(!resultado){
+  if(!resultados.length){
     alert("Não foi encontrado acerto para esta aposta.");
     return;
   }
 
-  if(!playerPixKey){
-    alert("Cadastre sua chave Pix antes de solicitar o saque.");
-    abrirModalNome();
-    return;
-  }
+  const premioPorAcerto = Number(aposta.valorPorTime || 0) * 35;
+  const premio = premioPorAcerto * resultados.length;
 
-  const premio = Number(aposta.valorPorTime || 0) * 35;
-
-  if(!confirm(
-    "Confirmar solicitação de saque de "+brl(premio)+
-    " para a chave Pix cadastrada?"
-  )){
-    return;
-  }
-
-  const solicitacao = {
-    apostaId:id,
-    jogadorId:playerId,
-    nome:playerName,
-    chavePix:playerPixKey,
-    valor:premio,
-    resultado:resultado.numero,
-    time:resultado.time,
-    data:resultado.data,
-    horario:resultado.horario,
-    status:"PENDENTE",
-    solicitadoEm:new Date().toISOString(),
-    timestamp:Date.now()
+  saqueSelecionado = {
+    aposta,
+    resultados,
+    premio
   };
 
+  $("withdrawAmount").textContent = brl(premio);
+  $("withdrawPix").value = "";
+  $("withdrawError").textContent = "";
+
+  $("withdrawModal").classList.add("show");
+}
+async function confirmarSaque(){
+
+  if(!saqueSelecionado){
+    alert("Nenhum prêmio selecionado.");
+    return;
+  }
+
+  const chavePix = $("withdrawPix").value.trim();
+
+  if(!chavePix){
+    $("withdrawError").textContent =
+      "Informe sua chave Pix para receber.";
+    return;
+  }
+
+  const {aposta,resultados,premio} = saqueSelecionado;
+
+const primeiroResultado = resultados[0];
+  const btn = $("confirmWithdraw");
+
+  btn.disabled = true;
+  btn.textContent = "ENVIANDO...";
+
+  const solicitacao = {
+  id: aposta.id,
+  apostaId: aposta.id,
+  jogadorId: playerId,
+  nome: playerName,
+  chavePix: chavePix,
+  valor: premio,
+
+  quantidadeAcertos: resultados.length,
+
+  resultados: resultados.map(resultado=>({
+    numero: resultado.numero,
+    time: resultado.time,
+    data: resultado.data,
+    horario: resultado.horario
+  })),
+
+  resultado: primeiroResultado.numero,
+  time: primeiroResultado.time,
+  data: primeiroResultado.data,
+  horario: primeiroResultado.horario,
+
+  status: "PENDENTE",
+  solicitadoEm: new Date().toISOString(),
+  timestamp: Date.now()
+};
   try{
 
     const atualizacoes = {};
 
-    atualizacoes["solicitacoesSaque/"+id] = solicitacao;
+    atualizacoes["solicitacoesSaque/"+aposta.id] = solicitacao;
 
-    atualizacoes[BETS_PATH+"/"+id+"/saqueSolicitado"] = true;
+    atualizacoes[BETS_PATH+"/"+aposta.id+"/saqueSolicitado"] = true;
 
-    atualizacoes[BETS_PATH+"/"+id+"/saqueStatus"] = "PENDENTE";
+    atualizacoes[BETS_PATH+"/"+aposta.id+"/saqueStatus"] = "PENDENTE";
 
     await db.ref().update(atualizacoes);
 
-    alert("Solicitação de saque enviada com sucesso!");
+    $("withdrawModal").classList.remove("show");
+
+    saqueSelecionado = null;
+
+    alert("Solicitação de saque enviada ao painel com sucesso!");
+
+    atualizarSaques();
 
   }catch(error){
 
-    console.error(error);
+    console.error("Erro ao solicitar saque:",error);
 
-    alert("Não foi possível solicitar o saque. Tente novamente.");
+    $("withdrawError").textContent =
+      "Erro ao enviar. Verifique sua conexão e tente novamente.";
+
+  }finally{
+
+    btn.disabled = false;
+    btn.textContent = "CONFIRMAR SOLICITAÇÃO";
+
   }
 }
+
+$("confirmWithdraw").onclick = confirmarSaque;
+
+$("cancelWithdraw").onclick = ()=>{
+  $("withdrawModal").classList.remove("show");
+  saqueSelecionado = null;
+};
+
+$("withdrawModal").addEventListener("click",e=>{
+  if(e.target === $("withdrawModal")){
+    $("withdrawModal").classList.remove("show");
+    saqueSelecionado = null;
+  }
+});
+
+function salvarNome(){
+
+  const nome = $("playerNameInput").value.trim();
+
+  if(!nome){
+    $("nameError").textContent = "Digite seu nome.";
+    return;
+  }
+
+  playerName = nome;
+
+  localStorage.setItem("timeCertoPlayerName",nome);
+
+  updatePlayerDisplay();
+
+  $("nameModal").classList.remove("show");
+}
+
+$("saveName").onclick = salvarNome;
 function animarResultado(numero,time,horario){
 
   const numeroEl = $("roletaNumero");
   const timeEl = $("roletaTime");
   const horarioEl = $("roletaHorario");
+  const escudoEl = $("roletaEscudo");
   const caixa = $("resultadoRoleta");
 
-  if(!numeroEl || !timeEl || !horarioEl || !caixa) return;
+  const escudos = {
+    1:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794519241/atletico-paranaense.png",
+    2:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784507594/atletico-mineiro.png",
+    3:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197838/bahia.jpg",
+    4:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794522877/botafo.jpg",
+    5:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794523405/bragantino.png",
+    6:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784512917/chapecoense.png",
+    7:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794523484/corinthians.png",
+    8:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197703/coritiba.jpg",
+    9:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198371/cruzeiro.png",
+    10:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513564/flamengo.png",
+    11:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778195735/fluminense.jpg",
+    12:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786830843/gremio.png",
+    13:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198189/internacional.jpg",
+    14:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786831074/mirassol.png",
+    15:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513469/palmeiras.png",
+    16:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786926638/remo.png",
+    17:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778195807/santos.jpg",
+    18:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513002/sao-paulo.png",
+    19:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794524604/vasco.png",
+    20:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198343/vitoria.png",
+    21:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784508008/america-mg.png",
+    22:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794524959/athletic-mg.png",
+    23:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786746932/atletico-goianiense.png",
+    24:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784507675/avai.png",
+    25:"https://res.cloudinary.com/dtw3turzb/image/upload/v1787081047/botafogo-sp.png",
+    26:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198001/ceara.png",
+    27:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198031/crb.jpg",
+    28:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198777/criciuma.jpg",
+    29:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198491/cuiaba.jpg",
+    30:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784508115/fortaleza.png",
+    31:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197882/goias.png",
+    32:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197334/juventude.jpg",
+    33:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513960/londrina.png",
+    34:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513173/nautico.png",
+    35:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784507748/novo-horizontino.png",
+    36:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198743/operario.png",
+    37:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197963/ponte-preta.png",
+    38:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786636721/sao-bernardo.png",
+    39:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198657/sport-recife.jpg",
+    40:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198422/vila-nova.jpg",
+    41:"https://res.cloudinary.com/dtw3turzb/image/upload/v1788145764/arsenal.png",
+    42:"https://res.cloudinary.com/dtw3turzb/image/upload/v1788052987/chelsea.png",
+    43:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526766/liverpool.jpg",
+    44:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526804/mancheste-united.png",
+    45:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526879/atletico-de-madrid.webp",
+    46:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526928/barcelonasportingclubbarcelona-sporting-club-logo.png",
+    47:"https://res.cloudinary.com/dtw3turzb/image/upload/v1787701694/real-madrid.png",
+    48:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794527212/internazionale.png",
+    49:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794527240/juventus.png",
+    50:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794527271/psg.png"
+  };
+
+  const url = escudos[Number(numero)];
 
   numeroEl.classList.remove("roleta-revelado");
   numeroEl.classList.add("roleta-girando");
@@ -1153,8 +1659,14 @@ function animarResultado(numero,time,horario){
       timeEl.textContent = time;
       horarioEl.textContent = horario;
 
-      void caixa.offsetWidth;
+      if(url){
+        escudoEl.src = url;
+        escudoEl.style.display = "block";
+      }else{
+        escudoEl.style.display = "none";
+      }
 
+      void caixa.offsetWidth;
       caixa.classList.add("roleta-revelado");
     }
 
@@ -1163,16 +1675,70 @@ function animarResultado(numero,time,horario){
 
 function mostrarResultados(dados){
 
-  const textarea = $("resultsTextarea");
   const status = $("resultsStatus");
+const listaHTML = $("resultsLista");
+  const escudos = {
+    1:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794519241/atletico-paranaense.png",
+    2:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784507594/atletico-mineiro.png",
+    3:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197838/bahia.jpg",
+    4:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794522877/botafo.jpg",
+    5:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794523405/bragantino.png",
+    6:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784512917/chapecoense.png",
+    7:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794523484/corinthians.png",
+    8:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197703/coritiba.jpg",
+    9:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198371/cruzeiro.png",
+    10:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513564/flamengo.png",
+    11:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778195735/fluminense.jpg",
+    12:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786830843/gremio.png",
+    13:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198189/internacional.jpg",
+    14:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786831074/mirassol.png",
+    15:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513469/palmeiras.png",
+    16:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786926638/remo.png",
+    17:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778195807/santos.jpg",
+    18:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513002/sao-paulo.png",
+    19:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794524604/vasco.png",
+    20:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198343/vitoria.png",
+    21:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784508008/america-mg.png",
+    22:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794524959/athletic-mg.png",
+    23:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786746932/atletico-goianiense.png",
+    24:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784507675/avai.png",
+    25:"https://res.cloudinary.com/dtw3turzb/image/upload/v1787081047/botafogo-sp.png",
+    26:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198001/ceara.png",
+    27:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198031/crb.jpg",
+    28:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198777/criciuma.jpg",
+    29:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198491/cuiaba.jpg",
+    30:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784508115/fortaleza.png",
+    31:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197882/goias.png",
+    32:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197334/juventude.jpg",
+    33:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513960/londrina.png",
+    34:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513173/nautico.png",
+    35:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784507748/novo-horizontino.png",
+    36:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198743/operario.png",
+    37:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197963/ponte-preta.png",
+    38:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786636721/sao-bernardo.png",
+    39:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198657/sport-recife.jpg",
+    40:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198422/vila-nova.jpg",
+    41:"https://res.cloudinary.com/dtw3turzb/image/upload/v1788145764/arsenal.png",
+    42:"https://res.cloudinary.com/dtw3turzb/image/upload/v1788052987/chelsea.png",
+    43:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526766/liverpool.jpg",
+    44:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526804/mancheste-united.png",
+    45:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526879/atletico-de-madrid.webp",
+    46:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526928/barcelonasportingclubbarcelona-sporting-club-logo.png",
+    47:"https://res.cloudinary.com/dtw3turzb/image/upload/v1787701694/real-madrid.png",
+    48:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794527212/internazionale.png",
+    49:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794527240/juventus.png",
+    50:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794527271/psg.png"
+  };
 
   if(!dados || typeof dados !== "object"){
-    textarea.value = "AGUARDANDO O PRIMEIRO RESULTADO...";
-    status.textContent = "Nenhum resultado publicado ainda.";
-    resultadosCache = [];
-    atualizarSaques();
-    return;
-  }
+
+  listaHTML.innerHTML = "";
+  status.textContent = "Nenhum resultado publicado ainda.";
+
+  resultadosCache = [];
+  atualizarSaques();
+  return;
+}
 
   const lista = [];
 
@@ -1189,11 +1755,18 @@ function mostrarResultados(dados){
       if(!resultado || typeof resultado !== "object") return;
 
       const numero = Number(resultado.numero);
-      const time = resultado.time || resultado.nome || "TIME NÃO INFORMADO";
-      const horario = resultado.horario || horarioKey.replace("-",":");
+
+      const time = resultado.time ||
+                   resultado.nome ||
+                   teamNames[numero-1] ||
+                   "TIME NÃO INFORMADO";
+
+      const horario = resultado.horario ||
+                      horarioKey.replace("-",":");
+
       const dataResultado = resultado.data || data;
 
-      if(!Number.isInteger(numero)) return;
+      if(!Number.isInteger(numero) || numero < 1 || numero > 50) return;
 
       lista.push({
         data:dataResultado,
@@ -1206,19 +1779,34 @@ function mostrarResultados(dados){
 
   });
 
-  lista.sort((a,b)=>{
+  // ORDEM: MAIS RECENTE PRIMEIRO
+function converterDataHora(data, horario){
 
-    const chaveA = a.data+" "+a.horario;
-    const chaveB = b.data+" "+b.horario;
+  let ano, mes, dia;
 
-    return chaveB.localeCompare(chaveA);
+  if(data.includes("/")){
+    [dia,mes,ano] = data.split("/");
+  }else{
+    [ano,mes,dia] = data.split("-");
+  }
 
-  });
+  return new Date(
+    Number(ano),
+    Number(mes)-1,
+    Number(dia),
+    Number(horario.split(":")[0]),
+    Number(horario.split(":")[1])
+  ).getTime();
+}
 
-  // Atualiza os resultados para conferir as apostas
+lista.sort((a,b)=>
+  converterDataHora(b.data,b.horario) -
+  converterDataHora(a.data,a.horario)
+);
+
   resultadosCache = lista;
 
-  // Anima somente quando chega um resultado novo
+  // RESULTADO MAIS RECENTE
   if(lista.length){
 
     const ultimo = lista[0];
@@ -1238,22 +1826,43 @@ function mostrarResultados(dados){
     }
   }
 
+  // MONTAR RESUMO COM ESCUDO, NÚMERO E NOME
+  listaHTML.innerHTML = "";
+
+  lista.forEach(r=>{
+
+    const item = document.createElement("div");
+    item.className = "resultado-item";
+
+    const img = document.createElement("img");
+    img.src = escudos[r.numero];
+    img.alt = r.time;
+    img.loading = "lazy";
+
+    const numero = document.createElement("div");
+    numero.className = "numero";
+    numero.textContent = String(r.numero).padStart(2,"0");
+
+    const info = document.createElement("div");
+    info.style.flex = "1";
+
+    const nome = document.createElement("div");
+    nome.className = "nome";
+    nome.textContent = r.time;
+
+    const data = document.createElement("div");
+    data.className = "data";
+    data.textContent = r.data+" • "+r.horario;
+
+    info.append(nome,data);
+    item.append(img,numero,info);
+    listaHTML.appendChild(item);
+
+  });
+
   atualizarSaques();
 
-  if(!lista.length){
-    textarea.value = "AGUARDANDO RESULTADOS...";
-    status.textContent = "Nenhum resultado encontrado.";
-    return;
-  }
-
-  textarea.value = lista.map(r=>{
-
-    const numero = String(r.numero).padStart(2,"0");
-
-    return r.data+" — "+r.horario+"\n"+
-           numero+" — "+r.time;
-
-  }).join("\n\n");
+  
 
   status.textContent =
     lista.length+" resultado(s) recebido(s) do Firebase.";
@@ -1336,19 +1945,16 @@ const teamNames = [
   // FRANÇA (50)
   "PSG"
 ];
-
-const $ = id => document.getElementById(id);
-const chosen = new Set();
-
-let selectedSlots = new Set();
-let userClearedSlot = false;
+let resultadosCache = [];
+let apostasDoJogador = [];
+let ultimoResultadoAnimado = "";
+const selectedSlots = new Set();
 let currentBet = null;
 let currentBetSaved = false;
 let configBlocked = false;
 let configMessage = "";
 let playerName = localStorage.getItem("timeCertoPlayerName") || "";
-
-let playerPixKey = localStorage.getItem("timeCertoPlayerPix") || "";
+let saqueSelecionado = null;
 
 let playerId = localStorage.getItem("timeCertoPlayerId");
 
@@ -1357,7 +1963,7 @@ if(!playerId){
   localStorage.setItem("timeCertoPlayerId",playerId);
 }
 
-let currentDateKey = new Date().toDateString();
+let currentDateKey = getTodayKey();
 db.ref(BETS_PATH).on("value",snapshot=>{
 
   const dados = snapshot.val() || {};
@@ -1373,9 +1979,7 @@ db.ref(BETS_PATH).on("value",snapshot=>{
   console.error("Erro ao consultar apostas:",error);
 
 });
-let resultadosCache = [];
-let apostasDoJogador = [];
-let ultimoResultadoAnimado = "";
+
 
 const brl = n => Number(n || 0).toLocaleString("pt-BR", {
   style:"currency",
@@ -1402,40 +2006,16 @@ $("saqueMenu").onclick = ()=>{
   });
 };
 function abrirModalNome(){
+
   $("playerNameInput").value = playerName;
-  $("playerPixInput").value = playerPixKey;
 
   $("nameError").textContent = "";
+
   $("nameModal").classList.add("show");
+
   $("dropdown").classList.remove("show");
 }
 
-function salvarNome(){
-  const nome = $("playerNameInput").value.trim();
-  const pix = $("playerPixInput").value.trim();
-
-  if(!nome){
-    $("nameError").textContent = "Digite seu nome.";
-    return;
-  }
-
-  if(!pix){
-    $("nameError").textContent = "Informe sua chave Pix.";
-    return;
-  }
-
-  playerName = nome;
-  playerPixKey = pix;
-
-  localStorage.setItem("timeCertoPlayerName",nome);
-  localStorage.setItem("timeCertoPlayerPix",pix);
-
-  updatePlayerDisplay();
-
-  $("nameModal").classList.remove("show");
-}
-
-$("saveName").onclick = salvarNome;
 
 /* MENU */
 $("menuButton").onclick = e=>{
@@ -1621,6 +2201,7 @@ function getAvailableSlots(){
 }
 
 function renderSlots(){
+
   const root = $("slots");
   root.innerHTML = "";
 
@@ -1629,7 +2210,6 @@ function renderSlots(){
   if(hoje !== currentDateKey){
     currentDateKey = hoje;
     selectedSlots.clear();
-    userClearedSlot = false;
   }
 
   const available = getAvailableSlots();
@@ -1641,27 +2221,29 @@ function renderSlots(){
     }
   });
 
-  if(!selectedSlots.size && !userClearedSlot && available.length){
+  // Seleciona o primeiro horário automaticamente
+  if(!selectedSlots.size && available.length){
     selectedSlots.add(available[0]);
   }
 
   available.forEach(value=>{
+
     const b = document.createElement("button");
 
     b.type = "button";
+
     b.className = "slot" +
       (selectedSlots.has(value) ? " active" : "");
 
     b.textContent = value;
 
     b.onclick = ()=>{
+
       if(selectedSlots.has(value)){
         selectedSlots.delete(value);
       }else{
         selectedSlots.add(value);
       }
-
-      userClearedSlot = selectedSlots.size === 0;
 
       renderSlots();
       updateValues();
@@ -1670,23 +2252,31 @@ function renderSlots(){
     root.appendChild(b);
   });
 
-  const horarios = [...selectedSlots].sort();
+  const horariosEscolhidos = [...selectedSlots].sort();
 
   if(configBlocked){
+
     $("slotInfo").textContent =
       configMessage || "Marcações temporariamente encerradas.";
+
   }else if(!available.length){
+
     $("slotInfo").textContent =
-      "Todas as extrações de hoje encerradas.";
-  }else if(horarios.length){
+      "Todas as extrações de hoje encerradas. Aguarde a meia-noite.";
+
+  }else if(horariosEscolhidos.length){
+
     $("slotInfo").textContent =
-      "HORÁRIOS ESCOLHIDOS: " + horarios.join(" • ");
+      horariosEscolhidos.length+
+      " horário(s) selecionado(s): "+
+      horariosEscolhidos.join(" • ");
+
   }else{
+
     $("slotInfo").textContent =
       "Escolha um ou mais horários.";
   }
 }
-
 /* CONFIGURAÇÃO DO ADMIN */
 db.ref("timeCerto/configuracao").on("value",snap=>{
   const cfg = snap.val() || {};
@@ -1706,31 +2296,26 @@ db.ref("timeCerto/configuracao").on("value",snap=>{
 function updateValues(){
 
   const valorPorCombinacao =
-    Number($("amount").value) || 0;
+    Math.max(0,Number($("amount").value) || 0);
 
   const quantidadeTimes = chosen.size;
   const quantidadeHorarios = selectedSlots.size;
 
-  const quantidadeCombinacoes =
-    quantidadeTimes * quantidadeHorarios;
+  const combinacoes = quantidadeTimes * quantidadeHorarios;
 
-  const valorTotal =
-    valorPorCombinacao * quantidadeCombinacoes;
+  const valorTotal = valorPorCombinacao * combinacoes;
 
-  // Campo VALOR: total a pagar
-  $("topValue").textContent = brl(valorTotal);
+  const premioTotal = valorPorCombinacao * 35 * combinacoes;
 
-  // Total no pagamento
+  $("amountDisplay").textContent = brl(valorPorCombinacao);
+
   $("payValue").textContent = brl(valorTotal);
 
-  // Valor individual
-  $("amountDisplay").textContent =
-    brl(valorPorCombinacao);
+  $("prizeValue").textContent = brl(premioTotal);
 
-  // Prêmio por cada acerto
-  $("prizeValue").textContent =
-    brl(valorPorCombinacao * 35);
+  $("topValue").textContent = brl(valorTotal);
 }
+
 $("amount").addEventListener("input",updateValues);
 
 /* PIX */
@@ -1854,9 +2439,14 @@ function renderHistory(){
     const title = document.createElement("strong");
     title.textContent = item.id+" • "+item.status;
 
-    const details = document.createElement("div");
-    details.textContent =
-      item.data+" • "+brl(item.valor)+" • "+item.horario;
+    const horarios = item.horarios || [item.horario];
+
+const details = document.createElement("div");
+
+details.textContent =
+  item.data+
+  " • "+brl(item.valor)+
+  " • "+horarios.join(", ");
 
     const teams = document.createElement("div");
     teams.textContent = (item.times || []).join(", ");
@@ -1883,25 +2473,27 @@ function toggleHistory(){
 
 $("historyMenu").onclick = toggleHistory;
 /* BOTÃO RESUMO */
+
 $("resumoMenu").onclick = ()=>{
 
-  const textarea = $("resultsTextarea");
+  const lista = $("resultsLista");
   const status = $("resultsStatus");
 
-  const mostrar = !textarea.classList.contains("show");
+  const mostrar = !lista.classList.contains("show");
 
-  textarea.classList.toggle("show",mostrar);
+  lista.classList.toggle("show",mostrar);
   status.classList.toggle("show",mostrar);
 
   $("dropdown").classList.remove("show");
 
   if(mostrar){
-    textarea.scrollIntoView({
+    lista.scrollIntoView({
       behavior:"smooth",
       block:"center"
     });
   }
 };
+
 /* LIMPAR SELEÇÃO */
 function clearSelection(){
 
@@ -1911,13 +2503,11 @@ function clearSelection(){
     el.classList.remove("selected");
   });
 
+  selectedSlots.clear();
+
   updateCount();
 
-  selectedSlots.clear();
-  userClearedSlot = true;
-
   $("amount").value = "1.00";
-
   updateValues();
 
   $("pixPanel").classList.remove("show");
@@ -1940,13 +2530,13 @@ $("clearMenu").onclick = clearSelection;
 $("createBet").onclick = async()=>{
 
   if(configBlocked){
-    alert(configMessage || "Marcações bloqueadas.");
+    alert(configMessage || "Marcações temporariamente bloqueadas.");
     return;
   }
 
-  if(!playerName || !playerPixKey){
+  if(!playerName){
     abrirModalNome();
-    alert("Informe seu nome e sua chave Pix.");
+    alert("Informe seu nome para continuar.");
     return;
   }
 
@@ -1963,17 +2553,26 @@ $("createBet").onclick = async()=>{
   }
 
   if(!selectedSlots.size){
-    alert("Escolha pelo menos um horário.");
+    alert("Selecione pelo menos um horário.");
     return;
   }
 
-  const horarios = [...selectedSlots].sort();
-
   const available = getAvailableSlots();
 
-  if(horarios.some(h=>!available.includes(h))){
-    alert("Um dos horários já passou. Escolha novamente.");
+  const horarios = [...selectedSlots].sort();
+
+  const horariosInvalidos = horarios.filter(h=>
+    !available.includes(h)
+  );
+
+  if(horariosInvalidos.length){
+
+    horariosInvalidos.forEach(h=>selectedSlots.delete(h));
+
     renderSlots();
+    updateValues();
+
+    alert("Um ou mais horários já passaram. Confira sua seleção.");
     return;
   }
 
@@ -1982,6 +2581,8 @@ $("createBet").onclick = async()=>{
     return;
   }
 
+  const id = "TC"+Date.now().toString(36).toUpperCase();
+
   const times = [...chosen]
     .sort((a,b)=>a-b)
     .map(n=>({
@@ -1989,89 +2590,71 @@ $("createBet").onclick = async()=>{
       nome:teamNames[n-1]
     }));
 
+  const quantidadeTimes = times.length;
+  const quantidadeHorarios = horarios.length;
+
   const quantidadeCombinacoes =
-    times.length * horarios.length;
+    quantidadeTimes * quantidadeHorarios;
+
+  const valorPorTime = amount;
 
   const valorTotal =
-    amount * quantidadeCombinacoes;
+    valorPorTime * quantidadeCombinacoes;
 
-  const id = "TC" + Date.now().toString(36).toUpperCase();
+  const premioPotencial =
+    valorPorTime * 35 * quantidadeCombinacoes;
 
   const payload = pixPayload(valorTotal,id);
 
-  // Cada combinação será uma aposta independente
-  const registros = [];
+  const bet = {
 
-  horarios.forEach(horario=>{
+    id,
+    jogadorId: playerId,
+    nome: playerName,
 
-    times.forEach(time=>{
+    valorPorTime,
+    quantidadeTimes,
+    quantidadeHorarios,
+    quantidadeCombinacoes,
 
-      const registroId =
-        id + "_" + time.numero + "_" + horario.replace(":","");
+    valor: valorTotal,
+    premioPotencial,
 
-      registros.push({
+    dataHorario: getTodayKey(),
 
-        id:registroId,
-        grupoId:id,
+    // Compatibilidade com apostas antigas e painel
+    horario: horarios[0],
+    horarios: horarios,
 
-        jogadorId:playerId,
-        nome:playerName,
+    times,
 
-        valorPorTime:amount,
-        quantidadeTimes:1,
+    status: "PENDENTE",
 
-        valor:amount,
-        premioPotencial:amount * 35,
+    pixCopiaECola: payload,
 
-        dataHorario:getTodayKey(),
-        horario:horario,
-
-        times:[time],
-
-        status:"PENDENTE",
-
-        chavePix:playerPixKey,
-        pixCopiaECola:payload,
-
-        criadoEm:new Date().toISOString(),
-        timestamp:Date.now()
-
-      });
-
-    });
-
-  });
-
-  currentBet = {
-    id:id,
-    registros:registros,
-    valor:valorTotal,
-    valorPorTime:amount,
-    quantidadeTimes:times.length,
-    quantidadeHorarios:horarios.length,
-    quantidadeCombinacoes:quantidadeCombinacoes,
-    horarios:horarios,
-    times:times,
-    pixCopiaECola:payload
+    criadoEm: new Date().toISOString(),
+    timestamp: Date.now()
   };
-
-  currentBetSaved = false;
 
   const btn = $("createBet");
 
   btn.disabled = true;
-  btn.textContent = "GERANDO PIX...";
+  btn.textContent = "PREPARANDO PIX...";
 
   try{
+
+    currentBet = bet;
+    currentBetSaved = false;
 
     $("pixPanel").classList.add("show");
 
     $("pixAmount").textContent =
-      quantidadeCombinacoes + " combinações • " +
-      brl(amount) + " cada • TOTAL: " + brl(valorTotal);
+      quantidadeTimes+" time(s) × "+
+      quantidadeHorarios+" horário(s) × "+
+      brl(valorPorTime)+" = "+
+      brl(valorTotal);
 
     $("pixPayload").value = payload;
-
     $("qr").innerHTML = "";
 
     new QRCode($("qr"),{
@@ -2087,10 +2670,18 @@ $("createBet").onclick = async()=>{
 
     $("betModal").classList.add("show");
 
+    setTimeout(()=>{
+      $("pixPanel").scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+      });
+    },150);
+
   }catch(error){
 
     console.error(error);
-    alert("Erro ao gerar o Pix.");
+
+    alert("Não foi possível preparar o Pix. Tente novamente.");
 
   }finally{
 
@@ -2100,18 +2691,19 @@ $("createBet").onclick = async()=>{
       ? "MARCAÇÕES BLOQUEADAS"
       : "APOSTAR • PIX";
   }
-
 };
 /* COPIAR PIX */
 
+
 $("copyPix").onclick = async()=>{
 
-  if(!currentBet || !currentBet.registros){
-    alert("Nenhuma aposta disponível.");
+  const payload = $("pixPayload").value;
+
+  if(!payload || !currentBet){
+    alert("Nenhuma aposta Pix disponível.");
     return;
   }
 
-  const payload = $("pixPayload").value;
   const btn = $("copyPix");
 
   btn.disabled = true;
@@ -2119,6 +2711,7 @@ $("copyPix").onclick = async()=>{
 
   try{
 
+    // PRIMEIRO: COPIAR SOMENTE PELO BOTÃO
     let copiado = false;
 
     if(navigator.clipboard && window.isSecureContext){
@@ -2128,55 +2721,48 @@ $("copyPix").onclick = async()=>{
 
     }else{
 
-      $("pixPayload").focus();
-      $("pixPayload").select();
+      throw new Error("Copie o Pix usando uma conexão segura (HTTPS).");
 
-      copiado = document.execCommand("copy");
     }
 
     if(!copiado){
-      throw new Error("Falha ao copiar Pix.");
+      throw new Error("Não foi possível copiar o Pix.");
     }
 
+    // SEGUNDO: GRAVAR NO FIREBASE
     if(!currentBetSaved){
 
-      const atualizacoes = {};
-
-      currentBet.registros.forEach(registro=>{
-        atualizacoes[
-          BETS_PATH + "/" + registro.id
-        ] = registro;
-      });
-
-      await db.ref().update(atualizacoes);
+      await db.ref(BETS_PATH+"/"+currentBet.id).set(currentBet);
 
       currentBetSaved = true;
 
+      // HISTÓRICO LOCAL
       localHistoryAdd({
 
-        id:currentBet.id,
-        valor:currentBet.valor,
-        valorPorTime:currentBet.valorPorTime,
+  id:currentBet.id,
 
-        quantidadeTimes:currentBet.quantidadeTimes,
-        quantidadeHorarios:currentBet.quantidadeHorarios,
-        quantidadeCombinacoes:currentBet.quantidadeCombinacoes,
+  valor:currentBet.valor,
+  valorPorTime:currentBet.valorPorTime,
 
-        horarios:currentBet.horarios,
-        horario:currentBet.horarios.join(", "),
+  quantidadeTimes:currentBet.quantidadeTimes,
+  quantidadeHorarios:currentBet.quantidadeHorarios,
+  quantidadeCombinacoes:currentBet.quantidadeCombinacoes,
 
-        status:"PENDENTE",
+  horario:currentBet.horario,
+  horarios:currentBet.horarios,
 
-        data:new Date().toLocaleString("pt-BR"),
+  status:"PENDENTE",
 
-        times:currentBet.times.map(t=>
-          t.numero + " " + t.nome
-        )
+  data:new Date().toLocaleString("pt-BR"),
 
-      });
+  times:currentBet.times.map(t=>
+    t.numero+" "+t.nome
+  )
+});
 
     }
 
+    // TERCEIRO: MENSAGEM DE CONFIRMAÇÃO
     $("copyStatus").innerHTML = "";
 
     const mensagem = document.createElement("div");
@@ -2193,40 +2779,61 @@ $("copyPix").onclick = async()=>{
     `;
 
     mensagem.innerHTML = `
-      <strong style="color:#18c889">
-        ✓ PIX COPIADO E APOSTAS REGISTRADAS!
+      <strong style="color:#18c889;font-size:16px">
+        ✓ PIX COPIADO COM SUCESSO!
       </strong>
       <br><br>
-      Combinações: ${currentBet.quantidadeCombinacoes}
-      <br>
-      Valor total: ${brl(currentBet.valor)}
-      <br>
-      Prêmio por acerto: ${brl(currentBet.valorPorTime * 35)}
+      Sua aposta foi registrada no sistema.
       <br><br>
       <strong style="color:#f5c451">
-        AGUARDANDO CONFIRMAÇÃO DO PAGAMENTO
+        STATUS: AGUARDANDO PAGAMENTO
       </strong>
+      <br>
+      Seu jogo somente será validado após a confirmação
+      do recebimento do pagamento
     `;
 
     $("copyStatus").appendChild(mensagem);
 
   }catch(error){
 
-    console.error(error);
+    console.error("Erro:",error);
 
     $("copyStatus").textContent =
-      "Erro ao copiar ou registrar. Tente novamente.";
+      "Não foi possível copiar o Pix. Tente novamente.";
 
   }finally{
 
     btn.disabled = false;
-
     btn.textContent = currentBetSaved
       ? "PIX COPIADO • REGISTRADO"
       : "COPIAR CÓDIGO PIX";
+
   }
 
 };
+
+const modalComoJogar = document.getElementById("modalComoJogar");
+
+document.getElementById("comoJogarMenu").onclick = () => {
+  modalComoJogar.classList.add("ativo");
+  document.getElementById("dropdown")?.classList.remove("show");
+};
+
+document.getElementById("fecharComoJogar").onclick = () => {
+  modalComoJogar.classList.remove("ativo");
+};
+
+document.getElementById("entendiComoJogar").onclick = () => {
+  modalComoJogar.classList.remove("ativo");
+};
+
+modalComoJogar.onclick = (e) => {
+  if(e.target === modalComoJogar){
+    modalComoJogar.classList.remove("ativo");
+  }
+};
+
 /* INICIALIZAÇÃO */
 renderTeams();
 renderSlots();
@@ -2234,7 +2841,7 @@ updateValues();
 updatePlayerDisplay();
 renderHistory();
 
-if(!playerName || !playerPixKey){
+if(!playerName){
   abrirModalNome();
 }
 setInterval(renderSlots,10000);
