@@ -1,0 +1,1945 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#081426">
+<title>TIME CERTO - ADMIN</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#081426;color:white;font-family:Arial,sans-serif}
+header{background:#101f35;padding:16px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #eabb45}
+h1{font-size:19px;color:#f5c451;margin:0}
+h2{font-size:17px;color:#f5c451}
+main{max-width:1100px;margin:auto;padding:12px}
+.card{background:#122640;border:1px solid #29415e;border-radius:13px;padding:15px;margin-bottom:14px}
+input,select{width:100%;padding:12px;border-radius:8px;border:1px solid #38516f;background:#071629;color:white;margin:5px 0}
+button{padding:11px 13px;border:0;border-radius:8px;background:#f5c451;color:#142033;font-weight:bold;cursor:pointer;margin:3px}
+button:disabled{opacity:.5;cursor:not-allowed}
+.verde{background:#16845c;color:white}
+.vermelho{background:#a12e3c;color:white}
+.azul{background:#294968;color:white}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.kpi{background:#091a2e;padding:13px;border-radius:10px;border:1px solid #29415e}
+.kpi small{color:#aabbd0}
+.kpi strong{display:block;color:#f5c451;font-size:21px;margin-top:6px}
+.kpi.pago strong{color:#35df9a}
+.kpi.pendente strong{color:#ff7777}
+.tabs{display:flex;gap:5px;overflow:auto;margin:15px 0}
+.tabs button{white-space:nowrap;background:#294968;color:white}
+.tabs button.ativo{background:#f5c451;color:#142033}
+.tela{display:none}
+.tela.ativo{display:block}
+table{width:100%;border-collapse:collapse;min-width:1000px;background:#091a2e}
+th,td{padding:9px;text-align:left;border-bottom:1px solid #29415e;font-size:12px}
+th{color:#f5c451;background:#142b47}
+.tablebox{overflow:auto}
+small,.info{color:#aabbd0}
+.info{background:#1b3551;padding:12px;border-radius:8px;font-size:13px;line-height:1.6;margin:10px 0}
+.resultado{color:#f5c451;font-size:25px;font-weight:bold;margin:15px 0}
+.hidden{display:none!important}
+#toast{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#203b59;border:1px solid #f5c451;padding:12px;border-radius:10px;z-index:100;max-width:90%;width:max-content}
+.status-auto{font-size:16px;font-weight:bold;margin:8px 0;color:#f5c451}
+.auto-horarios{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.auto-horarios div{background:#091a2e;border:1px solid #29415e;padding:9px 3px;text-align:center;border-radius:7px;color:#f5c451;font-size:12px;font-weight:bold}
+.pagamento-pago{color:#35df9a;font-weight:bold}
+.pagamento-pendente{color:#ff7777;font-weight:bold}
+.filtro-titulo{display:block;margin-top:10px;font-size:13px;color:#f5c451}
+@media(max-width:600px){
+ .grid{grid-template-columns:repeat(2,1fr)}
+ main{padding:8px}
+ .card{padding:11px}
+ header{padding:12px}
+ .auto-horarios{grid-template-columns:repeat(3,1fr)}
+ button{font-size:11px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- PAINEL ABRE DIRETAMENTE, SEM LOGIN -->
+
+<div id="painel">
+
+<header>
+ <div>
+  <h1>TIME CERTO ADMIN</h1>
+  <small>Gerenciamento administrativo</small>
+ </div>
+ <span style="color:#35df9a;font-weight:bold">● PAINEL ATIVO</span>
+</header>
+
+<main>
+
+<div class="grid">
+ <div class="kpi"><small>Total de apostas</small><strong id="total">0</strong></div>
+ <div class="kpi"><small>Valor apostado</small><strong id="valor">R$ 0,00</strong></div>
+ <div class="kpi"><small>Ganhadores</small><strong id="ganhadores">0</strong></div>
+ <div class="kpi pago"><small>Pagas</small><strong id="pagas">0</strong></div>
+ <div class="kpi pendente"><small>Pendentes</small><strong id="pendentes">0</strong></div>
+</div>
+
+<div class="tabs">
+    <button onclick="abrir('saques',this)">SAQUES</button>
+ <button class="ativo" onclick="abrir('apostas',this)">APOSTAS</button>
+ <button onclick="abrir('sorteio',this)">SORTEIO</button>
+ <button onclick="abrir('resultados',this)">RESULTADOS</button>
+ <button onclick="abrir('controle',this)">CONTROLE</button>
+ <button onclick="abrir('limpeza',this)">LIMPEZA</button>
+</div>
+
+<section id="apostas" class="tela ativo card">
+ <h2>APOSTAS REGISTRADAS</h2>
+
+ <label class="filtro-titulo">Data</label>
+ <input type="date" id="filtroData">
+
+ <label class="filtro-titulo">Horário</label>
+ <select id="filtroHora"><option value="">Todos os horários</option></select>
+
+ <label class="filtro-titulo">Status do pagamento</label>
+ <select id="filtroPagamento">
+  <option value="">Todos os pagamentos</option>
+  <option value="PAGO">Somente PAGOS</option>
+  <option value="PENDENTE">Somente PENDENTES</option>
+ </select>
+
+ <label class="filtro-titulo">Pesquisar jogador ou time</label>
+ <input id="pesquisa" placeholder="Pesquisar...">
+
+ <button onclick="mostrarApostas()">PESQUISAR</button>
+ <button class="azul" onclick="limparFiltros()">LIMPAR FILTROS</button>
+
+ <p class="info" id="quantidade">Carregando apostas...</p>
+
+ <div class="tablebox">
+ <table>
+ <thead>
+ <tr>
+  <th>JOGADOR</th><th>DATA</th><th>HORÁRIO</th><th>TIME</th>
+  <th>NÚMERO</th><th>VALOR</th><th>PRÊMIO</th>
+  <th>PAGAMENTO</th><th>RESULTADO</th>
+  <th>PAGAMENTO DO PRÊMIO</th><th>AÇÃO</th>
+ </tr>
+ </thead>
+ <tbody id="listaApostas"></tbody>
+ </table>
+ </div>
+</section>
+<div class="card" style="background:#091a2e;text-align:center;margin-top:15px">
+  <h2>ESCUDO OFICIAL DO TIME</h2>
+
+  <div style="background:#fff;border-radius:15px;width:190px;height:190px;margin:15px auto;display:flex;align-items:center;justify-content:center;padding:12px">
+    <img id="escudoReal"
+      src=""
+      alt="Escudo oficial do time"
+      style="max-width:100%;max-height:100%;object-fit:contain">
+  </div>
+
+  <h2 id="nomeEscudo">SELECIONE UM TIME</h2>
+
+  <p class="info" id="statusEscudo">
+    O escudo oficial aparecerá aqui.
+  </p>
+
+  <button class="verde" onclick="baixarEscudoReal()">
+    BAIXAR ESCUDO REAL
+  </button>
+
+  <button onclick="compartilharEscudoReal()">
+    COMPARTILHAR ESCUDO
+  </button>
+
+  <button class="azul" onclick="abrirEscudoOriginal()">
+    ABRIR IMAGEM ORIGINAL
+  </button>
+</div>
+<section id="saques" class="tela card">
+ <h2>💸 SOLICITAÇÕES DE SAQUE</h2>
+
+ <div class="grid">
+  <div class="kpi">
+   <small>Solicitações</small>
+   <strong id="totalSaques">0</strong>
+  </div>
+  <div class="kpi pendente">
+   <small>Pendentes</small>
+   <strong id="saquesPendentes">0</strong>
+  </div>
+  <div class="kpi pago">
+   <small>Pagos</small>
+   <strong id="saquesPagos">0</strong>
+  </div>
+  <div class="kpi">
+   <small>Total solicitado</small>
+   <strong id="valorSaques">R$ 0,00</strong>
+  </div>
+ </div>
+
+ <label class="filtro-titulo">Status</label>
+ <select id="filtroSaque" onchange="mostrarSaques()">
+  <option value="">Todos</option>
+  <option value="PENDENTE">Pendentes</option>
+  <option value="PAGO">Pagos</option>
+ </select>
+
+ <p class="info">
+  Confira a chave Pix e o valor antes de realizar a transferência.
+  Confirme o pagamento somente depois de enviar o dinheiro.
+ </p>
+
+ <div class="tablebox">
+  <table>
+   <thead>
+    <tr>
+     <th>JOGADOR</th>
+     <th>VALOR</th>
+     <th>CHAVE PIX</th>
+     <th>TIME</th>
+     <th>DATA/HORÁRIO</th>
+     <th>SOLICITADO EM</th>
+     <th>STATUS</th>
+     <th>AÇÃO</th>
+    </tr>
+   </thead>
+   <tbody id="listaSaques"></tbody>
+  </table>
+ </div>
+</section>
+<section id="sorteio" class="tela card">
+ <h2>SORTEAR E PUBLICAR</h2>
+
+ <div class="info">
+  <b>SORTEIO AUTOMÁTICO — 24 HORAS</b>
+  <p id="statusAutomatico" class="status-auto">CARREGANDO CONFIGURAÇÃO...</p>
+
+  <button class="verde" onclick="configurarSorteioAutomatico(true)">ATIVAR AUTOMÁTICO</button>
+  <button class="vermelho" onclick="configurarSorteioAutomatico(false)">DESATIVAR AUTOMÁTICO</button>
+
+  <p>Sorteios programados de 00:00 até 23:30, de 30 em 30 minutos, todos os dias, no horário de Brasília.</p>
+
+  <div class="auto-horarios">
+   <div>00:00</div><div>00:30</div><div>01:00</div><div>01:30</div>
+   <div>02:00</div><div>02:30</div><div>03:00</div><div>03:30</div>
+   <div>04:00</div><div>04:30</div><div>05:00</div><div>05:30</div>
+   <div>06:00</div><div>06:30</div><div>07:00</div><div>07:30</div>
+   <div>08:00</div><div>08:30</div><div>09:00</div><div>09:30</div>
+   <div>10:00</div><div>10:30</div><div>11:00</div><div>11:30</div>
+   <div>12:00</div><div>12:30</div><div>13:00</div><div>13:30</div>
+   <div>14:00</div><div>14:30</div><div>15:00</div><div>15:30</div>
+   <div>16:00</div><div>16:30</div><div>17:00</div><div>17:30</div>
+   <div>18:00</div><div>18:30</div><div>19:00</div><div>19:30</div>
+   <div>20:00</div><div>20:30</div><div>21:00</div><div>21:30</div>
+   <div>22:00</div><div>22:30</div><div>23:00</div><div>23:30</div>
+  </div>
+
+  <p id="proximoAutomatico">Próxima extração: aguardando...</p>
+  <p id="ultimaAutomatica">Última verificação: aguardando...</p>
+ </div>
+
+ <label>Data do sorteio</label>
+ <input type="date" id="dataSorteio">
+
+ <label>Horário</label>
+ <select id="horaSorteio"></select>
+
+ <label>Time sorteado</label>
+ <select id="timeSorteado"></select>
+
+ <div class="resultado" id="preview">SELECIONE O TIME</div>
+ 
+<div class="card" style="background:#091a2e;text-align:center;margin-top:15px">
+  <h2>IMAGEM DO RESULTADO</h2>
+  <canvas id="canvasResultado"
+    width="1080" height="1080"
+    style="width:100%;max-width:380px;border-radius:14px;background:#081426">
+  </canvas>
+
+  <p class="info" id="statusImagem">
+    Selecione a data, o horário e o time para montar a imagem.
+  </p>
+
+  <button class="verde" onclick="baixarImagemResultado()">
+    BAIXAR IMAGEM
+  </button>
+
+  <button onclick="compartilharImagemWhatsApp()">
+    COMPARTILHAR NO WHATSAPP
+  </button>
+</div>
+ <button onclick="sortear()">SORTEAR TIME</button>
+ <button class="azul" onclick="conferir()">CONFERIR APOSTAS</button>
+ <button class="verde" onclick="publicar()">PUBLICAR RESULTADO</button>
+
+ <div class="info" id="conferencia">Selecione o resultado para conferir.</div>
+
+ <h2>GANHADORES</h2>
+ <div class="tablebox">
+ <table>
+ <thead><tr><th>JOGADOR</th><th>TIME</th><th>NÚMERO</th><th>VALOR</th><th>PRÊMIO POTENCIAL</th></tr></thead>
+ <tbody id="listaGanhadores"></tbody>
+ </table>
+ </div>
+</section>
+
+<section id="resultados" class="tela card">
+ <h2>RESULTADOS PUBLICADOS</h2>
+ <div class="tablebox">
+ <table>
+ <thead><tr><th>DATA</th><th>HORÁRIO</th><th>NÚMERO</th><th>TIME</th><th>PUBLICADO EM</th><th>AÇÃO</th></tr></thead>
+ <tbody id="listaResultados"></tbody>
+ </table>
+ </div>
+</section>
+
+<section id="controle" class="tela card">
+ <h2>CONTROLE DAS APOSTAS</h2>
+ <label>Mensagem para os jogadores</label>
+ <input id="mensagem" placeholder="Apostas temporariamente encerradas">
+ <button class="vermelho" onclick="bloquear(true)">BLOQUEAR APOSTAS</button>
+ <button class="verde" onclick="bloquear(false)">LIBERAR APOSTAS</button>
+ <p class="info" id="situacao">Carregando configuração...</p>
+</section>
+
+<section id="limpeza" class="tela card">
+ <h2>LIMPEZA DE HISTÓRICO</h2>
+ <p class="info">Atenção! As exclusões são permanentes.</p>
+ <h3>Apagar todas as apostas</h3>
+ <button class="vermelho" onclick="limparApostas()">APAGAR TODAS AS APOSTAS</button>
+ <hr style="border-color:#29415e;margin:20px 0">
+ <h3>Apagar todos os resultados</h3>
+ <button class="vermelho" onclick="limparResultados()">APAGAR TODOS OS RESULTADOS</button>
+</section>
+
+</main>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-database-compat.js"></script>
+
+<script>
+/* CONFIGURAÇÕES */
+
+const firebaseConfig = {
+ apiKey:"AIzaSyAGOy5lPtqjSTtZpyFX7xtGGy3P2nYA77U",
+ authDomain:"placarexato-97966.firebaseapp.com",
+ databaseURL:"https://placarexato-97966-default-rtdb.asia-southeast1.firebasedatabase.app",
+ projectId:"placarexato-97966"
+};
+
+const FUSO_HORARIO="America/Sao_Paulo";
+const CAMINHO_CONFIG="timeCerto/configuracao";
+const CAMINHO_RESULTADOS="timeCerto/resultados";
+const INTERVALO_SORTEIO=30*60*1000;
+
+let solicitacoesSaques = {};
+let db;
+let apostas={};
+let resultados={};
+let sorteioAutomaticoAtivo=false;
+let verificacaoAutomatica=null;
+let processandoAutomatico=false;
+let inicializado=false;
+let ultimaVerificacao="";
+let ultimaMensagemAutomatica="";
+const times=[
+"ATHLETICO PR","ATLÉTICO MG","BAHIA","BOTAFOGO",
+"RB BRAGANTINO","CHAPECOENSE","CORINTHIANS",
+"CORITIBA","CRUZEIRO","FLAMENGO","FLUMINENSE",
+"GRÊMIO","INTERNACIONAL","MIRASSOL","PALMEIRAS",
+"REMO","SANTOS","SÃO PAULO","VASCO","VITÓRIA",
+"AMÉRICA MG","ATHLETIC MG","ATLÉTICO GO","AVAÍ",
+"BOTAFOGO SP","CEARÁ","CRB","CRICIÚMA","CUIABÁ",
+"FORTALEZA","GOIÁS","JUVENTUDE","LONDRINA",
+"NÁUTICO","NOVORIZONTINO","OPERÁRIO PR",
+"PONTE PRETA","SÃO BERNARDO","SPORT","VILA NOVA",
+"ARSENAL","CHELSEA","LIVERPOOL","MANCHESTER UNITED",
+"ATLÉTICO DE MADRID","BARCELONA","REAL MADRID",
+"INTERNAZIONALE","JUVENTUS","PSG"
+];
+const $=id=>document.getElementById(id);
+const escudos = {
+  1:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794519241/atletico-paranaense.png",
+  2:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784507594/atletico-mineiro.png",
+  3:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197838/bahia.jpg",
+  4:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794522877/botafo.jpg",
+  5:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794523405/bragantino.png",
+  6:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784512917/chapecoense.png",
+  7:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794523484/corinthians.png",
+  8:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197703/coritiba.jpg",
+  9:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198371/cruzeiro.png",
+  10:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513564/flamengo.png",
+  11:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778195735/fluminense.jpg",
+  12:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786830843/gremio.png",
+  13:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198189/internacional.jpg",
+  14:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786831074/mirassol.png",
+  15:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513469/palmeiras.png",
+  16:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786926638/remo.png",
+  17:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778195807/santos.jpg",
+  18:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513002/sao-paulo.png",
+  19:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794524604/vasco.png",
+  20:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198343/vitoria.png",
+  21:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784508008/america-mg.png",
+  22:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794524959/athletic-mg.png",
+  23:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786746932/atletico-goianiense.png",
+  24:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784507675/avai.png",
+  25:"https://res.cloudinary.com/dtw3turzb/image/upload/v1787081047/botafogo-sp.png",
+  26:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198001/ceara.png",
+  27:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198031/crb.jpg",
+  28:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198777/criciuma.jpg",
+  29:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198491/cuiaba.jpg",
+  30:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784508115/fortaleza.png",
+  31:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197882/goias.png",
+  32:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197334/juventude.jpg",
+  33:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513960/londrina.png",
+  34:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513173/nautico.png",
+  35:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784507748/novo-horizontino.png",
+  36:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198743/operario.png",
+  37:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197963/ponte-preta.png",
+  38:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786636721/sao-bernardo.png",
+  39:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198657/sport-recife.jpg",
+  40:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198422/vila-nova.jpg",
+  41:"https://res.cloudinary.com/dtw3turzb/image/upload/v1788145764/arsenal.png",
+  42:"https://res.cloudinary.com/dtw3turzb/image/upload/v1788052987/chelsea.png",
+  43:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526766/liverpool.jpg",
+  44:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526804/mancheste-united.png",
+  45:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526879/atletico-de-madrid.webp",
+  46:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526928/barcelonasportingclubbarcelona-sporting-club-logo.png",
+  47:"https://res.cloudinary.com/dtw3turzb/image/upload/v1787701694/real-madrid.png",
+  48:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794527212/internazionale.png",
+  49:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794527240/juventus.png",
+  50:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794527271/psg.png"
+};
+function dinheiro(v){
+ return Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+}
+
+function escapar(v){
+ return String(v??"").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+function aviso(msg){
+ $("toast").textContent=msg;
+ $("toast").style.display="block";
+ clearTimeout(window.toastTimer);
+ window.toastTimer=setTimeout(()=>$("toast").style.display="none",4000);
+}
+
+/* DATA BRASÍLIA */
+
+function hojeSP(){
+ const partes=new Intl.DateTimeFormat("en-CA",{
+  timeZone:FUSO_HORARIO,year:"numeric",month:"2-digit",day:"2-digit"
+ }).formatToParts(new Date());
+ const p={};
+ partes.forEach(x=>p[x.type]=x.value);
+ return p.year+"-"+p.month+"-"+p.day;
+}
+
+function partesSP(timestamp){
+ const partes=new Intl.DateTimeFormat("en-GB",{
+  timeZone:FUSO_HORARIO,year:"numeric",month:"2-digit",day:"2-digit",
+  hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"
+ }).formatToParts(new Date(timestamp));
+ const p={};
+ partes.forEach(x=>p[x.type]=x.value);
+ return p;
+}
+
+function formatarDataHoraSP(timestamp){
+ const p=partesSP(timestamp);
+ return {data:p.year+"-"+p.month+"-"+p.day,hora:p.hour+":"+p.minute};
+}
+
+function proximaHoraSP(){
+ const agora=Date.now();
+ const p=partesSP(agora);
+ const minutos=Number(p.minute);
+ const segundos=Number(p.second);
+ const ms=new Date(agora).getMilliseconds();
+ const faltam=((30-(minutos%30))*60*1000)-(segundos*1000)-ms;
+ return agora+faltam;
+}
+
+function formatarHorarioCompleto(timestamp){
+ if(!timestamp)return "Não definido";
+ return new Intl.DateTimeFormat("pt-BR",{
+  timeZone:FUSO_HORARIO,dateStyle:"short",timeStyle:"short"
+ }).format(new Date(timestamp));
+}
+
+/* ABAS */
+
+function abrir(nome,botao){
+ document.querySelectorAll(".tela").forEach(x=>x.classList.remove("ativo"));
+ $(nome).classList.add("ativo");
+ document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("ativo"));
+ botao.classList.add("ativo");
+ if(nome==="apostas")mostrarApostas();
+ if(nome==="resultados")mostrarResultados();
+ if(nome==="sorteio")conferir();
+}
+
+/* INICIALIZAÇÃO */
+
+function iniciar(){
+ if(inicializado)return;
+
+ try{
+  if(!firebase.apps.length){
+   firebase.initializeApp(firebaseConfig);
+  }
+
+  db=firebase.database();
+  inicializado=true;
+
+  const horas=Array.from({length:48},(_,i)=>{
+   const hora=Math.floor(i/2);
+   const minuto=(i%2)*30;
+   return String(hora).padStart(2,"0")+":"+
+          String(minuto).padStart(2,"0");
+  });
+
+  $("horaSorteio").innerHTML=horas.map(h=>
+   `<option value="${h}">${h}</option>`
+  ).join("");
+
+  $("filtroHora").innerHTML=
+   '<option value="">Todos os horários</option>'+
+   horas.map(h=>`<option value="${h}">${h}</option>`).join("");
+
+  $("timeSorteado").innerHTML=times.map((t,i)=>
+   `<option value="${i+1}">${String(i+1).padStart(2,"0")} - ${t}</option>`
+  ).join("");
+
+  $("dataSorteio").value=hojeSP();
+  $("filtroData").value=hojeSP();
+
+  $("timeSorteado").onchange=atualizarPreview;
+
+  $("dataSorteio").onchange=()=>{
+   conferir();
+   atualizarEscudoReal();
+   desenharImagemResultado();
+  };
+
+  $("horaSorteio").onchange=()=>{
+   conferir();
+   atualizarEscudoReal();
+   desenharImagemResultado();
+  };
+
+  $("pesquisa").oninput=mostrarApostas;
+  $("filtroPagamento").onchange=mostrarApostas;
+  $("filtroHora").onchange=mostrarApostas;
+  $("filtroData").onchange=mostrarApostas;
+
+  $("filtroSaque").onchange=mostrarSaques;
+
+  atualizarPreview();
+
+  // APOSTAS
+  db.ref("palpites").on("value",s=>{
+   apostas=s.val()||{};
+   estatisticas();
+   mostrarApostas();
+
+   if($("sorteio").classList.contains("ativo")){
+    conferir();
+   }
+  },e=>aviso("Erro ao ler apostas: "+e.message));
+
+  // RESULTADOS — APENAS UM LISTENER
+  db.ref(CAMINHO_RESULTADOS).on("value",s=>{
+   resultados=s.val()||{};
+
+   estatisticas();
+   mostrarResultados();
+   mostrarApostas();
+   atualizarEscudoReal();
+   desenharImagemResultado();
+
+   if($("sorteio").classList.contains("ativo")){
+    conferir();
+   }
+  },e=>aviso("Erro ao ler resultados: "+e.message));
+
+  // SAQUES — FORA DO LISTENER DE RESULTADOS
+  db.ref("solicitacoesSaque").on("value",s=>{
+   solicitacoesSaques=s.val()||{};
+   mostrarSaques();
+  },e=>aviso("Erro ao carregar saques: "+e.message));
+
+  // CONFIGURAÇÃO DO SORTEIO AUTOMÁTICO
+  db.ref(CAMINHO_CONFIG).on("value",s=>{
+   const c=s.val()||{};
+
+   sorteioAutomaticoAtivo=
+    c.sorteioAutomatico===true;
+
+   atualizarStatusAutomatico(c);
+
+   if(sorteioAutomaticoAtivo){
+    verificarHorarioAutomatico();
+   }
+  },e=>aviso("Erro ao ler configuração: "+e.message));
+
+  // CONTROLE DE APOSTAS
+  db.ref(CAMINHO_CONFIG).on("value",s=>{
+   const c=s.val()||{};
+
+   $("situacao").textContent=c.bloqueado?
+    "🔴 APOSTAS BLOQUEADAS — "+(c.mensagem||""):
+    "🟢 APOSTAS LIBERADAS";
+
+   if(c.mensagem){
+    $("mensagem").value=c.mensagem;
+   }
+  });
+
+  iniciarVerificacaoAutomatica();
+
+  aviso("Painel conectado ao Firebase!");
+
+ }catch(e){
+  inicializado=false;
+  aviso("Erro Firebase: "+e.message);
+ }
+}
+/* STATUS AUTOMÁTICO */
+
+/* =====================================
+   SORTEIO AUTOMÁTICO — TIME CERTO
+   INTERVALO DE 30 MINUTOS
+   FUSO: BRASÍLIA
+===================================== */
+
+function atualizarStatusAutomatico(c){
+ c=c||{};
+
+ $("statusAutomatico").textContent=
+  sorteioAutomaticoAtivo?
+  "🟢 SORTEIO AUTOMÁTICO ATIVADO":
+  "🔴 SORTEIO AUTOMÁTICO DESATIVADO";
+
+ $("proximoAutomatico").textContent=
+  "Próxima extração: "+
+  formatarHorarioCompleto(
+   Number(c.sorteioAutomaticoProximo||0)
+  );
+
+ $("ultimaAutomatica").textContent=
+  ultimaMensagemAutomatica||
+  (ultimaVerificacao?
+   "Última verificação: "+ultimaVerificacao:
+   "Última verificação: aguardando...");
+}
+
+async function configurarSorteioAutomatico(ativar){
+
+ if(!db){
+  aviso("Firebase ainda não conectado.");
+  return;
+ }
+
+ if(!confirm(
+  ativar?
+  "ATIVAR os sorteios automáticos de 30 em 30 minutos?":
+  "DESATIVAR os sorteios automáticos?"
+ ))return;
+
+ try{
+
+  if(ativar){
+
+   const ref=db.ref(CAMINHO_CONFIG);
+   const snapshot=await ref.once("value");
+   const c=snapshot.val()||{};
+
+   let proxima=Number(c.sorteioAutomaticoProximo||0);
+
+   // Se não existe próximo horário ou ele já passou,
+   // programa a próxima meia hora.
+   if(!proxima||proxima<=Date.now()){
+    proxima=proximaHoraSP();
+   }
+
+   await ref.update({
+    sorteioAutomatico:true,
+    sorteioAutomaticoProximo:proxima,
+    sorteioAutomaticoAtivadoEm:new Date().toISOString(),
+    atualizadoEm:new Date().toISOString()
+   });
+
+   aviso(
+    "AUTOMÁTICO ATIVADO! Próximo sorteio: "+
+    formatarHorarioCompleto(proxima)
+   );
+
+  }else{
+
+   await db.ref(CAMINHO_CONFIG).update({
+    sorteioAutomatico:false,
+    atualizadoEm:new Date().toISOString()
+   });
+
+   aviso("SORTEIO AUTOMÁTICO DESATIVADO!");
+
+  }
+
+ }catch(e){
+  aviso("Erro ao configurar: "+e.message);
+ }
+}
+
+/* NÚMERO ALEATÓRIO */
+
+function numeroAleatorio(){
+
+ const limite=Math.floor(4294967296/50)*50;
+ const arr=new Uint32Array(1);
+
+ do{
+  crypto.getRandomValues(arr);
+ }while(arr[0]>=limite);
+
+ return (arr[0]%50)+1;
+}
+
+/* PRÓXIMO HORÁRIO */
+
+async function obterProximoHorario(){
+
+ const ref=db.ref(
+  CAMINHO_CONFIG+"/sorteioAutomaticoProximo"
+ );
+
+ const s=await ref.once("value");
+ let proximo=Number(s.val()||0);
+
+ if(!proximo){
+
+  const calculado=proximaHoraSP();
+
+  const tx=await ref.transaction(atual=>{
+   if(atual!==null)return;
+   return calculado;
+  });
+
+  if(tx.committed){
+   proximo=calculado;
+  }else{
+   const novamente=await ref.once("value");
+   proximo=Number(novamente.val()||0);
+  }
+ }
+
+ return proximo;
+}
+
+/* PUBLICAR RESULTADO AUTOMÁTICO */
+
+async function processarHorarioAutomatico(timestamp){
+
+ const d=formatarDataHoraSP(timestamp);
+ const numero=numeroAleatorio();
+
+ const dados={
+  data:d.data,
+  horario:d.hora,
+  numero:numero,
+  time:times[numero-1],
+  publicadoEm:new Date().toISOString(),
+  timestamp:Date.now(),
+  horarioProgramado:timestamp,
+  automatico:true
+ };
+
+ const chaveHora=d.hora.replace(":","-");
+
+ const caminho=
+  `${CAMINHO_RESULTADOS}/${d.data}/${chaveHora}`;
+
+ // A transação impede duplicidade de publicação.
+ const tx=await db.ref(caminho).transaction(atual=>{
+  if(atual!==null)return;
+  return dados;
+ });
+
+ // Avança o próximo horário somente se este ainda
+ // for o horário programado atual.
+ const avancar=await db.ref(
+  CAMINHO_CONFIG+"/sorteioAutomaticoProximo"
+ ).transaction(atual=>{
+
+  if(Number(atual)!==Number(timestamp)){
+   return;
+  }
+
+  return timestamp+INTERVALO_SORTEIO;
+ });
+
+ if(tx.committed){
+
+  ultimaMensagemAutomatica=
+   "Publicado: "+d.data+
+   " às "+d.hora+
+   " — "+numero+" "+dados.time;
+
+  aviso(
+   "RESULTADO AUTOMÁTICO: "+
+   numero+" - "+dados.time+
+   " ("+d.hora+")"
+  );
+
+ }else{
+
+  ultimaMensagemAutomatica=
+   "Horário já publicado: "+d.data+" "+d.hora;
+
+ }
+
+ if(!avancar.committed){
+  console.warn(
+   "O horário foi atualizado por outra execução."
+  );
+ }
+
+ return tx.committed;
+}
+
+/* VERIFICAÇÃO AUTOMÁTICA */
+
+async function verificarHorarioAutomatico(){
+
+ if(!db||!sorteioAutomaticoAtivo||processandoAutomatico){
+  return;
+ }
+
+ processandoAutomatico=true;
+
+ try{
+
+  const agora=Date.now();
+  let proximo=await obterProximoHorario();
+
+  if(!proximo||proximo>agora){
+   atualizarProximoNaTela(proximo);
+   return;
+  }
+
+  let quantidade=0;
+
+  // Recupera horários vencidos, limitado a 24 por verificação.
+  while(
+   proximo<=Date.now()&&
+   quantidade<24&&
+   sorteioAutomaticoAtivo
+  ){
+
+   await processarHorarioAutomatico(proximo);
+
+   quantidade++;
+
+   const s=await db.ref(
+    CAMINHO_CONFIG+"/sorteioAutomaticoProximo"
+   ).once("value");
+
+   const novo=Number(s.val()||0);
+
+   if(novo<=proximo){
+    throw new Error(
+     "Não foi possível avançar o próximo horário."
+    );
+   }
+
+   proximo=novo;
+  }
+
+  if(quantidade>0){
+
+   ultimaVerificacao=
+    new Date().toLocaleTimeString("pt-BR",{
+     timeZone:FUSO_HORARIO
+    });
+
+   $("ultimaAutomatica").textContent=
+    ultimaMensagemAutomatica+
+    " • Verificado: "+ultimaVerificacao;
+
+  }
+
+  atualizarProximoNaTela(proximo);
+
+ }catch(e){
+
+  console.error(e);
+  aviso("Erro no automático: "+e.message);
+
+ }finally{
+
+  processandoAutomatico=false;
+
+ }
+}
+
+/* ATUALIZAR PRÓXIMO HORÁRIO */
+
+function atualizarProximoNaTela(timestamp){
+
+ if(!timestamp)return;
+
+ $("proximoAutomatico").textContent=
+  "Próxima extração: "+
+  formatarHorarioCompleto(timestamp);
+}
+
+/* INICIAR VERIFICAÇÃO */
+
+function iniciarVerificacaoAutomatica(){
+
+ if(verificacaoAutomatica)return;
+
+ verificacaoAutomatica=setInterval(()=>{
+  verificarHorarioAutomatico();
+ },5000);
+
+ document.addEventListener("visibilitychange",()=>{
+  if(!document.hidden){
+   verificarHorarioAutomatico();
+  }
+ });
+
+ window.addEventListener("online",()=>{
+  verificarHorarioAutomatico();
+ });
+
+}
+/* LEITURA DAS APOSTAS */
+
+function lista(){
+ return Object.entries(apostas).map(([id,b])=>({id,b:b||{}}));
+}
+
+function dataAposta(b){
+ if(b.dataHorario)return String(b.dataHorario).slice(0,10);
+ if(b.data)return String(b.data).slice(0,10);
+
+ let d=b.criadoEm?new Date(b.criadoEm):
+  b.timestamp?new Date(Number(b.timestamp)):null;
+
+ if(!d||isNaN(d))return "";
+
+ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+
+function horaAposta(b){
+ return String(b.horario||b.hora||"").slice(0,5);
+}
+
+function numeros(b){
+ let v=b.times??b.time??b.numero??[];
+ if(!Array.isArray(v))v=[v];
+
+ return v.map(x=>{
+  let n=Number(typeof x==="object"&&x!==null?(x.numero??x.number??x.id):x);
+  let nome=typeof x==="object"&&x!==null?(x.nome||x.time):"";
+  return {n,nome:nome||times[n-1]||String(x)};
+ }).filter(x=>Number.isInteger(x.n)&&x.n>=1&&x.n<=50);
+}
+
+function statusPagamento(b){
+ return String(b.status||"").toUpperCase()==="PAGO"?"PAGO":"PENDENTE";
+}
+
+function resultado(data,hora){
+ const chave=String(hora||"").replace(":","-").slice(0,5);
+ return resultados?.[data]?.[chave]||null;
+}
+
+function ganhou(b){
+ const r=resultado(dataAposta(b),horaAposta(b));
+ return !!r&&numeros(b).some(x=>x.n===Number(r.numero));
+}
+
+/* ESTATÍSTICAS */
+
+function estatisticas(){
+ const a=lista();
+ const pagas=a.filter(x=>statusPagamento(x.b)==="PAGO");
+ const pendentes=a.filter(x=>statusPagamento(x.b)==="PENDENTE");
+
+ $("total").textContent=a.length;
+ $("valor").textContent=dinheiro(a.reduce((s,x)=>s+Number(x.b.valor||0),0));
+ $("ganhadores").textContent=a.filter(x=>ganhou(x.b)).length;
+ $("pagas").textContent=pagas.length;
+ $("pendentes").textContent=pendentes.length;
+}
+
+/* PAGAMENTO DA APOSTA */
+
+async function atualizarPagamento(encoded,status){
+ const id=decodeURIComponent(encoded);
+ const acao=status==="PAGO"?"CONFIRMAR o pagamento desta aposta?":"VOLTAR esta aposta para PENDENTE?";
+ if(!confirm(acao))return;
+
+ try{
+  await db.ref("palpites/"+id).update({
+   status:status,
+   pagamentoConfirmadoEm:status==="PAGO"?new Date().toISOString():null
+  });
+  aviso(status==="PAGO"?"Pagamento confirmado com sucesso!":"Pagamento voltou para pendente.");
+ }catch(e){aviso("Erro ao atualizar pagamento: "+e.message);}
+}
+
+/* FILTROS */
+
+function limparFiltros(){
+ $("filtroData").value="";
+ $("filtroHora").value="";
+ $("filtroPagamento").value="";
+ $("pesquisa").value="";
+ mostrarApostas();
+}
+
+function mostrarApostas(){
+ if(!db)return;
+
+ const data=$("filtroData").value;
+ const hora=$("filtroHora").value;
+ const pagamento=$("filtroPagamento").value;
+ const busca=$("pesquisa").value.toLowerCase().trim();
+
+ const listaFiltrada=lista().filter(({b})=>{
+  if(data&&dataAposta(b)!==data)return false;
+  if(hora&&horaAposta(b)!==hora)return false;
+
+  const status=statusPagamento(b);
+  if(pagamento&&status!==pagamento)return false;
+
+  const texto=[b.nome,...numeros(b).flatMap(x=>[x.nome,x.n])].join(" ").toLowerCase();
+  return !busca||texto.includes(busca);
+ });
+
+ $("quantidade").textContent=listaFiltrada.length+" aposta(s) encontrada(s)";
+
+ $("listaApostas").innerHTML=listaFiltrada.length?
+ listaFiltrada.map(({id,b})=>{
+  const ns=numeros(b);
+  const r=resultado(dataAposta(b),horaAposta(b));
+  const win=r&&ns.some(x=>x.n===Number(r.numero));
+  const status=statusPagamento(b);
+  const premioStatus=String(b.premioStatus||"PENDENTE").toUpperCase();
+
+  return `<tr>
+   <td>${escapar(b.nome||"Sem nome")}</td>
+   <td>${escapar(dataAposta(b))}</td>
+   <td>${escapar(horaAposta(b)||"—")}</td>
+   <td>${ns.map(x=>escapar(x.nome)).join("<br>")||"—"}</td>
+   <td>${ns.map(x=>String(x.n).padStart(2,"0")).join("<br>")||"—"}</td>
+   <td>${dinheiro(b.valor)}</td>
+   <td>${dinheiro(b.premioPotencial)}</td>
+   <td class="${status==="PAGO"?"pagamento-pago":"pagamento-pendente"}">${status}</td>
+   <td>${!r?"AGUARDANDO":win?"GANHOU":"NÃO GANHOU"}</td>
+   <td>
+    ${win?(premioStatus==="PAGO"?
+     `<button class="verde">PRÊMIO PAGO ✓</button>
+      <button class="vermelho" onclick="atualizarPagamentoPremio('${encodeURIComponent(id)}','PENDENTE')">DESFAZER</button>`:
+     `<button class="verde" onclick="atualizarPagamentoPremio('${encodeURIComponent(id)}','PAGO')">CONFIRMAR PRÊMIO PAGO</button>
+      <span class="pagamento-pendente">PRÊMIO PENDENTE</span>`):"—"}
+   </td>
+   <td>
+    ${status==="PAGO"?
+     `<button class="vermelho" onclick="atualizarPagamento('${encodeURIComponent(id)}','PENDENTE')">VOLTAR PENDENTE</button>`:
+     `<button class="verde" onclick="atualizarPagamento('${encodeURIComponent(id)}','PAGO')">CONFIRMAR PAGO</button>`}
+    <button class="vermelho" onclick="excluirAposta('${encodeURIComponent(id)}')">EXCLUIR</button>
+   </td>
+  </tr>`;
+ }).join(""):
+ '<tr><td colspan="11">Nenhuma aposta encontrada.</td></tr>';
+}
+
+/* SORTEIO MANUAL */
+
+function atualizarPreview(){
+ const n=Number($("timeSorteado").value||1);
+ $("preview").textContent=String(n).padStart(2,"0")+" - "+times[n-1];
+
+ atualizarEscudoReal();
+ desenharImagemResultado();
+ 
+}
+
+function sortear(){
+ const numero=numeroAleatorio();
+ $("timeSorteado").value=numero;
+ atualizarPreview();
+ conferir();
+}
+
+function escolha(){
+ const n=Number($("timeSorteado").value);
+ return {data:$("dataSorteio").value,hora:$("horaSorteio").value,numero:n,time:times[n-1]};
+}
+
+/* CONFERÊNCIA */
+
+function conferir(){
+ if(!db||!$("dataSorteio").value)return;
+
+ const d=escolha();
+ const mesmoHorario=lista().filter(({b})=>dataAposta(b)===d.data&&horaAposta(b)===d.hora);
+ const acertaram=mesmoHorario.filter(({b})=>numeros(b).some(x=>x.n===d.numero));
+ const publicado=resultado(d.data,d.hora);
+
+ $("conferencia").innerHTML=
+  `<b>${mesmoHorario.length}</b> aposta(s) neste horário.<br>
+   <b>${acertaram.length}</b> aposta(s) acertariam ${String(d.numero).padStart(2,"0")} - ${escapar(d.time)}.`+
+  (publicado?`<br>Resultado já publicado: ${publicado.numero} - ${escapar(publicado.time||"")}`:
+  "<br>Este horário ainda não possui resultado publicado.");
+
+ $("listaGanhadores").innerHTML=acertaram.length?
+ acertaram.map(({b})=>`
+  <tr>
+   <td>${escapar(b.nome||"Sem nome")}</td>
+   <td>${escapar(d.time)}</td>
+   <td>${d.numero}</td>
+   <td>${dinheiro(b.valor)}</td>
+   <td>${dinheiro(b.premioPotencial)}</td>
+  </tr>`).join(""):
+ '<tr><td colspan="5">Nenhuma aposta acertaria esse resultado.</td></tr>';
+}
+
+/* PUBLICAÇÃO MANUAL */
+
+async function publicar(){
+ const d=escolha();
+ if(!d.data||!d.hora||!d.numero){aviso("Selecione data, horário e time.");return;}
+
+ const caminho=`${CAMINHO_RESULTADOS}/${d.data}/${d.hora.replace(":","-")}`;
+ if(!confirm(`Publicar ${d.numero} - ${d.time} em ${d.data} às ${d.hora}?`))return;
+
+ try{
+  const tx=await db.ref(caminho).transaction(atual=>{
+   if(atual!==null)return;
+   return {
+    data:d.data,horario:d.hora,numero:d.numero,time:d.time,
+    publicadoEm:new Date().toISOString(),timestamp:Date.now(),automatico:false
+   };
+  });
+
+  if(!tx.committed){aviso("Já existe resultado publicado neste horário.");return;}
+  aviso("Resultado publicado com sucesso!");
+  conferir();
+ }catch(e){aviso("Erro ao publicar: "+e.message);}
+}
+
+/* RESULTADOS PUBLICADOS */
+
+function mostrarResultados(){
+ if(!db)return;
+
+ const listaResultados=[];
+ Object.keys(resultados).forEach(data=>{
+  Object.keys(resultados[data]||{}).forEach(hora=>{
+   listaResultados.push({data,hora,r:resultados[data][hora]||{}});
+  });
+ });
+
+ listaResultados.sort((a,b)=>(b.data+b.hora).localeCompare(a.data+a.hora));
+
+ $("listaResultados").innerHTML=listaResultados.length?
+ listaResultados.map(x=>`
+  <tr>
+   <td>${escapar(x.data)}</td>
+   <td>${escapar(x.r.horario||x.hora.replace("-",":"))}</td>
+   <td>${String(x.r.numero??"—").padStart(2,"0")}</td>
+   <td>${escapar(x.r.time||times[Number(x.r.numero)-1]||"—")}</td>
+   <td>${escapar(x.r.publicadoEm||"—")}</td>
+   <td><button class="vermelho" onclick="excluirResultado('${x.data}','${x.hora}')">EXCLUIR</button></td>
+  </tr>`).join(""):
+ '<tr><td colspan="6">Nenhum resultado publicado.</td></tr>';
+}
+
+/* EXCLUIR APOSTA */
+
+async function excluirAposta(encoded){
+ const id=decodeURIComponent(encoded);
+ if(!confirm("Excluir esta aposta permanentemente?"))return;
+ try{
+  await db.ref("palpites/"+id).remove();
+  aviso("Aposta excluída.");
+ }catch(e){aviso(e.message);}
+}
+
+/* EXCLUIR RESULTADO */
+
+async function excluirResultado(data,hora){
+ if(!confirm("Excluir este resultado?"))return;
+ try{
+  await db.ref(`${CAMINHO_RESULTADOS}/${data}/${hora}`).remove();
+  aviso("Resultado excluído.");
+ }catch(e){aviso(e.message);}
+}
+
+/* LIMPAR APOSTAS */
+
+async function limparApostas(){
+ if(!confirm("Apagar TODAS as apostas?"))return;
+ if(!confirm("Confirma novamente? Esta ação não pode ser desfeita."))return;
+ try{
+  await db.ref("palpites").remove();
+  aviso("Todas as apostas foram apagadas.");
+ }catch(e){aviso(e.message);}
+}
+
+/* LIMPAR RESULTADOS */
+
+async function limparResultados(){
+ if(!confirm("Apagar TODOS os resultados?"))return;
+ if(!confirm("Confirma novamente? Esta ação não pode ser desfeita."))return;
+ try{
+  await db.ref(CAMINHO_RESULTADOS).remove();
+  aviso("Todos os resultados foram apagados.");
+ }catch(e){aviso(e.message);}
+}
+
+/* BLOQUEAR E LIBERAR APOSTAS */
+
+async function bloquear(valor){
+ try{
+  await db.ref(CAMINHO_CONFIG).update({
+   bloqueado:valor,
+   mensagem:$("mensagem").value.trim()||(valor?"Apostas temporariamente encerradas":""),
+   atualizadoEm:new Date().toISOString()
+  });
+  aviso(valor?"Apostas bloqueadas.":"Apostas liberadas.");
+ }catch(e){aviso("Erro: "+e.message);}
+}
+
+/* PAGAMENTO DO PRÊMIO */
+
+async function atualizarPagamentoPremio(encoded,status){
+ const id=decodeURIComponent(encoded);
+ const mensagem=status==="PAGO"?
+  "Confirmar que o prêmio foi pago ao ganhador?":
+  "Voltar o prêmio para pendente?";
+
+ if(!confirm(mensagem))return;
+
+ try{
+  await db.ref("palpites/"+id).update({
+   premioStatus:status,
+   premioPagoEm:status==="PAGO"?new Date().toISOString():null
+  });
+
+  aviso(status==="PAGO"?"PRÊMIO CONFIRMADO COMO PAGO!":"Prêmio voltou para pendente.");
+ }catch(e){aviso("Erro ao atualizar prêmio: "+e.message);}
+}
+/* IMAGEM DO RESULTADO — TIME CERTO */
+
+function arredondar(ctx,x,y,w,h,r){
+ ctx.beginPath();
+ ctx.roundRect(x,y,w,h,r);
+ ctx.fill();
+}
+
+function carregarEscudo(numero){
+ return new Promise(resolve=>{
+  let url="";
+
+  // Usa os escudos do index.html caso o mapa seja incluído neste painel.
+  try{
+   if(typeof escudos!=="undefined")url=escudos[numero]||"";
+  }catch(e){}
+
+  if(!url){
+   resolve(null);
+   return;
+  }
+
+  const img=new Image();
+  img.crossOrigin="anonymous";
+  img.onload=()=>resolve(img);
+  img.onerror=()=>resolve(null);
+  img.src=url;
+ });
+}
+
+async function desenharImagemResultado(){
+ const canvas=$("canvasResultado");
+ if(!canvas)return;
+
+ const ctx=canvas.getContext("2d");
+ const d=escolha();
+ const publicado=resultado(d.data,d.hora);
+
+ ctx.clearRect(0,0,1080,1080);
+
+ const fundo=ctx.createLinearGradient(0,0,1080,1080);
+ fundo.addColorStop(0,"#081426");
+ fundo.addColorStop(1,"#142d4a");
+ ctx.fillStyle=fundo;
+ ctx.fillRect(0,0,1080,1080);
+
+ // Moldura
+ ctx.strokeStyle="#f5c451";
+ ctx.lineWidth=8;
+ ctx.strokeRect(28,28,1024,1024);
+
+ // Cabeçalho
+ ctx.textAlign="center";
+ ctx.fillStyle="#f5c451";
+ ctx.font="bold 68px Arial";
+ ctx.fillText("TIME CERTO",540,145);
+
+ ctx.fillStyle="#ffffff";
+ ctx.font="bold 38px Arial";
+ ctx.fillText("RESULTADO OFICIAL",540,215);
+
+ ctx.strokeStyle="#f5c451";
+ ctx.lineWidth=3;
+ ctx.beginPath();
+ ctx.moveTo(160,260);
+ ctx.lineTo(920,260);
+ ctx.stroke();
+
+ if(!publicado){
+  ctx.fillStyle="#ffffff";
+  ctx.font="bold 42px Arial";
+  ctx.fillText("AGUARDANDO PUBLICAÇÃO",540,520);
+
+  ctx.fillStyle="#f5c451";
+  ctx.font="32px Arial";
+  ctx.fillText("Publique o resultado para liberar a imagem",540,590);
+
+  $("statusImagem").textContent=
+   "Este horário ainda não possui resultado publicado.";
+  return;
+ }
+
+ const numero=Number(publicado.numero);
+ const nome=publicado.time||times[numero-1]||"TIME";
+ const data=publicado.data||d.data;
+ const hora=publicado.horario||d.hora;
+
+ // Data e horário
+ ctx.fillStyle="#ffffff";
+ ctx.font="bold 38px Arial";
+ ctx.fillText("DATA: "+data.split("-").reverse().join("/"),540,345);
+ ctx.fillText("HORÁRIO: "+hora,540,405);
+
+ // Número em destaque
+ ctx.fillStyle="#f5c451";
+ ctx.font="bold 230px Arial";
+ ctx.fillText(String(numero).padStart(2,"0"),540,675);
+
+ // Escudo do time, quando disponível
+ const escudo=await carregarEscudo(numero);
+
+ if(escudo){
+  try{
+   ctx.save();
+   ctx.beginPath();
+   ctx.arc(540,790,75,0,Math.PI*2);
+   ctx.clip();
+   ctx.drawImage(escudo,465,715,150,150);
+   ctx.restore();
+  }catch(e){
+   desenharEscudoAlternativo(ctx,numero,nome);
+  }
+ }else{
+  desenharEscudoAlternativo(ctx,numero,nome);
+ }
+
+ // Nome do time
+ ctx.fillStyle="#ffffff";
+ ctx.font="bold 48px Arial";
+ ctx.fillText(nome.toUpperCase(),540,930);
+
+ // Rodapé
+ ctx.fillStyle="#f5c451";
+ ctx.font="bold 27px Arial";
+ ctx.fillText("RESULTADO PUBLICADO",540,990);
+
+ $("statusImagem").textContent=
+  "Imagem pronta: "+data.split("-").reverse().join("/")+" às "+hora;
+}
+
+function desenharEscudoAlternativo(ctx,numero,nome){
+ ctx.save();
+
+ ctx.fillStyle="#f5c451";
+ ctx.beginPath();
+ ctx.moveTo(540,710);
+ ctx.lineTo(625,740);
+ ctx.lineTo(610,830);
+ ctx.lineTo(540,880);
+ ctx.lineTo(470,830);
+ ctx.lineTo(455,740);
+ ctx.closePath();
+ ctx.fill();
+
+ ctx.fillStyle="#081426";
+ ctx.font="bold 65px Arial";
+ ctx.textAlign="center";
+ ctx.fillText(String(numero).padStart(2,"0"),540,805);
+
+ ctx.restore();
+}
+
+async function gerarArquivoResultado(){
+ await desenharImagemResultado();
+
+ const d=escolha();
+ const publicado=resultado(d.data,d.hora);
+
+ if(!publicado){
+  aviso("Publique o resultado antes de baixar ou compartilhar.");
+  return null;
+ }
+
+ const canvas=$("canvasResultado");
+
+ return new Promise(resolve=>{
+  canvas.toBlob(blob=>{
+   if(!blob){
+    aviso("Não foi possível gerar a imagem.");
+    resolve(null);
+    return;
+   }
+   resolve(blob);
+  },"image/png");
+ });
+}
+
+async function baixarImagemResultado(){
+ try{
+  const blob=await gerarArquivoResultado();
+  if(!blob)return;
+
+  const d=escolha();
+  const link=document.createElement("a");
+  const url=URL.createObjectURL(blob);
+
+  link.href=url;
+  link.download="TIME-CERTO-"+d.data+"-"+d.hora.replace(":","-")+".png";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(()=>URL.revokeObjectURL(url),3000);
+  aviso("Imagem baixada!");
+ }catch(e){
+  aviso("Erro ao baixar imagem: "+e.message);
+ }
+}
+
+async function compartilharImagemWhatsApp(){
+ try{
+  const blob=await gerarArquivoResultado();
+  if(!blob)return;
+
+  const d=escolha();
+  const nomeArquivo="TIME-CERTO-RESULTADO.png";
+  const arquivo=new File([blob],nomeArquivo,{type:"image/png"});
+
+  if(navigator.canShare && navigator.canShare({files:[arquivo]})){
+   await navigator.share({
+    files:[arquivo],
+    title:"Resultado TIME CERTO",
+    text:"Resultado TIME CERTO — "+d.data.split("-").reverse().join("/")+" às "+d.hora
+   });
+   return;
+  }
+
+  // Alternativa para navegadores sem compartilhamento de arquivos.
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement("a");
+  link.href=url;
+  link.download=nomeArquivo;
+  link.click();
+
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+
+  const texto=encodeURIComponent(
+   "Resultado TIME CERTO — "+d.data.split("-").reverse().join("/")+
+   " às "+d.hora+". A imagem foi baixada; anexe-a na conversa do WhatsApp."
+  );
+
+  window.open("https://wa.me/?text="+texto,"_blank");
+
+  aviso("Imagem baixada. Anexe-a no WhatsApp.");
+ }catch(e){
+  if(e.name!=="AbortError"){
+   aviso("Não foi possível compartilhar: "+e.message);
+  }
+ }
+}
+/* ESCUDO REAL DO TIME */
+
+
+/* ESCUDO REAL DO TIME — SEMPRE O ÚLTIMO RESULTADO */
+
+function obterUltimoResultadoPublicado(){
+ let ultimo=null;
+ let maiorOrdem=-1;
+
+ Object.entries(resultados||{}).forEach(([data,horarios])=>{
+  Object.entries(horarios||{}).forEach(([chave,r])=>{
+   if(!r || !Number.isInteger(Number(r.numero)))return;
+
+   const numero=Number(r.numero);
+   if(numero<1 || numero>50)return;
+
+   const hora=String(
+    r.horario || chave.replace("-",":")
+   ).slice(0,5);
+
+   const timestamp=Number(r.timestamp)||0;
+   const publicadoEm=Date.parse(r.publicadoEm||"")||0;
+
+   // Prioriza o momento da publicação.
+   // Se não existir, utiliza data e horário do sorteio.
+   const ordem=timestamp || publicadoEm ||
+    Number((data+hora).replace(/\D/g,"")) || 0;
+
+   if(!ultimo || ordem>maiorOrdem){
+    maiorOrdem=ordem;
+
+    ultimo={
+     ...r,
+     data:r.data||data,
+     horario:hora,
+     numero:numero
+    };
+   }
+  });
+ });
+
+ return ultimo;
+}
+
+function numeroEscudoAtual(){
+ const ultimo=obterUltimoResultadoPublicado();
+
+ if(ultimo)return Number(ultimo.numero);
+
+ return Number($("timeSorteado").value||1);
+}
+
+function obterUrlEscudoAtual(){
+ const numero=numeroEscudoAtual();
+ return escudos[numero]||"";
+}
+
+function atualizarEscudoReal(){
+ const ultimo=obterUltimoResultadoPublicado();
+
+ const numero=ultimo
+  ? Number(ultimo.numero)
+  : Number($("timeSorteado").value||1);
+
+ const nome=ultimo
+  ? (ultimo.time||times[numero-1]||"TIME")
+  : (times[numero-1]||"TIME");
+
+ const url=escudos[numero];
+ const img=$("escudoReal");
+
+ $("nomeEscudo").textContent=
+  String(numero).padStart(2,"0")+" - "+nome;
+
+ if(ultimo){
+  const tipo=ultimo.automatico===true
+   ? "AUTOMÁTICO"
+   : "PUBLICADO";
+
+  $("statusEscudo").textContent=
+   "ÚLTIMO RESULTADO "+tipo+": "+
+   ultimo.data+" às "+ultimo.horario+
+   " — ESCUDO DO TIME VENCEDOR.";
+ }else{
+  $("statusEscudo").textContent=
+   "Nenhum resultado publicado. Mostrando prévia do time selecionado.";
+ }
+
+ if(!url){
+  img.removeAttribute("src");
+  $("statusEscudo").textContent="Escudo não encontrado.";
+  return;
+ }
+
+ img.onerror=()=>{
+  $("statusEscudo").textContent=
+   "Não foi possível carregar o escudo deste time.";
+ };
+
+ img.onload=()=>{
+  if(ultimo){
+   $("statusEscudo").textContent=
+    "Último resultado: "+ultimo.data+
+    " às "+ultimo.horario+
+    ". Escudo carregado: "+nome;
+  }
+ };
+
+ img.src=url;
+}
+
+function abrirEscudoOriginal(){
+ const url=obterUrlEscudoAtual();
+
+ if(!url){
+  aviso("Escudo não encontrado.");
+  return;
+ }
+
+ window.open(url,"_blank");
+}
+
+function extensaoEscudo(url){
+ const caminho=url.split("?")[0];
+ const ext=caminho.split(".").pop().toLowerCase();
+
+ if(["jpg","jpeg","png","webp"].includes(ext)){
+  return ext;
+ }
+
+ return "png";
+}
+
+function tipoImagemEscudo(ext){
+ if(ext==="jpg"||ext==="jpeg")return "image/jpeg";
+ if(ext==="webp")return "image/webp";
+ return "image/png";
+}
+
+async function baixarEscudoReal(){
+ const url=obterUrlEscudoAtual();
+
+ if(!url){
+  aviso("Escudo não encontrado.");
+  return;
+ }
+
+ const numero=numeroEscudoAtual();
+ const nome=times[numero-1]||"TIME";
+ const ext=extensaoEscudo(url);
+
+ try{
+  const resposta=await fetch(url,{mode:"cors"});
+
+  if(!resposta.ok){
+   throw new Error("Não foi possível acessar a imagem.");
+  }
+
+  const blob=await resposta.blob();
+
+  if(!blob.size)throw new Error("Imagem vazia.");
+
+  const link=document.createElement("a");
+  const objeto=URL.createObjectURL(blob);
+
+  link.href=objeto;
+  link.download="TIME-CERTO-ESCUDO-"+
+   nome.replace(/\s+/g,"-")+"."+ext;
+
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(()=>URL.revokeObjectURL(objeto),5000);
+
+  aviso("Download do escudo iniciado!");
+
+ }catch(e){
+  aviso("Abrindo a imagem original.");
+  window.open(url,"_blank");
+ }
+}
+
+async function compartilharEscudoReal(){
+ const ultimo=obterUltimoResultadoPublicado();
+ const url=obterUrlEscudoAtual();
+
+ if(!url){
+  aviso("Escudo não encontrado.");
+  return;
+ }
+
+ const numero=numeroEscudoAtual();
+ const nome=times[numero-1]||"TIME";
+ const ext=extensaoEscudo(url);
+
+ const linkSite="https://multyplay.netlify.app/timecertotop";
+
+ const texto=ultimo
+  ? `🏆 ÚLTIMO RESULTADO TIME CERTO
+
+🛡️ TIME: ${nome}
+🔢 NÚMERO: ${String(numero).padStart(2,"0")}
+📅 DATA: ${ultimo.data}
+⏰ HORÁRIO: ${ultimo.horario}
+
+🌐 Acesse nosso site:
+${linkSite}
+
+Escudo oficial:
+${url}`
+  : `🏆 TIME CERTO
+
+🛡️ TIME: ${nome}
+
+🌐 Acesse nosso site:
+${linkSite}
+
+Escudo:
+${url}`;
+
+ try{
+  const resposta=await fetch(url,{mode:"cors"});
+
+  if(!resposta.ok)throw new Error("Falha ao carregar imagem.");
+
+  const blob=await resposta.blob();
+
+  const arquivo=new File(
+   [blob],
+   "ESCUDO-"+nome.replace(/\s+/g,"-")+"."+ext,
+   {type:blob.type||tipoImagemEscudo(ext)}
+  );
+
+  if(!navigator.canShare || !navigator.canShare({files:[arquivo]})){
+   throw new Error("Compartilhamento de imagem indisponível.");
+  }
+
+  await navigator.share({
+   files:[arquivo],
+   title:"TIME CERTO - "+nome,
+   text:texto
+  });
+
+ }catch(e){
+  if(e.name==="AbortError")return;
+
+  window.open(
+   "https://wa.me/?text="+encodeURIComponent(texto),
+   "_blank"
+  );
+
+  aviso("WhatsApp aberto. Anexe a imagem do escudo.");
+ }
+}
+
+/* ==================================
+   SAQUES DOS GANHADORES
+================================== */
+
+function mostrarSaques(){
+
+ const todos = Object.entries(solicitacoesSaques || {})
+  .map(([id,s])=>({id,s:s||{}}));
+
+ const pendentes = todos.filter(x=>
+  String(x.s.status||"PENDENTE").toUpperCase()==="PENDENTE"
+ );
+
+ const pagos = todos.filter(x=>
+  String(x.s.status||"").toUpperCase()==="PAGO"
+ );
+
+ const totalSolicitado = todos.reduce((s,x)=>
+  s+Number(x.s.valor||0),0
+ );
+
+ $("totalSaques").textContent=todos.length;
+ $("saquesPendentes").textContent=pendentes.length;
+ $("saquesPagos").textContent=pagos.length;
+ $("valorSaques").textContent=dinheiro(totalSolicitado);
+
+ const filtro=$("filtroSaque")?.value||"";
+
+ const exibidos=todos
+  .filter(x=>!filtro||
+   String(x.s.status||"PENDENTE").toUpperCase()===filtro
+  )
+  .sort((a,b)=>
+   Number(b.s.timestamp||0)-Number(a.s.timestamp||0)
+  );
+
+ $("listaSaques").innerHTML=exibidos.length?
+ exibidos.map(({id,s})=>{
+
+  const status=String(s.status||"PENDENTE").toUpperCase();
+  const pago=status==="PAGO";
+
+  const pix=String(s.chavePix||"");
+  const valor=dinheiro(s.valor);
+
+  const dataHora=[
+   s.data||"",
+   s.horario||""
+  ].filter(Boolean).join(" ");
+
+  const solicitado=s.solicitadoEm?
+   new Date(s.solicitadoEm).toLocaleString("pt-BR"):
+   "—";
+
+  return `
+   <tr>
+    <td>
+     <b>${escapar(s.nome||"Sem nome")}</b>
+     <br><small>${escapar(s.jogadorId||"")}</small>
+    </td>
+
+    <td style="color:#f5c451;font-weight:bold">
+     ${valor}
+    </td>
+
+    <td>
+     <b>${escapar(pix||"Não informado")}</b>
+     ${pix?`
+      <br>
+      <button class="azul"
+       onclick="copiarPixSaque('${encodeURIComponent(id)}')">
+       COPIAR PIX
+      </button>
+     `:""}
+    </td>
+
+    <td>${escapar(s.time||"—")}</td>
+
+    <td>
+     ${escapar(dataHora||"—")}
+     <br>Número: ${escapar(s.resultado??"—")}
+    </td>
+
+    <td>${escapar(solicitado)}</td>
+
+    <td class="${pago?"pagamento-pago":"pagamento-pendente"}">
+     ${pago?"PAGO ✓":"PENDENTE"}
+    </td>
+
+    <td>
+     ${pago?
+      `<button class="verde" disabled>JÁ PAGO ✓</button>
+       <button class="vermelho"
+        onclick="atualizarSaque('${encodeURIComponent(id)}','PENDENTE')">
+        DESFAZER
+       </button>`:
+      `<button class="verde"
+        onclick="atualizarSaque('${encodeURIComponent(id)}','PAGO')">
+        CONFIRMAR PAGAMENTO
+       </button>`
+     }
+    </td>
+   </tr>
+  `;
+ }).join(""):
+ '<tr><td colspan="8">Nenhuma solicitação encontrada.</td></tr>';
+}
+
+
+/* COPIAR CHAVE PIX */
+
+async function copiarPixSaque(encoded){
+
+ const id=decodeURIComponent(encoded);
+ const saque=solicitacoesSaques[id];
+
+ if(!saque||!saque.chavePix){
+  aviso("Chave Pix não encontrada.");
+  return;
+ }
+
+ try{
+  await navigator.clipboard.writeText(String(saque.chavePix));
+  aviso("Chave Pix copiada!");
+ }catch(e){
+  prompt("Copie a chave Pix:",saque.chavePix);
+ }
+}
+
+
+/* CONFIRMAR PAGAMENTO DO SAQUE */
+
+async function atualizarSaque(encoded,status){
+
+ const id=decodeURIComponent(encoded);
+ const saque=solicitacoesSaques[id];
+
+ if(!saque){
+  aviso("Solicitação não encontrada.");
+  return;
+ }
+
+ const valor=dinheiro(saque.valor);
+ const pix=saque.chavePix||"Não informado";
+
+ if(status==="PAGO"){
+
+  if(!confirm(
+   "CONFIRMAR PAGAMENTO DO PRÊMIO?\n\n"+
+   "Jogador: "+(saque.nome||"Sem nome")+"\n"+
+   "Valor: "+valor+"\n"+
+   "Pix: "+pix+"\n\n"+
+   "Confirme somente se já realizou a transferência."
+  ))return;
+
+ }else{
+
+  if(!confirm("Voltar esta solicitação para PENDENTE?"))return;
+
+ }
+
+ try{
+
+  const atualizacao={
+   status:status,
+   atualizadoEm:new Date().toISOString()
+  };
+
+  if(status==="PAGO"){
+   atualizacao.pagoEm=new Date().toISOString();
+  }else{
+   atualizacao.pagoEm=null;
+  }
+
+  const tarefas=[
+   db.ref("solicitacoesSaque/"+id).update(atualizacao),
+
+   db.ref("palpites/"+id).update({
+    saqueStatus:status,
+    premioStatus:status,
+    premioPagoEm:status==="PAGO"?
+     new Date().toISOString():null
+   })
+  ];
+
+  await Promise.all(tarefas);
+
+  aviso(status==="PAGO"?
+   "PAGAMENTO DO PRÊMIO CONFIRMADO!":
+   "Saque voltou para pendente."
+  );
+
+ }catch(e){
+  aviso("Erro ao atualizar saque: "+e.message);
+ }
+}
+
+/* INICIAR AUTOMATICAMENTE, SEM LOGIN */
+
+iniciar();
+
+</script>
+</body>
+</html>
