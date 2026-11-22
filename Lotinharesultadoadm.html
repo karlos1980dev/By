@@ -25,7 +25,7 @@ header{text-align:center;padding:15px 5px 20px}header .tag{font-size:11px;letter
 
 <section class="panel" id="login">
   <h2>🔐 Acesso ao painel</h2>
-  <div class="field"><label for="pin">SENHA LOCAL DO PAINEL</label><input id="pin" type="password" placeholder="Digite a senha" autocomplete="current-password"></div>
+  <div class="field"><label for="pin">SENHA LOCAL DO PAINEL</label><input style="text-align:center" id="pin" type="password" placeholder="Digite a senha" autocomplete="current-password"></div>
   <div class="actions"><button class="primary" id="enter">ENTRAR</button></div>
   <div id="loginMsg" class="msg bad"></div>
   <p class="hint">A senha local apenas oculta a tela administrativa. Ela não substitui a proteção das regras do Firebase.</p>
@@ -112,20 +112,63 @@ function drawGrid(){
   }
   $("count").textContent=`${selected.size} / 15`;
 }
+
 function loadNumbersFromText(){
-  const raw=$("numbersText").value.trim();
-  if(!raw)throw new Error("Digite os 15 números no campo de texto.");
-  // Extrai grupos numéricos separados por qualquer caractere que não seja dígito.
-  const tokens=raw.split(/[^\d]+/).filter(Boolean);
-  if(tokens.length!==15)throw new Error(`Foram encontrados ${tokens.length} números. Digite exatamente 15.`);
-  const nums=tokens.map(Number);
-  if(nums.some(n=>!Number.isInteger(n)||n<1||n>25))throw new Error("Use somente números de 01 até 25.");
-  if(new Set(nums).size!==15)throw new Error("Existem números repetidos. Cada número deve aparecer uma única vez.");
-  selected=new Set(nums);
-  $("numbersText").value=nums.map(n=>String(n).padStart(2,"0")).join(" ");
+  const raw = $("numbersText").value.trim();
+
+  if(!raw){
+    throw new Error("Digite os 15 números do resultado.");
+  }
+
+  let nums = [];
+
+  // Remove espaços e caracteres separadores.
+  const compact = raw.replace(/[^\d]/g,"");
+
+  // FORMATO JUNTO: 020304050910121315161718192122
+  if(/^\d{30}$/.test(compact)){
+    for(let i=0;i<compact.length;i+=2){
+      nums.push(Number(compact.substring(i,i+2)));
+    }
+  }else{
+    // FORMATO SEPARADO: 02 03 04 05...
+    const tokens = raw.split(/[^\d]+/).filter(Boolean);
+
+    if(tokens.length !== 15){
+      throw new Error("Digite 15 números separados ou cole os 30 dígitos juntos.");
+    }
+
+    nums = tokens.map(Number);
+  }
+
+  if(nums.length !== 15){
+    throw new Error("O resultado precisa ter exatamente 15 números.");
+  }
+
+  if(nums.some(n => !Number.isInteger(n) || n < 1 || n > 25)){
+    throw new Error("Use somente números de 01 até 25.");
+  }
+
+  if(new Set(nums).size !== 15){
+    throw new Error("Existem números repetidos no resultado.");
+  }
+
+  selected = new Set(nums);
+
+  // Mostra automaticamente os números separados.
+  $("numbersText").value = nums
+    .map(n => String(n).padStart(2,"0"))
+    .join(" ");
+
   drawGrid();
-  showMsg("formMsg","15 números carregados corretamente. Agora você pode publicar.","ok");
+
+  showMsg(
+    "formMsg",
+    "15 números identificados e separados corretamente!",
+    "ok"
+  );
 }
+
 function clearForm(){
   selected.clear();editingKey=null;$("drawDate").value=localDate();$("numbersText").value="";
   $("formTitle").textContent="➕ Publicar novo resultado";$("publish").textContent="PUBLICAR RESULTADO";
