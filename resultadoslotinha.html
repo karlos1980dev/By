@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#180d2b">
+<title>LOTINHA | Resultados</title>
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#10091d;--panel:#211332;--panel2:#2c1942;--gold:#f5c451;--pink:#f04ca6;--text:#fff;--muted:#b9a9c9;--green:#21c58b;--line:#49345e}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#32184b 0,#10091d 48%);font-family:Arial,sans-serif;color:var(--text);min-height:100vh}
+.wrap{width:min(920px,100%);margin:auto;padding:18px 14px 40px}.hero{text-align:center;padding:24px 12px 20px}.logo{font-size:13px;letter-spacing:4px;color:var(--gold);font-weight:900}.hero h1{margin:8px 0;color:var(--gold);font-size:clamp(28px,7vw,42px)}.hero p{color:var(--muted);margin:0;font-size:13px}
+.panel{background:linear-gradient(145deg,#29183d,#1a1028);border:1px solid var(--line);border-radius:18px;padding:17px;margin:14px 0;box-shadow:0 12px 30px #0003}.topline{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.topline h2{font-size:17px;margin:0}.pill{background:#123d32;color:#69efbd;border:1px solid #23785d;border-radius:30px;padding:6px 10px;font-size:11px;font-weight:bold}
+.date{color:var(--muted);font-size:13px;margin:13px 0 15px}.balls{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;max-width:520px;margin:15px auto}.ball{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#ffdf75,#d99a22);color:#29183d;font-size:clamp(18px,5vw,25px);font-weight:900;box-shadow:inset 0 2px 3px #fff8,0 5px 12px #0005;border:2px solid #ffe8a2}
+.empty{text-align:center;color:var(--muted);padding:30px 12px}.history-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.history-head h2{margin:0;font-size:17px}input,select{background:#130b20;color:#fff;border:1px solid var(--line);border-radius:10px;padding:11px;font-size:14px;min-width:0}button{border:0;border-radius:10px;padding:11px 15px;font-weight:bold;background:var(--gold);color:#24132f;cursor:pointer}.history-list{display:grid;gap:10px}.history-item{background:#160e23;border:1px solid var(--line);border-radius:13px;padding:13px}.history-row{display:flex;justify-content:space-between;align-items:center;gap:8px}.history-date{font-weight:bold}.mini-balls{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.mini-ball{background:#3b2451;color:#ffe29a;border:1px solid #76538f;border-radius:20px;padding:6px 9px;font-size:12px;font-weight:bold}.status{font-size:12px;color:var(--muted);text-align:center;margin-top:18px}.error{color:#ff9b9b;text-align:center;font-size:13px;padding:12px}
+@media(min-width:600px){.balls{grid-template-columns:repeat(5,76px);justify-content:center}.panel{padding:22px}}
+.btn-jogar{
+  position:fixed;
+  bottom:calc(12px + env(safe-area-inset-bottom));
+  left:14px;
+  right:14px;
+  z-index:9999;
+  display:block;
+  text-align:center;
+  padding:17px;
+  border-radius:16px;
+  background:linear-gradient(135deg,#ffe17a,#f5b92e);
+  color:#24132f;
+  font-size:19px;
+  font-weight:900;
+  text-decoration:none;
+  box-shadow:0 5px 25px #f5c45155;
+  border:2px solid #fff0b5;
+}
+
+body{
+  padding-bottom:90px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+  <div class="logo">MULTIJOGO APRESENTA</div>
+  <h1>🏆 LOTINHA</h1>
+  <p>PAINEL OFICIAL DE RESULTADOS</p>
+</header>
+
+<section class="panel">
+  <div class="topline"><h2>Último resultado publicado</h2><span class="pill" id="latestStatus">AGUARDANDO</span></div>
+  <div id="latest">
+    <div class="empty">Carregando resultados...</div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="history-head">
+    <h2>📚 Histórico de resultados</h2>
+    <input id="searchDate" type="date" aria-label="Filtrar por data">
+  </div>
+  <div id="history" class="history-list"><div class="empty">Carregando histórico...</div></div>
+  <div style="text-align:center;margin-top:14px"><button id="clearFilter" type="button">Mostrar todos</button></div>
+</section>
+<div id="connection" class="status">Conectando ao servidor...</div>
+<div class="status">LOTINHA • Consulte os resultados publicados</div>
+</div>
+<a class="btn-jogar"
+   href="https://multyplay.netlify.app/lotinhatop"
+   target="_blank"
+   rel="noopener">
+   🎮 JOGAR AGORA
+</a>
+<script>
+// COLE AQUI O MESMO firebaseConfig DO SEU index.html ATUAL DA LOTINHA.
+const firebaseConfig = {
+  apiKey: "COLE_SUA_API_KEY",
+  authDomain: "COLE_SEU_AUTH_DOMAIN",
+  databaseURL: "https://loteriasmj-274f9-default-rtdb.firebaseio.com/",
+  projectId: "loteriasmj-274f9",
+  storageBucket: "COLE_SEU_STORAGE_BUCKET",
+  messagingSenderId: "COLE_SEU_MESSAGING_SENDER_ID",
+  appId: "COLE_SEU_APP_ID"
+};
+
+const RESULT_PATH = "resultados/LOTINHA";
+const $ = id => document.getElementById(id);
+let allResults = [];
+
+function dateBR(key){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(key)) return key || "";
+  const [y,m,d]=key.split("-");
+  return `${d}/${m}/${y}`;
+}
+function normalizeNumbers(value){
+  if(!Array.isArray(value)) return [];
+  return value.map(n=>String(n).padStart(2,"0"));
+}
+function ballsHTML(numbers, mini=false){
+  const cls=mini?"mini-ball":"ball";
+  return `<div class="${mini?"mini-balls":"balls"}">${numbers.map(n=>`<span class="${cls}">${String(n).padStart(2,"0")}</span>`).join("")}</div>`;
+}
+function renderLatest(){
+  const valid=allResults.filter(r=>r.data && Array.isArray(r.numeros) && r.numeros.length===15).sort((a,b)=>b.key.localeCompare(a.key));
+  if(!valid.length){
+    $("latestStatus").textContent="SEM RESULTADO";
+    $("latest").innerHTML='<div class="empty">Nenhum resultado publicado ainda.</div>';
+    return;
+  }
+  const r=valid[0];
+  $("latestStatus").textContent="PUBLICADO";
+  $("latest").innerHTML=`<div class="date">📅 Extração: <strong>${dateBR(r.key)}</strong></div>${ballsHTML(normalizeNumbers(r.numeros))}<div style="text-align:center;color:var(--muted);font-size:12px">15 números publicados</div>`;
+}
+function renderHistory(){
+  const filter=$("searchDate").value;
+  let rows=allResults.filter(r=>r.data && Array.isArray(r.numeros) && r.numeros.length===15);
+  if(filter) rows=rows.filter(r=>r.key===filter);
+  rows.sort((a,b)=>b.key.localeCompare(a.key));
+  if(!rows.length){
+    $("history").innerHTML=`<div class="empty">${filter?"Não existe resultado publicado nessa data.":"Ainda não há resultados no histórico."}</div>`;
+    return;
+  }
+  $("history").innerHTML=rows.map(r=>`<article class="history-item"><div class="history-row"><span class="history-date">📅 ${dateBR(r.key)}</span><span class="pill">PUBLICADO</span></div>${ballsHTML(normalizeNumbers(r.numeros),true)}</article>`).join("");
+}
+function init(){
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db=firebase.database();
+    db.ref(".info/connected").on("value",s=>{
+      $("connection").textContent=s.val()?"🟢 Conectado • Atualização em tempo real":"🟠 Reconectando ao servidor...";
+    });
+    db.ref(RESULT_PATH).on("value",snap=>{
+      const data=snap.val()||{};
+      allResults=Object.keys(data).map(key=>({key,...data[key]})).filter(r=>r.status==="PUBLICADO");
+      renderLatest();renderHistory();
+    },err=>{
+      $("latest").innerHTML='<div class="error">Não foi possível carregar os resultados. Verifique a configuração e as regras do Firebase.</div>';
+      $("connection").textContent="Erro de conexão: "+err.message;
+    });
+    $("searchDate").addEventListener("change",renderHistory);
+    $("clearFilter").addEventListener("click",()=>{$("searchDate").value="";renderHistory();});
+  }catch(e){
+    $("latest").innerHTML='<div class="error">Erro ao iniciar Firebase. Confira o firebaseConfig deste arquivo.</div>';
+    $("connection").textContent=e.message;
+  }
+}
+init();
+</script>
+</body>
+</html>
