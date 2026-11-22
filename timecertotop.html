@@ -1135,6 +1135,661 @@ main{
     opacity:0;
   }
 }
+
+/* ==========================================
+   TIME CERTO — DESIGN PREMIUM GOLD
+   CAMADA VISUAL COMPLETA
+   PRESERVA O JAVASCRIPT E O FIREBASE
+========================================== */
+
+:root{
+  --bg:#080a0e;
+  --panel:#15171d;
+  --gold:#e8bd61;
+  --green:#20c987;
+  --muted:#a6a6ad;
+  --red:#ff6678;
+  --gold-light:#ffe5a0;
+  --gold-dark:#98702c;
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html{
+  scroll-behavior:smooth;
+  background:#080a0e;
+}
+
+body{
+  background:
+    radial-gradient(ellipse at 50% -10%,#45331a 0%,transparent 40%),
+    radial-gradient(ellipse at bottom,#17130c 0%,#080a0e 65%);
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+/* CABEÇALHO */
+
+header{
+  background:linear-gradient(135deg,#171717,#080808);
+  border-bottom:1px solid #9e7836;
+  box-shadow:0 5px 25px #000b;
+  padding:11px 13px;
+}
+
+.header-top{
+  min-height:43px;
+}
+
+.logo{
+  font-size:25px;
+  font-weight:1000;
+  letter-spacing:3px;
+  background:linear-gradient(
+    180deg,
+    #fff3c4,
+    #e8bd61 45%,
+    #9b6d26
+  );
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  filter:drop-shadow(0 2px 5px #e8bd6144);
+}
+
+.menu-button{
+  background:linear-gradient(145deg,#34302a,#171717);
+  color:var(--gold-light);
+  border:1px solid #9b783d;
+  border-radius:11px;
+  width:46px;
+  height:43px;
+  font-size:22px;
+  box-shadow:0 3px 10px #0008;
+}
+
+.dropdown{
+  background:linear-gradient(145deg,#24221d,#101114);
+  border:1px solid #a17c3e;
+  border-radius:13px;
+  box-shadow:0 15px 35px #000e;
+  z-index:2000;
+}
+
+.dropdown button{
+  border-bottom:1px solid #ffffff12;
+  padding:14px 12px;
+  color:#f7e5bd;
+  transition:.2s;
+}
+
+.dropdown button:active{
+  background:#46371f;
+}
+
+/* INDICADORES */
+
+.stat{
+  background:linear-gradient(145deg,#24231f,#101114);
+  border:1px solid #5c4929;
+  border-radius:11px;
+  padding:8px 5px;
+  box-shadow:inset 0 1px 0 #ffffff0a;
+}
+
+.stat small{
+  color:#b9ad96;
+  letter-spacing:1px;
+  font-size:9px;
+  font-weight:bold;
+}
+
+.stat strong{
+  color:#f2ce7c;
+  font-size:13px;
+}
+
+/* PAINÉIS */
+
+main{
+  padding:12px;
+}
+
+.panel{
+  background:
+    linear-gradient(145deg,#202126,#111216);
+  border:1px solid #594729;
+  border-radius:17px;
+  padding:14px;
+  box-shadow:
+    0 9px 25px #0008,
+    inset 0 1px 0 #ffffff0b;
+  margin-bottom:15px;
+}
+
+.heading,
+.results-title{
+  color:var(--gold);
+  font-size:16px;
+  font-weight:900;
+  letter-spacing:.7px;
+}
+
+.muted{
+  color:#aaa7a0;
+}
+
+/* ESCUDOS DOS TIMES */
+
+.teams{
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:9px;
+}
+
+.team{
+  min-height:112px;
+  padding:9px 3px;
+  border:1px solid #594a32;
+  border-radius:15px;
+  background:
+    radial-gradient(circle at top,#383027,#17181c 75%);
+  box-shadow:
+    0 5px 12px #0008,
+    inset 0 1px 0 #ffffff12;
+  transition:
+    transform .2s,
+    border-color .2s,
+    box-shadow .2s,
+    background .2s;
+}
+
+.team img{
+  width:76px;
+  height:65px;
+  max-width:100%;
+  object-fit:contain;
+  filter:drop-shadow(0 4px 7px #000);
+}
+
+.team span{
+  color:#e9e2d4;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.2px;
+}
+
+.team.selected{
+  border:2px solid #f3ca70;
+  background:
+    radial-gradient(circle at top,#735727,#272015);
+  box-shadow:
+    0 0 7px #e8bd61,
+    0 0 19px #e8bd6155,
+    inset 0 0 15px #e8bd6122;
+}
+
+.team.selected span{
+  color:#ffe7ad;
+}
+
+.team.selected:after{
+  background:linear-gradient(135deg,#ffe8a0,#c79536);
+  color:#17120a;
+  box-shadow:0 0 10px #e8bd61;
+}
+
+/* HORÁRIOS */
+
+.times{
+  gap:8px;
+}
+
+.slot{
+  background:linear-gradient(145deg,#27282c,#15161a);
+  border:1px solid #635033;
+  color:#f1d69b;
+  border-radius:11px;
+  padding:14px 4px;
+  font-size:13px;
+  font-weight:900;
+  box-shadow:0 3px 8px #0007;
+  transition:.2s;
+}
+
+.slot.active{
+  background:linear-gradient(135deg,#ffe6a2,#c08b32);
+  color:#17120a;
+  border:1px solid #fff0b7;
+  box-shadow:0 0 13px #e8bd6166;
+}
+
+/* RESULTADO DA ROLETA */
+
+.resultado-roleta{
+  background:
+    radial-gradient(circle at top,#4b3820,#171717 65%);
+  border:2px solid #d6a94d;
+  border-radius:20px;
+  padding:22px 12px;
+  box-shadow:
+    0 0 20px #d6a94d33,
+    inset 0 0 25px #d6a94d12;
+}
+
+.roleta-titulo{
+  color:#ffe5a0;
+  font-size:13px;
+  letter-spacing:3px;
+}
+
+.roleta-numero{
+  font-size:76px;
+  font-weight:1000;
+  color:#ffe5a0;
+  text-shadow:
+    0 0 10px #e8bd61,
+    0 0 30px #e8bd6188;
+}
+
+.roleta-time{
+  color:#fff0c9;
+  font-size:21px;
+  font-weight:1000;
+  letter-spacing:1px;
+}
+
+.roleta-horario{
+  color:#c8b58f;
+  margin-top:10px;
+}
+
+.resultado-item{
+  background:linear-gradient(145deg,#25231f,#111216);
+  border:1px solid #594729;
+  border-radius:13px;
+  box-shadow:0 4px 12px #0006;
+}
+
+.resultado-item .numero{
+  color:#f5ce7a;
+  font-size:27px;
+}
+
+.resultado-item .nome{
+  color:#fff0ce;
+}
+
+.resultado-item .data{
+  color:#aaa39a;
+}
+
+/* BOTÕES */
+
+.btn{
+  border-radius:12px;
+  font-weight:1000;
+  letter-spacing:.5px;
+  transition:transform .15s,filter .15s;
+}
+
+.btn:active,
+.bottom-inner button:active{
+  transform:scale(.97);
+}
+
+.primary,
+.bottom-inner button{
+  background:linear-gradient(
+    135deg,
+    #fff0b5 0%,
+    #e8bd61 45%,
+    #a87528 100%
+  );
+  color:#17110a;
+  border:1px solid #ffe9ae;
+  box-shadow:
+    0 5px 15px #b88a3844,
+    inset 0 1px 0 #ffffff88;
+}
+
+.secondary{
+  background:linear-gradient(145deg,#38352f,#1b1b1d);
+  border:1px solid #78613c;
+  color:#f5d99e;
+}
+
+.btn:disabled{
+  filter:grayscale(.6);
+  opacity:.55;
+}
+
+/* BARRA INFERIOR */
+
+.bottom-bar{
+  background:linear-gradient(135deg,#1a1916,#080808);
+  border-top:1px solid #987438;
+  box-shadow:0 -7px 25px #000c;
+  padding-top:11px;
+}
+
+.bottom-inner{
+  max-width:900px;
+}
+
+.bottom-inner input{
+  background:#111216;
+  border:1px solid #a07b3d;
+  color:#ffe4a0;
+  border-radius:11px;
+  font-size:19px;
+}
+
+.bottom-inner button{
+  min-height:48px;
+  font-size:14px;
+  border-radius:11px;
+}
+
+.bottom-bar p{
+  color:#d7b66f;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:2px;
+  margin:8px 0 2px;
+}
+
+/* CAMPOS */
+
+.field,
+.pixcode,
+.results-textarea{
+  background:#0d0e11;
+  border:1px solid #675334;
+  border-radius:11px;
+  color:#fff0c9;
+}
+
+.field:focus,
+.pixcode:focus,
+.results-textarea:focus,
+.bottom-inner input:focus{
+  border-color:#e8bd61;
+  box-shadow:0 0 0 3px #e8bd6122;
+}
+
+/* MODAIS */
+
+.modal-backdrop{
+  background:#000e;
+  backdrop-filter:blur(9px);
+}
+
+.name-modal,
+.bet-modal{
+  background:
+    radial-gradient(circle at top,#45341d,#1c1b1a 55%,#101114);
+  border:1px solid #b18a45;
+  border-radius:20px;
+  box-shadow:
+    0 20px 65px #000,
+    0 0 20px #d6a94d22;
+}
+
+.name-modal h2{
+  color:#f2cc78;
+  letter-spacing:1px;
+}
+
+.bet-modal{
+  max-width:550px;
+}
+
+.close-bet{
+  background:#642c28;
+  border:1px solid #b55b46;
+  border-radius:10px;
+}
+
+.metric{
+  background:linear-gradient(145deg,#292720,#111216);
+  border:1px solid #594729;
+  border-radius:13px;
+}
+
+.metric strong{
+  color:#f1ce7b;
+}
+
+.playerline{
+  background:#111216;
+  border:1px solid #57462b;
+  border-radius:12px;
+}
+
+/* PIX */
+
+.pixbox{
+  background:linear-gradient(145deg,#1d201d,#101114);
+  border:1px solid #9d793c;
+}
+
+.qr{
+  border:4px solid #e8bd61;
+  box-shadow:0 0 18px #e8bd6133;
+}
+
+.pixcode{
+  color:#d8e9dd;
+}
+
+.notice{
+  background:#302719;
+  border:1px solid #8e6c34;
+  color:#ffe5a0;
+}
+
+/* HISTÓRICO */
+
+.history-item{
+  border-top:1px solid #54452d;
+  color:#e5dfd2;
+  padding:13px 3px;
+}
+
+.history-item strong{
+  color:#f1ce7b;
+}
+
+/* SAQUE */
+
+#saqueMenu:not(:disabled){
+  background:linear-gradient(135deg,#176b4e,#0e4736);
+  color:#fff;
+  border:1px solid #24c98c;
+}
+
+#saqueMenu:disabled{
+  opacity:.4;
+}
+
+/* VITÓRIA */
+
+.win-modal{
+  background:
+    radial-gradient(circle at top,#755526,#292016 42%,#111216);
+  border:2px solid #f5ce78;
+  border-radius:24px;
+  box-shadow:
+    0 0 25px #e8bd6188,
+    0 20px 60px #000;
+}
+
+.win-trophy{
+  filter:drop-shadow(0 0 20px #ffe09a);
+}
+
+.win-subtitle{
+  color:#ffe3a0;
+}
+
+.win-modal h3{
+  color:#f5ce78;
+}
+
+.win-team{
+  background:#111216;
+  border:1px solid #e1b85d;
+  border-radius:13px;
+}
+
+.win-prize{
+  color:#36e5a2;
+  text-shadow:0 0 18px #18c88988;
+}
+
+/* COMO JOGAR */
+
+.modal-como-jogar{
+  background:
+    radial-gradient(circle at top,#49351b,#171717 65%);
+  border:1px solid #e3b65b;
+  box-shadow:0 0 35px #d6a94d44;
+}
+
+.modal-como-jogar h2{
+  color:#f5ce78;
+}
+
+.premio-como-jogar{
+  background:linear-gradient(135deg,#49351b,#17130b);
+  border:1px solid #e8bd61;
+}
+
+.premio-como-jogar strong{
+  color:#ffe09a;
+}
+
+.btn-entendi{
+  background:linear-gradient(135deg,#ffe6a2,#b78330);
+  color:#17110a;
+  font-weight:1000;
+}
+
+/* ANIMAÇÕES */
+
+.team.selected img{
+  filter:
+    drop-shadow(0 0 8px #e8bd61)
+    drop-shadow(0 4px 5px #000);
+}
+
+@keyframes brilhoPremium{
+  0%,100%{box-shadow:0 0 7px #e8bd6133}
+  50%{box-shadow:0 0 19px #e8bd61aa}
+}
+
+.resultado-roleta{
+  animation:brilhoPremium 3s infinite;
+}
+
+/* TABLETS */
+
+@media(min-width:601px){
+  .teams{
+    grid-template-columns:repeat(7,minmax(0,1fr));
+  }
+
+  .team{
+    min-height:130px;
+  }
+}
+
+/* COMPUTADORES */
+
+@media(min-width:1000px){
+  main{
+    max-width:1400px;
+    padding:20px;
+  }
+
+  .teams{
+    grid-template-columns:repeat(10,minmax(0,1fr));
+    gap:13px;
+  }
+
+  .team{
+    min-height:145px;
+  }
+
+  .team:hover{
+    border-color:#e8bd61;
+    transform:translateY(-3px);
+    box-shadow:0 8px 20px #e8bd6122;
+  }
+
+  .team img{
+    height:90px;
+  }
+
+  .panel{
+    padding:20px;
+  }
+}
+
+/* CELULARES */
+
+@media(max-width:380px){
+  .logo{
+    font-size:20px;
+  }
+
+  .teams{
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:5px;
+  }
+
+  .team{
+    min-height:94px;
+    padding:6px 2px;
+  }
+
+  .team img{
+    height:53px;
+  }
+
+  .team span{
+    font-size:8px;
+  }
+
+  .panel{
+    padding:10px;
+  }
+
+  .roleta-numero{
+    font-size:62px;
+  }
+}
+
+/* ACABAMENTO */
+
+button{
+  cursor:pointer;
+}
+
+button:focus-visible,
+.team:focus-visible{
+  outline:2px solid #ffe5a0;
+  outline-offset:3px;
+}
+
+::selection{
+  background:#e8bd61;
+  color:#17110a;
+}
+
 </style>
 </head>
 
