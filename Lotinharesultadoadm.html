@@ -69,14 +69,17 @@ header{text-align:center;padding:15px 5px 20px}header .tag{font-size:11px;letter
 <script>
 // COLE AQUI O MESMO firebaseConfig DO SEU index.html ATUAL DA LOTINHA.
 const firebaseConfig = {
-  apiKey: "COLE_SUA_API_KEY",
-  authDomain: "COLE_SEU_AUTH_DOMAIN",
-  databaseURL: "https://loteriasmj-274f9-default-rtdb.firebaseio.com/",
-  projectId: "loteriasmj-274f9",
-  storageBucket: "COLE_SEU_STORAGE_BUCKET",
-  messagingSenderId: "COLE_SEU_MESSAGING_SENDER_ID",
-  appId: "COLE_SEU_APP_ID"
-};
+    apiKey: "AIzaSyAqaXdveJ525bQr2OTaU-7KBiP8gjKCZhk",
+    authDomain: "loteriasmj-274f9.firebaseapp.com",
+    databaseURL: "https://loteriasmj-274f9-default-rtdb.firebaseio.com",
+    projectId: "loteriasmj-274f9",
+    storageBucket: "loteriasmj-274f9.firebasestorage.app",
+    messagingSenderId: "354230372107",
+    appId: "1:354230372107:web:ce5ed4de654b83041fc40e"
+  };
+
+  // Initialize Firebase
+  
 
 // TROQUE ESTA SENHA. É SOMENTE UMA TRAVA VISUAL, NÃO É AUTENTICAÇÃO DO FIREBASE.
 const SENHA_LOCAL_PAINEL = "123456";
@@ -234,16 +237,32 @@ function renderResults(){
 }
 function connect(){
   try{
-    if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
-    db=firebase.database();
+    if(!firebase.apps.length){
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    db = firebase.database();
+
     db.ref(RESULT_PATH).on("value",snap=>{
-      results=snap.val()||{};
-      Object.keys(results).forEach(k=>{
-        if(results[k]?.status!=="PUBLICADO"||!Array.isArray(results[k]?.numeros)||results[k].numeros.length!==15)delete results[k];
-      });
+      results = snap.val() || {};
+
       renderResults();
-    },err=>showMsg("formMsg","Erro ao ler Firebase: "+err.message,"bad"));
-  }catch(e){showMsg("formMsg","Confira o firebaseConfig: "+e.message,"bad");}
+
+    },err=>{
+      showMsg(
+        "formMsg",
+        "Erro ao ler Firebase: "+err.message,
+        "bad"
+      );
+    });
+
+  }catch(e){
+    showMsg(
+      "formMsg",
+      "Erro ao conectar Firebase: "+e.message,
+      "bad"
+    );
+  }
 }
 $("enter").addEventListener("click",()=>{
   if($("pin").value!==SENHA_LOCAL_PAINEL){showMsg("loginMsg","Senha incorreta.","bad");return;}
