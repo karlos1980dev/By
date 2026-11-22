@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101522">
+<title>LOTINHA | Administração de Resultados</title>
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#0d1320;--panel:#172238;--panel2:#202e47;--gold:#f5c451;--green:#19c88a;--red:#ff647c;--text:#f7f8fc;--muted:#aab6ca;--line:#34445f}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#111d32,#0b101a 60%);font-family:Arial,sans-serif;color:var(--text);min-height:100vh}.wrap{width:min(1000px,100%);margin:auto;padding:16px 13px 40px}
+header{text-align:center;padding:15px 5px 20px}header .tag{font-size:11px;letter-spacing:3px;color:var(--gold);font-weight:bold}header h1{font-size:clamp(25px,6vw,36px);margin:8px 0}header p{margin:0;color:var(--muted);font-size:13px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin:13px 0;box-shadow:0 10px 25px #0003}.panel h2{font-size:17px;margin:0 0 14px}.formgrid{display:grid;grid-template-columns:1fr;gap:12px}.field{display:grid;gap:7px}.field label{font-size:12px;color:var(--muted);font-weight:bold}input{width:100%;background:#0d1728;border:1px solid var(--line);border-radius:10px;padding:12px;color:#fff;font-size:16px}
+.numbers{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:14px 0}.num{aspect-ratio:1;border-radius:50%;background:#253650;color:#e8edf7;border:1px solid #465a78;font-weight:bold;font-size:16px;cursor:pointer}.num.selected{background:linear-gradient(145deg,#ffe18b,#e2a52e);color:#25172d;border:2px solid #fff0b9;box-shadow:0 3px 10px #0005}
+.counter{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#101b2d;padding:11px;border-radius:10px;font-size:13px}.counter strong{color:var(--gold);font-size:18px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}button{border:0;border-radius:10px;padding:12px 15px;font-weight:bold;cursor:pointer}.primary{background:var(--gold);color:#241a0b;flex:1}.secondary{background:#30415d;color:#fff}.danger{background:#512433;color:#ffc2cb}.msg{font-size:13px;padding:11px;border-radius:10px;margin-top:12px;display:none}.msg.ok{display:block;background:#123d32;color:#8bf0c9}.msg.bad{display:block;background:#4a1e2a;color:#ffc1ca}.hint{font-size:12px;color:var(--muted);line-height:1.5;margin-top:10px}
+.results{display:grid;gap:10px}.item{background:#101a2b;border:1px solid var(--line);border-radius:12px;padding:13px}.itemtop{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.itemdate{font-weight:bold}.itemnums{font-size:12px;color:#d9c38b;margin-top:8px;line-height:1.7}.itemactions{display:flex;gap:7px;margin-top:10px}.itemactions button{padding:8px 11px;font-size:12px}.badge{font-size:10px;color:#7df0c2;background:#124333;padding:5px 8px;border-radius:20px}
+#login{max-width:420px;margin:35px auto}.hidden{display:none!important}.warning{border:1px solid #805b25;background:#382a16;color:#ffe0a1;border-radius:12px;padding:12px;font-size:12px;line-height:1.5}
+@media(min-width:620px){.formgrid{grid-template-columns:1fr 1fr}.numbers{grid-template-columns:repeat(5,66px);justify-content:start}.num{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="tag">MULTIJOGO • CONTROLE ADMINISTRATIVO</div><h1>🏆 LOTINHA</h1><p>GERENCIAMENTO DE RESULTADOS</p></header>
+
+<section class="panel" id="login">
+  <h2>🔐 Acesso ao painel</h2>
+  <div class="field"><label for="pin">SENHA LOCAL DO PAINEL</label><input style="text-align:center" id="pin" type="password" placeholder="Digite a senha" autocomplete="current-password"></div>
+  <div class="actions"><button class="primary" id="enter">ENTRAR</button></div>
+  <div id="loginMsg" class="msg bad"></div>
+  <p class="hint">A senha local apenas oculta a tela administrativa. Ela não substitui a proteção das regras do Firebase.</p>
+</section>
+
+<main id="app" class="hidden">
+  <div class="warning">ATENÇÃO: a senha desta página não protege o banco de dados. Configure as regras do Firebase para permitir gravação somente a um administrador autenticado. Não deixe regras de gravação públicas.</div>
+  <section class="panel">
+    <h2 id="formTitle">➕ Publicar novo resultado</h2>
+    <div class="formgrid">
+      <div class="field"><label for="drawDate">DATA DA EXTRAÇÃO</label><input type="date" id="drawDate"></div>
+      <div class="field"><label>QUANTIDADE DE NÚMEROS</label><input value="15 números obrigatórios" disabled></div>
+    </div>
+    <div class="counter"><span>Números selecionados</span><strong id="count">0 / 15</strong></div>
+    <div class="numbers" id="numberGrid"></div>
+    <div class="actions">
+      <button class="primary" id="publish">PUBLICAR RESULTADO</button>
+      <button class="secondary" id="clear">LIMPAR</button>
+      <button class="secondary hidden" id="cancelEdit">CANCELAR EDIÇÃO</button>
+    </div>
+    <div id="formMsg" class="msg"></div>
+    <p class="hint">Selecione exatamente 15 números diferentes, de 01 até 25. A publicação ficará salva no caminho resultados/LOTINHA do Firebase.</p>
+  </section>
+
+  <section class="panel">
+    <h2>📚 Resultados armazenados</h2>
+    <div class="field" style="margin-bottom:12px"><label for="filterDate">FILTRAR POR DATA (OPCIONAL)</label><input type="date" id="filterDate"></div>
+    <div id="resultList" class="results"><div class="hint">Carregando resultados...</div></div>
+  </section>
+  <div class="actions"><button class="secondary" id="logout">SAIR DO PAINEL</button></div>
+</main>
+</div>
+<script>
+// COLE AQUI O MESMO firebaseConfig DO SEU index.html ATUAL DA LOTINHA.
+const firebaseConfig = {
+  apiKey: "COLE_SUA_API_KEY",
+  authDomain: "COLE_SEU_AUTH_DOMAIN",
+  databaseURL: "https://loteriasmj-274f9-default-rtdb.firebaseio.com/",
+  projectId: "loteriasmj-274f9",
+  storageBucket: "COLE_SEU_STORAGE_BUCKET",
+  messagingSenderId: "COLE_SEU_MESSAGING_SENDER_ID",
+  appId: "COLE_SEU_APP_ID"
+};
+
+// TROQUE ESTA SENHA. É SOMENTE UMA TRAVA VISUAL, NÃO É AUTENTICAÇÃO DO FIREBASE.
+const SENHA_LOCAL_PAINEL = "123456";
+const RESULT_PATH = "resultados/LOTINHA";
+const $ = id => document.getElementById(id);
+let db=null, selected=new Set(), editingKey=null, results={};
+
+function localDate(){
+  const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function brDate(key){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(key))return key||"";
+  const [y,m,d]=key.split("-");return `${d}/${m}/${y}`;
+}
+function showMsg(id,text,type){
+  const el=$(id);el.textContent=text;el.className="msg "+type;
+}
+function hideMsg(id){$(id).className="msg";}
+function drawGrid(){
+  $("numberGrid").innerHTML="";
+  for(let n=1;n<=25;n++){
+    const b=document.createElement("button");b.type="button";b.className="num"+(selected.has(n)?" selected":"");
+    b.textContent=String(n).padStart(2,"0");b.setAttribute("aria-pressed",selected.has(n)?"true":"false");
+    b.addEventListener("click",()=>{
+      if(selected.has(n))selected.delete(n);
+      else if(selected.size<15)selected.add(n);
+      else {showMsg("formMsg","Você já selecionou 15 números. Retire um para escolher outro.","bad");return;}
+      hideMsg("formMsg");drawGrid();
+    });
+    $("numberGrid").appendChild(b);
+  }
+  $("count").textContent=`${selected.size} / 15`;
+}
+function clearForm(){
+  selected.clear();editingKey=null;$("drawDate").value=localDate();
+  $("formTitle").textContent="➕ Publicar novo resultado";$("publish").textContent="PUBLICAR RESULTADO";
+  $("cancelEdit").classList.add("hidden");hideMsg("formMsg");drawGrid();
+}
+function validNumbers(){
+  const nums=[...selected].sort((a,b)=>a-b);
+  if(nums.length!==15)throw new Error("Selecione exatamente 15 números.");
+  if(new Set(nums).size!==15||nums.some(n=>n<1||n>25))throw new Error("Os números precisam ser únicos e estar entre 01 e 25.");
+  return nums;
+}
+async function publish(){
+  try{
+    const key=$("drawDate").value;
+    if(!key)throw new Error("Escolha a data da extração.");
+    const nums=validNumbers();
+    const ref=db.ref(`${RESULT_PATH}/${key}`);
+    const payload={data:brDate(key),numeros:nums,status:"PUBLICADO",publicadoEm:firebase.database.ServerValue.TIMESTAMP,atualizadoEm:firebase.database.ServerValue.TIMESTAMP};
+    if(editingKey){
+      if(editingKey!==key && results[key])throw new Error("Já existe resultado publicado para a nova data escolhida.");
+      if(editingKey!==key){
+        const old=results[editingKey];
+        await ref.set(payload);
+        await db.ref(`${RESULT_PATH}/${editingKey}`).remove();
+      }else{
+        await ref.update({data:payload.data,numeros:payload.numeros,status:"PUBLICADO",atualizadoEm:payload.atualizadoEm});
+      }
+      clearForm();
+      showMsg("formMsg","Resultado atualizado com sucesso!","ok");
+    }else{
+      const tx=await ref.transaction(current=>current===null?payload:undefined);
+      if(!tx.committed)throw new Error("Já existe um resultado nessa data. Use EDITAR para alterá-lo.");
+      clearForm();
+      showMsg("formMsg","Resultado publicado e armazenado no Firebase!","ok");
+    }
+  }catch(e){showMsg("formMsg",e.message||"Não foi possível salvar o resultado.","bad");}
+}
+function editResult(key){
+  const r=results[key];if(!r)return;
+  editingKey=key;$("drawDate").value=key;selected=new Set((r.numeros||[]).map(Number));
+  $("formTitle").textContent="✏️ Editar resultado de "+brDate(key);
+  $("publish").textContent="SALVAR ALTERAÇÕES";$("cancelEdit").classList.remove("hidden");
+  hideMsg("formMsg");drawGrid();window.scrollTo({top:0,behavior:"smooth"});
+}
+async function deleteResult(key){
+  if(!confirm(`Tem certeza que deseja excluir o resultado de ${brDate(key)}? Essa ação não pode ser desfeita.`))return;
+  try{await db.ref(`${RESULT_PATH}/${key}`).remove();}
+  catch(e){alert("Erro ao excluir: "+e.message);}
+}
+function renderResults(){
+  const filter=$("filterDate").value;
+  const keys=Object.keys(results).filter(k=>!filter||k===filter).sort((a,b)=>b.localeCompare(a));
+  if(!keys.length){$("resultList").innerHTML='<div class="hint">Nenhum resultado encontrado.</div>';return;}
+  $("resultList").innerHTML=keys.map(key=>{
+    const nums=(results[key].numeros||[]).map(n=>String(n).padStart(2,"0")).join(" • ");
+    return `<article class="item"><div class="itemtop"><span class="itemdate">📅 ${brDate(key)}</span><span class="badge">PUBLICADO</span></div><div class="itemnums">${nums}</div><div class="itemactions"><button class="secondary" data-edit="${key}">EDITAR</button><button class="danger" data-delete="${key}">EXCLUIR</button></div></article>`;
+  }).join("");
+  $("resultList").querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",()=>editResult(b.dataset.edit)));
+  $("resultList").querySelectorAll("[data-delete]").forEach(b=>b.addEventListener("click",()=>deleteResult(b.dataset.delete)));
+}
+function connect(){
+  try{
+    if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+    db=firebase.database();
+    db.ref(RESULT_PATH).on("value",snap=>{
+      results=snap.val()||{};
+      Object.keys(results).forEach(k=>{
+        if(results[k]?.status!=="PUBLICADO"||!Array.isArray(results[k]?.numeros)||results[k].numeros.length!==15)delete results[k];
+      });
+      renderResults();
+    },err=>showMsg("formMsg","Erro ao ler Firebase: "+err.message,"bad"));
+  }catch(e){showMsg("formMsg","Confira o firebaseConfig: "+e.message,"bad");}
+}
+$("enter").addEventListener("click",()=>{
+  if($("pin").value!==SENHA_LOCAL_PAINEL){showMsg("loginMsg","Senha incorreta.","bad");return;}
+  $("login").classList.add("hidden");$("app").classList.remove("hidden");connect();
+});
+$("pin").addEventListener("keydown",e=>{if(e.key==="Enter")$("enter").click();});
+$("publish").addEventListener("click",publish);
+$("clear").addEventListener("click",clearForm);
+$("cancelEdit").addEventListener("click",clearForm);
+$("filterDate").addEventListener("change",renderResults);
+$("logout").addEventListener("click",()=>{ $("app").classList.add("hidden");$("login").classList.remove("hidden");$("pin").value="";});
+$("drawDate").value=localDate();drawGrid();
+</script>
+</body>
+</html>
