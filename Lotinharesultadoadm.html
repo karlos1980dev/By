@@ -11,7 +11,7 @@
 :root{--bg:#0d1320;--panel:#172238;--panel2:#202e47;--gold:#f5c451;--green:#19c88a;--red:#ff647c;--text:#f7f8fc;--muted:#aab6ca;--line:#34445f}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#111d32,#0b101a 60%);font-family:Arial,sans-serif;color:var(--text);min-height:100vh}.wrap{width:min(1000px,100%);margin:auto;padding:16px 13px 40px}
 header{text-align:center;padding:15px 5px 20px}header .tag{font-size:11px;letter-spacing:3px;color:var(--gold);font-weight:bold}header h1{font-size:clamp(25px,6vw,36px);margin:8px 0}header p{margin:0;color:var(--muted);font-size:13px}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin:13px 0;box-shadow:0 10px 25px #0003}.panel h2{font-size:17px;margin:0 0 14px}.formgrid{display:grid;grid-template-columns:1fr;gap:12px}.field{display:grid;gap:7px}.field label{font-size:12px;color:var(--muted);font-weight:bold}input{width:100%;background:#0d1728;border:1px solid var(--line);border-radius:10px;padding:12px;color:#fff;font-size:16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin:13px 0;box-shadow:0 10px 25px #0003}.panel h2{font-size:17px;margin:0 0 14px}.formgrid{display:grid;grid-template-columns:1fr;gap:12px}.field{display:grid;gap:7px}.field label{font-size:12px;color:var(--muted);font-weight:bold}input,textarea{width:100%;background:#0d1728;border:1px solid var(--line);border-radius:10px;padding:12px;color:#fff;font-size:16px;font-family:Arial,sans-serif}textarea{min-height:105px;resize:vertical;line-height:1.5}
 .numbers{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:14px 0}.num{aspect-ratio:1;border-radius:50%;background:#253650;color:#e8edf7;border:1px solid #465a78;font-weight:bold;font-size:16px;cursor:pointer}.num.selected{background:linear-gradient(145deg,#ffe18b,#e2a52e);color:#25172d;border:2px solid #fff0b9;box-shadow:0 3px 10px #0005}
 .counter{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#101b2d;padding:11px;border-radius:10px;font-size:13px}.counter strong{color:var(--gold);font-size:18px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}button{border:0;border-radius:10px;padding:12px 15px;font-weight:bold;cursor:pointer}.primary{background:var(--gold);color:#241a0b;flex:1}.secondary{background:#30415d;color:#fff}.danger{background:#512433;color:#ffc2cb}.msg{font-size:13px;padding:11px;border-radius:10px;margin-top:12px;display:none}.msg.ok{display:block;background:#123d32;color:#8bf0c9}.msg.bad{display:block;background:#4a1e2a;color:#ffc1ca}.hint{font-size:12px;color:var(--muted);line-height:1.5;margin-top:10px}
 .results{display:grid;gap:10px}.item{background:#101a2b;border:1px solid var(--line);border-radius:12px;padding:13px}.itemtop{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.itemdate{font-weight:bold}.itemnums{font-size:12px;color:#d9c38b;margin-top:8px;line-height:1.7}.itemactions{display:flex;gap:7px;margin-top:10px}.itemactions button{padding:8px 11px;font-size:12px}.badge{font-size:10px;color:#7df0c2;background:#124333;padding:5px 8px;border-radius:20px}
@@ -25,7 +25,7 @@ header{text-align:center;padding:15px 5px 20px}header .tag{font-size:11px;letter
 
 <section class="panel" id="login">
   <h2>🔐 Acesso ao painel</h2>
-  <div class="field"><label for="pin">SENHA LOCAL DO PAINEL</label><input style="text-align:center" id="pin" type="password" placeholder="Digite a senha" autocomplete="current-password"></div>
+  <div class="field"><label for="pin">SENHA LOCAL DO PAINEL</label><input id="pin" type="password" placeholder="Digite a senha" autocomplete="current-password"></div>
   <div class="actions"><button class="primary" id="enter">ENTRAR</button></div>
   <div id="loginMsg" class="msg bad"></div>
   <p class="hint">A senha local apenas oculta a tela administrativa. Ela não substitui a proteção das regras do Firebase.</p>
@@ -39,6 +39,14 @@ header{text-align:center;padding:15px 5px 20px}header .tag{font-size:11px;letter
       <div class="field"><label for="drawDate">DATA DA EXTRAÇÃO</label><input type="date" id="drawDate"></div>
       <div class="field"><label>QUANTIDADE DE NÚMEROS</label><input value="15 números obrigatórios" disabled></div>
     </div>
+
+    <div class="field" style="margin-top:14px">
+      <label for="numbersText">DIGITE OU COLE OS 15 NÚMEROS DO RESULTADO</label>
+      <textarea id="numbersText" placeholder="Exemplo: 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15"></textarea>
+      <div class="hint">Pode separar os números por espaço, vírgula, ponto e vírgula ou quebra de linha. Ao preencher, os números serão selecionados automaticamente abaixo.</div>
+      <div class="actions"><button type="button" class="secondary" id="applyText">CARREGAR NÚMEROS NO PAINEL</button></div>
+    </div>
+
     <div class="counter"><span>Números selecionados</span><strong id="count">0 / 15</strong></div>
     <div class="numbers" id="numberGrid"></div>
     <div class="actions">
@@ -97,25 +105,42 @@ function drawGrid(){
       if(selected.has(n))selected.delete(n);
       else if(selected.size<15)selected.add(n);
       else {showMsg("formMsg","Você já selecionou 15 números. Retire um para escolher outro.","bad");return;}
+      $("numbersText").value=[...selected].sort((a,b)=>a-b).map(n=>String(n).padStart(2,"0")).join(" ");
       hideMsg("formMsg");drawGrid();
     });
     $("numberGrid").appendChild(b);
   }
   $("count").textContent=`${selected.size} / 15`;
 }
+function loadNumbersFromText(){
+  const raw=$("numbersText").value.trim();
+  if(!raw)throw new Error("Digite os 15 números no campo de texto.");
+  // Extrai grupos numéricos separados por qualquer caractere que não seja dígito.
+  const tokens=raw.split(/[^\d]+/).filter(Boolean);
+  if(tokens.length!==15)throw new Error(`Foram encontrados ${tokens.length} números. Digite exatamente 15.`);
+  const nums=tokens.map(Number);
+  if(nums.some(n=>!Number.isInteger(n)||n<1||n>25))throw new Error("Use somente números de 01 até 25.");
+  if(new Set(nums).size!==15)throw new Error("Existem números repetidos. Cada número deve aparecer uma única vez.");
+  selected=new Set(nums);
+  $("numbersText").value=nums.map(n=>String(n).padStart(2,"0")).join(" ");
+  drawGrid();
+  showMsg("formMsg","15 números carregados corretamente. Agora você pode publicar.","ok");
+}
 function clearForm(){
-  selected.clear();editingKey=null;$("drawDate").value=localDate();
+  selected.clear();editingKey=null;$("drawDate").value=localDate();$("numbersText").value="";
   $("formTitle").textContent="➕ Publicar novo resultado";$("publish").textContent="PUBLICAR RESULTADO";
   $("cancelEdit").classList.add("hidden");hideMsg("formMsg");drawGrid();
 }
 function validNumbers(){
   const nums=[...selected].sort((a,b)=>a-b);
-  if(nums.length!==15)throw new Error("Selecione exatamente 15 números.");
+  if(nums.length!==15)throw new Error("Selecione ou carregue exatamente 15 números.");
   if(new Set(nums).size!==15||nums.some(n=>n<1||n>25))throw new Error("Os números precisam ser únicos e estar entre 01 e 25.");
   return nums;
 }
 async function publish(){
   try{
+    // Se o campo de texto tiver conteúdo, ele será validado e usado na publicação.
+    if($("numbersText").value.trim())loadNumbersFromText();
     const key=$("drawDate").value;
     if(!key)throw new Error("Escolha a data da extração.");
     const nums=validNumbers();
@@ -124,7 +149,6 @@ async function publish(){
     if(editingKey){
       if(editingKey!==key && results[key])throw new Error("Já existe resultado publicado para a nova data escolhida.");
       if(editingKey!==key){
-        const old=results[editingKey];
         await ref.set(payload);
         await db.ref(`${RESULT_PATH}/${editingKey}`).remove();
       }else{
@@ -142,7 +166,9 @@ async function publish(){
 }
 function editResult(key){
   const r=results[key];if(!r)return;
-  editingKey=key;$("drawDate").value=key;selected=new Set((r.numeros||[]).map(Number));
+  editingKey=key;selected=new Set((r.numeros||[]).map(Number));
+  $("drawDate").value=key;
+  $("numbersText").value=[...selected].sort((a,b)=>a-b).map(n=>String(n).padStart(2,"0")).join(" ");
   $("formTitle").textContent="✏️ Editar resultado de "+brDate(key);
   $("publish").textContent="SALVAR ALTERAÇÕES";$("cancelEdit").classList.remove("hidden");
   hideMsg("formMsg");drawGrid();window.scrollTo({top:0,behavior:"smooth"});
@@ -181,6 +207,7 @@ $("enter").addEventListener("click",()=>{
   $("login").classList.add("hidden");$("app").classList.remove("hidden");connect();
 });
 $("pin").addEventListener("keydown",e=>{if(e.key==="Enter")$("enter").click();});
+$("applyText").addEventListener("click",()=>{try{loadNumbersFromText();}catch(e){showMsg("formMsg",e.message,"bad");}});
 $("publish").addEventListener("click",publish);
 $("clear").addEventListener("click",clearForm);
 $("cancelEdit").addEventListener("click",clearForm);
