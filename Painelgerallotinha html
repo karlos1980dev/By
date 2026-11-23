@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101522">
+<title>PAINEL TIME CERTO</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  padding:12px;
+  background:#080e19;
+  font-family:Arial,sans-serif;
+}
+
+.menu-multijogo{
+  width:100%;
+  padding:14px;
+  background:#0c1220;
+  border:1px solid #263650;
+  border-radius:18px;
+}
+
+.titulo-menu{
+  text-align:center;
+  color:#f5c451;
+  font-size:23px;
+  font-weight:900;
+  letter-spacing:2px;
+  padding:12px 5px 5px;
+}
+
+.subtitulo-menu{
+  text-align:center;
+  color:#aab5c8;
+  font-size:10px;
+  margin-bottom:18px;
+  letter-spacing:1px;
+}
+
+.secao-menu{
+  color:#f5c451;
+  font-size:12px;
+  font-weight:900;
+  margin:20px 0 10px;
+  padding-bottom:8px;
+  border-bottom:1px solid #34445f;
+}
+
+.grade-menu{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+}
+
+.grade-menu a{
+  min-width:0;
+  min-height:85px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:8px 3px;
+  border-radius:13px;
+  border:1px solid #34445f;
+  background:linear-gradient(145deg,#202e47,#121c30);
+  color:white;
+  text-decoration:none;
+  text-align:center;
+  font-size:10px;
+  font-weight:800;
+  transition:.2s;
+}
+
+.grade-menu a:active{
+  transform:scale(.95);
+  background:#34445f;
+}
+
+.grade-menu a:hover{
+  border-color:#f5c451;
+  box-shadow:0 0 12px #f5c45135;
+}
+
+.icone{
+  font-size:25px;
+  line-height:1;
+}
+
+.rodape-menu{
+  color:#8995aa;
+  text-align:center;
+  font-size:10px;
+  padding-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="menu-multijogo">
+
+  <div class="titulo-menu">PAINEL TIME CERTO</div>
+
+  <div class="subtitulo-menu">
+    SEU MUNDO DE JOGOS E OPORTUNIDADES
+  </div>
+
+  <div class="secao-menu">🎯 ADMINISTRAÇÃO</div>
+
+  <div class="grade-menu">
+
+    <a href="https://multyplay.netlify.app/pnltotinhabloquear" target="_blank">
+      <span class="icone">🎯</span>
+      LOTINHA ADM
+    </a>
+
+    <a href="https://multyplay.netlify.app/painellotinharesultado" target="_blank">
+      <span class="icone">⚙️</span>
+      PAINEL LOTINHA
+    </a>
+
+    <a href="https://multiplaybet.netlify.app/lotinha" target="_blank">
+      <span class="icone">🍀</span>
+      LOTINHA
+    </a>
+
+  </div>
+
+  <div class="secao-menu">🌟 RESULTADOS PUBLICAR</div>
+
+  <div class="grade-menu">
+
+    <a href="https://multyplay.netlify.app/lotinharesultadoadm" target="_blank">
+      <span class="icone">📢</span>
+      PUBLICAR RESULTADO
+    </a>
+
+    <a href="https://multyplay.netlify.app/resultadoslotinha" target="_blank">
+      <span class="icone">🏆</span>
+      VER RESULTADOS
+    </a>
+
+    <a href="https://lototecamultijogo.netlify.app/lotinha" target="_blank">
+      <span class="icone">🎟️</span>
+      LOTINHA COM CÓDIGO
+    </a>
+
+    <a href="https://lototecamultijogo.netlify.app/buscarcodigojb" target="_blank">
+      <span class="icone">🔎</span>
+      CONSULTAR CÓDIGO
+    </a>
+
+  </div>
+
+  <div class="rodape-menu">
+    MULTIJOGO • TODOS OS JOGOS EM UM SÓ LUGAR
+  </div>
+
+</div>
+
+</body>
+</html>
