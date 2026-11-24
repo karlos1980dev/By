@@ -1,0 +1,339 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#180020">
+<title>MULTIJOGO - CONTROLE</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;padding:15px;background:#100018;
+ color:white;font-family:Arial,sans-serif
+}
+main{max-width:550px;margin:auto}
+h1{text-align:center;color:#ff32d5}
+p{text-align:center;color:#bbb}
+.card{
+ background:#24102f;border:1px solid #653477;
+ border-radius:15px;padding:15px;margin-top:15px
+}
+input{
+ width:100%;padding:15px;border:0;border-radius:9px;
+ font-size:18px;margin:10px 0
+}
+button{
+ border:0;border-radius:9px;padding:12px;
+ font-weight:bold;cursor:pointer
+}
+button:disabled{opacity:.5;cursor:wait}
+.entrar{width:100%;background:#ed20cc;color:white}
+.item{
+ display:flex;justify-content:space-between;
+ align-items:center;gap:8px;background:#321740;
+ padding:12px;border-radius:10px;margin:9px 0
+}
+.nome{font-weight:bold}
+.estado{font-size:12px;margin-top:5px}
+.liberado{color:#4dff9b}
+.bloqueado{color:#ff6565}
+.acao{color:white;min-width:105px}
+.on{background:#159653;color:white}
+.off{background:#c52c48;color:white}
+#painel{display:none}
+#msg{text-align:center;color:#ffcf59}
+#resultadoTeste{
+ margin-top:12px;padding:12px;border-radius:9px;
+ background:#160d20;font-size:13px;overflow-wrap:anywhere
+}
+.teste{
+ width:100%;background:#ff00cc;color:white;
+ margin-bottom:12px
+}
+.info{color:#bbb;font-size:12px;line-height:1.5}
+</style>
+</head>
+
+<body>
+<main>
+
+<h1>🎮 MULTIJOGO</h1>
+<p>PAINEL DE BLOQUEIO E LIBERAÇÃO</p>
+
+<div class="card" id="acesso">
+<h3>🔐 SENHA ADMINISTRATIVA</h3>
+<input type="password" id="senha" placeholder="Digite a senha">
+<button class="entrar" id="btnEntrar">ENTRAR NO PAINEL</button>
+<div id="msg"></div>
+</div>
+
+<div id="painel">
+<div class="card">
+<h3>CONTROLE DOS JOGOS</h3>
+
+<button class="teste" id="btnTeste">
+TESTAR GRAVAÇÃO FIREBASE
+</button>
+
+<div id="resultadoTeste">Aguardando...</div>
+
+<p class="info">
+🟢 VERDE = JOGO LIBERADO<br>
+🔴 VERMELHO = JOGO BLOQUEADO
+</p>
+
+<div id="conexao">Conectando ao Firebase...</div>
+<div id="lista">Carregando jogos...</div>
+</div>
+</div>
+
+</main>
+
+<script type="module">
+
+import {initializeApp}
+from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+
+import {
+ getDatabase,
+ ref,
+ onValue,
+ set,
+ get
+} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyDQ991wvPALdunAuIM_UHQLFkl1ESpBBNY",
+ authDomain:"video-fb4fe.firebaseapp.com",
+ databaseURL:"https://video-fb4fe-default-rtdb.firebaseio.com",
+ projectId:"video-fb4fe",
+ storageBucket:"video-fb4fe.firebasestorage.app",
+ messagingSenderId:"225590526871",
+ appId:"1:225590526871:web:7508681d425906ad8ffad2"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+
+const caminho=ref(db,"menuMultijogo/botoes");
+const SENHA="12345";
+
+const jogos=[
+["lotinha","LOTINHA"],
+["seninha","SENINHA"],
+["quininha","QUININHA"],
+["supermania","SUPER MANIA"],
+["timecerto","TIME CERTO"],
+["apostaesportiva","APOSTA ESPORTIVA"],
+["multiplaybet","MULTIPLAY BET"],
+["palpitecerteiro","PALPITE CERTEIRO"],
+["achouganhou","ACHOU GANHOU"],
+["marcouganhou","MARCOU GANHOU"],
+["maispix","MAIS PIX"],
+["jogodobicho","JOGO DO BICHO"],
+["vivasorte","VIVA SORTE"],
+["bahiadasorte","BAHIA DA SORTE"],
+["rifadezenas","RIFA DEZENAS"],
+["rifacentena","RIFA CENTENA"],
+["rifamilhar","RIFA MILHAR"],
+["superrifa","SUPER RIFA"]
+];
+
+let dados={};
+let conectado=false;
+let autenticado=false;
+let pendentes={};
+
+const acesso=document.getElementById("acesso");
+const painel=document.getElementById("painel");
+const lista=document.getElementById("lista");
+const conexao=document.getElementById("conexao");
+const resultadoTeste=document.getElementById("resultadoTeste");
+
+document.getElementById("btnEntrar").addEventListener("click",entrar);
+
+document.getElementById("senha").addEventListener("keydown",e=>{
+ if(e.key==="Enter")entrar();
+});
+
+function entrar(){
+ const senha=document.getElementById("senha").value;
+
+ if(senha!==SENHA){
+  document.getElementById("msg").textContent="Senha incorreta!";
+  return;
+ }
+
+ autenticado=true;
+ acesso.style.display="none";
+ painel.style.display="block";
+ mostrar();
+}
+
+onValue(caminho,snapshot=>{
+ dados=snapshot.val()||{};
+ conectado=true;
+
+ conexao.textContent="🟢 CONECTADO AO FIREBASE";
+ conexao.style.color="#4dff9b";
+
+ mostrar();
+
+},erro=>{
+ conectado=false;
+ conexao.textContent="🔴 ERRO: "+erro.message;
+ conexao.style.color="#ff6565";
+ lista.textContent="Não foi possível carregar os jogos.";
+});
+
+function mostrar(){
+
+ if(!autenticado||!conectado)return;
+
+ lista.innerHTML="";
+
+ jogos.forEach(([id,nome])=>{
+
+  const bloqueado=dados[id]===false;
+
+  const item=document.createElement("div");
+  item.className="item";
+
+  const info=document.createElement("div");
+
+  const titulo=document.createElement("div");
+  titulo.className="nome";
+  titulo.textContent=nome;
+
+  const estado=document.createElement("div");
+  estado.className="estado "+(bloqueado?"bloqueado":"liberado");
+  estado.textContent=bloqueado?"🔴 BLOQUEADO":"🟢 LIBERADO";
+
+  info.append(titulo,estado);
+
+  const botao=document.createElement("button");
+  botao.className="acao "+(bloqueado?"off":"on");
+  botao.textContent=bloqueado?"LIBERAR":"BLOQUEAR";
+
+  if(pendentes[id]){
+   botao.disabled=true;
+   botao.textContent="SALVANDO...";
+  }
+
+  botao.addEventListener("click",()=>{
+   alterarJogo(id);
+  });
+
+  item.append(info,botao);
+  lista.appendChild(item);
+ });
+}
+
+async function alterarJogo(id){
+
+ if(pendentes[id])return;
+
+ // Consulta o estado mais recente antes de inverter
+ pendentes[id]=true;
+ mostrar();
+
+ try{
+
+  const referencia=ref(db,"menuMultijogo/botoes/"+id);
+  const leitura=await get(referencia);
+  const estadoAtual=leitura.val()!==false;
+
+  // Inverte: liberado vira bloqueado e vice-versa
+  const novoEstado=!estadoAtual;
+
+  resultadoTeste.textContent="Salvando "+id.toUpperCase()+"...";
+  resultadoTeste.style.color="#ffcf59";
+
+  await set(referencia,novoEstado);
+
+  // Confirma o valor que realmente ficou no Firebase
+  const confirmacao=await get(referencia);
+  const valorSalvo=confirmacao.val();
+
+  if(valorSalvo!==novoEstado){
+   throw new Error("O Firebase não confirmou o novo estado.");
+  }
+
+  dados[id]=valorSalvo;
+
+  resultadoTeste.textContent=
+   "✅ "+id.toUpperCase()+
+   (valorSalvo?" LIBERADO":" BLOQUEADO")+
+   " com sucesso!";
+
+  resultadoTeste.style.color="#4dff9b";
+
+ }catch(e){
+
+  resultadoTeste.textContent=
+   "❌ ERRO: "+(e.code||"")+
+   " | "+e.message;
+
+  resultadoTeste.style.color="#ff6565";
+
+  alert("Erro ao atualizar "+id+":\n"+e.message);
+
+ }finally{
+
+  delete pendentes[id];
+  mostrar();
+ }
+}
+
+// Teste de gravação e leitura
+document.getElementById("btnTeste")
+.addEventListener("click",testarFirebase);
+
+async function testarFirebase(){
+
+ const botao=document.getElementById("btnTeste");
+ botao.disabled=true;
+ botao.textContent="TESTANDO...";
+
+ try{
+
+  const teste=ref(db,"menuMultijogo/botoes/lotinha");
+
+  // Este teste deixa a LOTINHA BLOQUEADA
+  await set(teste,false);
+
+  const snap=await get(teste);
+
+  if(snap.val()===false){
+
+   dados.lotinha=false;
+   mostrar();
+
+   resultadoTeste.textContent=
+    "✅ TESTE OK! LOTINHA BLOQUEADA (false).";
+
+   resultadoTeste.style.color="#4dff9b";
+
+  }else{
+   throw new Error("O valor retornado foi: "+snap.val());
+  }
+
+ }catch(e){
+
+  resultadoTeste.textContent="❌ ERRO: "+e.message;
+  resultadoTeste.style.color="#ff6565";
+
+  alert("Erro no teste:\n"+e.message);
+
+ }finally{
+
+  botao.disabled=false;
+  botao.textContent="TESTAR GRAVAÇÃO FIREBASE";
+ }
+}
+
+</script>
+</body>
+</html>
