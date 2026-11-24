@@ -1,173 +1,352 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#180018">
-<title>Admin - PAINEL</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0c1220">
+<title>MULTIJOGO</title>
 
 <style>
-/* MENU MULTIJOGO */
+*{box-sizing:border-box}
+
+body{
+ margin:0;
+ padding:12px;
+ background:#080d18;
+ font-family:Arial,sans-serif;
+}
+
 .menu-multijogo{
-  width:100%;
-  padding:12px;
-  background:#0c1220;
-  border-radius:16px;
-  box-sizing:border-box;
+ width:100%;
+ padding:12px;
+ background:#0c1220;
+ border-radius:16px;
 }
 
-.menu-multijogo .titulo-menu{
-  text-align:center;
-  color:#f5c451;
-  font-size:23px;
-  font-weight:900;
-  letter-spacing:2px;
-  padding:12px 5px 5px;
+.titulo-menu{
+ text-align:center;
+ color:#f5c451;
+ font-size:23px;
+ font-weight:900;
+ letter-spacing:2px;
+ padding:12px 5px 5px;
 }
 
-.menu-multijogo .subtitulo-menu{
-  text-align:center;
-  color:#aab5c8;
-  font-size:10px;
-  margin-bottom:14px;
-  letter-spacing:1px;
+.subtitulo-menu{
+ text-align:center;
+ color:#aab5c8;
+ font-size:10px;
+ margin-bottom:14px;
+ letter-spacing:1px;
 }
 
-.menu-multijogo .grade-menu{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:9px;
+.grade-menu{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:9px;
 }
 
-.menu-multijogo a{
-  min-width:0;
-  min-height:82px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:7px;
-  padding:8px 3px;
-  box-sizing:border-box;
-  border-radius:13px;
-  border:1px solid #34445f;
-  background:linear-gradient(145deg,#202e47,#121c30);
-  color:#fff;
-  text-decoration:none;
-  text-align:center;
-  font-size:10px;
-  font-weight:800;
-  transition:.2s;
+.grade-menu a{
+ position:relative;
+ min-width:0;
+ min-height:82px;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ gap:7px;
+ padding:8px 3px;
+ border-radius:13px;
+ border:1px solid #34445f;
+ background:linear-gradient(145deg,#202e47,#121c30);
+ color:white;
+ text-decoration:none;
+ text-align:center;
+ font-size:10px;
+ font-weight:800;
+ transition:.2s;
 }
 
-.menu-multijogo a:active{
-  transform:scale(.95);
-  background:#34445f;
+.icone{font-size:23px;line-height:1}
+
+.grade-menu a:active{transform:scale(.95)}
+.grade-menu a:hover{border-color:#f5c451}
+
+/* BLOQUEADO */
+.grade-menu a.bloqueado{
+ background:linear-gradient(145deg,#333,#171717);
+ border:1px solid #e54848;
+ color:#aaa;
+ filter:grayscale(1);
+ cursor:not-allowed;
 }
 
-.menu-multijogo .icone{
-  font-size:23px;
-  line-height:1;
+.aviso-bloqueio{
+ display:none;
+ color:#ff6565;
+ font-size:9px;
+ font-weight:900;
 }
 
-.menu-multijogo a:hover{
-  border-color:#f5c451;
-  box-shadow:0 0 12px #f5c45135;
+.grade-menu a.bloqueado .aviso-bloqueio{
+ display:block;
 }
 
-.menu-multijogo .rodape-menu{
-  color:#8995aa;
-  text-align:center;
-  font-size:10px;
-  padding-top:15px;
+/* VERIFICANDO */
+.grade-menu a.verificando{
+ opacity:.65;
+ cursor:wait;
+}
+
+.rodape-menu{
+ color:#8995aa;
+ text-align:center;
+ font-size:10px;
+ padding-top:15px;
+}
+
+.carregando{
+ color:#f5c451;
+ text-align:center;
+ font-size:11px;
+ padding:8px;
 }
 </style>
 </head>
-  <body>
+
+<body>
+
 <div class="menu-multijogo">
 
-  <div class="titulo-menu">🎮 MULTIJOGO</div>
-  <div class="subtitulo-menu">
-    SEU MUNDO DE JOGOS E OPORTUNIDADES
-  </div>
+<div class="titulo-menu">🎮 MULTIJOGO</div>
 
-  <div class="grade-menu">
+<div class="subtitulo-menu">
+SEU MUNDO DE JOGOS E OPORTUNIDADES
+</div>
 
-    <a href="https://multyplay.netlify.app/lotinhatop" target="_blank">
-      <span class="icone">🎯</span>LOTINHA
-    </a>
+<div id="carregando" class="carregando">
+Verificando disponibilidade dos jogos...
+</div>
 
-    <a href="https://lototecamultijogo.netlify.app/seninha" target="_blank">
-      <span class="icone">🎰</span>SENINHA
-    </a>
+<div class="grade-menu" id="gradeMenu">
 
-    <a href="https://lototecamultijogo.netlify.app/quininha" target="_blank">
-      <span class="icone">🍀</span>QUININHA
-    </a>
+<a data-jogo="lotinha" href="https://multyplay.netlify.app/lotinhatop" target="_blank" rel="noopener">
+<span class="icone">🎯</span>LOTINHA
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
 
-    <a href="https://lototecamultijogo.netlify.app/supermania/" target="_blank">
-      <span class="icone">🌟</span>SUPER MANIA
-    </a>
+<a data-jogo="seninha" href="https://lototecamultijogo.netlify.app/seninha" target="_blank" rel="noopener">
+<span class="icone">🎰</span>SENINHA
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
 
-    <a href="https://multyplay.netlify.app/timecertotop" target="_blank">
-      <span class="icone">⏰</span>TIME CERTO
-    </a>
+<a data-jogo="quininha" href="https://lototecamultijogo.netlify.app/quininha" target="_blank" rel="noopener">
+<span class="icone">🍀</span>QUININHA
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
 
-    <a href="https://www.playbetweb.com/pre-match" target="_blank">
-      <span class="icone">⚽</span>APOSTA ESPORTIVA
-    </a>
+<a data-jogo="supermania" href="https://lototecamultijogo.netlify.app/supermania/" target="_blank" rel="noopener">
+<span class="icone">🌟</span>SUPER MANIA
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
 
-    <a href="https://multiplaybet.netlify.app" target="_blank">
-      <span class="icone">🏆</span>MULTIPLAY BET
-    </a>
+<a data-jogo="timecerto" href="https://multyplay.netlify.app/timecertotop" target="_blank" rel="noopener">
+<span class="icone">⏰</span>TIME CERTO
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
 
-    <a href="https://multiplaybet.netlify.app/palpitecerteiro" target="_blank">
-      <span class="icone">🔮</span>PALPITE CERTEIRO
-    </a>
+<a data-jogo="apostaesportiva" href="https://www.playbetweb.com/pre-match" target="_blank" rel="noopener">
+<span class="icone">⚽</span>APOSTA ESPORTIVA
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
 
-    <a href='https://achouganhou.netlify.app/' target='_blank'>
-      <span class="icone">🎁</span>ACHOU GANHOU
-    </a>
+<a data-jogo="multiplaybet" href="https://multiplaybet.netlify.app" target="_blank" rel="noopener">
+<span class="icone">🏆</span>MULTIPLAY BET
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
 
-    <a href='https://achouganhou.netlify.app/' target='_blank'>
-      <span class="icone">🥅</span>MARCOU GANHOU
-    </a>
+<a data-jogo="palpitecerteiro" href="https://multiplaybet.netlify.app/palpitecerteiro" target="_blank" rel="noopener">
+<span class="icone">🔮</span>PALPITE CERTEIRO
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
 
-    <a href="https://mjonline.netlify.app/girapix" target="_blank">
-      <span class="icone">💸</span>MAIS PIX
-    </a>
+<a data-jogo="achouganhou" href="https://achouganhou.netlify.app/index.html" target="_blank" rel="noopener">
+<span class="icone">🎁</span>ACHOU GANHOU
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
 
-    
+<a data-jogo="marcouganhou" href="https://achouganhou.netlify.app/index.html" target="_blank" rel="noopener">
+<span class="icone">🥅</span>MARCOU GANHOU
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
 
-    <a href="https://mjbicho.netlify.app/agentevenda" target="_blank">
-      <span class="icone">🎟️</span>JOGO DO BICHO
-    </a>
+<a data-jogo="maispix" href="https://mjonline.netlify.app/girapix" target="_blank" rel="noopener">
+<span class="icone">💸</span>MAIS PIX
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
 
-    <a href="https://comprarplace.netlify.app/vivasuasorte.html" target="_blank">
-      <span class="icone">🍀</span>VIVA SORTE
-    </a>
+<a data-jogo="jogodobicho" href="https://mjbicho.netlify.app/mextra" target="_blank" rel="noopener">
+<span class="icone">🎟️</span>JOGO DO BICHO
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
 
-    <a href="https://comprarplace.netlify.app/sortesua" target="_blank">
-      <span class="icone">🌴</span>BAHIA DA SORTE
-    </a>
-<a href="https://mjonline.netlify.app/rifafederalonline1pra85" target="_blank">
-      <span class="icone">🔢</span>RIFA DEZENAS <br>1.00 pra 85.00
-    </a>
-    <a href="https://mjonline.netlify.app/superacumulada.html" target="_blank">
-      <span class="icone">🔢</span>RIFA CENTENA<br>5.00 pra 4.500
-    </a>
-    <a href="https://mjbicho.netlify.app/agentevenda" target="_blank">
-      <span class="icone">🔢</span>RIFA MILHAR
-    </a>
-    <a href="https://mjbicho.netlify.app/agentevenda" target="_blank">
-      <span class="icone">🔢</span> SUPER RIFA
-    </a>
-  </div>
+<a data-jogo="vivasorte" href="https://comprarplace.netlify.app/vivasuasorte.html" target="_blank" rel="noopener">
+<span class="icone">🍀</span>VIVA SORTE
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
 
-  <div class="rodape-menu">
-    MULTIJOGO • TODOS OS JOGOS EM UM SÓ LUGAR
-  </div>
+<a data-jogo="bahiadasorte" href="https://comprarplace.netlify.app/sortesua" target="_blank" rel="noopener">
+<span class="icone">🌴</span>BAHIA DA SORTE
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
+
+<a data-jogo="rifadezenas" href="https://mjonline.netlify.app/rifafederalonline1pra85" target="_blank" rel="noopener">
+<span class="icone">🔢</span>RIFA DEZENAS<br>1.00 pra 85.00
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
+
+<a data-jogo="rifacentena" href="https://mjonline.netlify.app/superacumulada.html" target="_blank" rel="noopener">
+<span class="icone">🔢</span>RIFA CENTENA<br>5.00 pra 4.500
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
+
+<a data-jogo="rifamilhar" href="https://mjbicho.netlify.app/mextra" target="_blank" rel="noopener">
+<span class="icone">🔢</span>RIFA MILHAR
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
+
+<a data-jogo="superrifa" href="https://mjbicho.netlify.app/mextra" target="_blank" rel="noopener">
+<span class="icone">🔢</span>SUPER RIFA
+<span class="aviso-bloqueio">🔒 BLOQUEADO</span>
+</a>
 
 </div>
+
+<div class="rodape-menu">
+MULTIJOGO • TODOS OS JOGOS EM UM SÓ LUGAR
+</div>
+
+</div>
+
+<script type="module">
+
+import {initializeApp}
+from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+
+import {
+ getDatabase,
+ ref,
+ onValue
+} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyDQ991wvPALdunAuIM_UHQLFkl1ESpBBNY",
+ authDomain:"video-fb4fe.firebaseapp.com",
+ databaseURL:"https://video-fb4fe-default-rtdb.firebaseio.com",
+ projectId:"video-fb4fe",
+ storageBucket:"video-fb4fe.firebasestorage.app",
+ messagingSenderId:"225590526871",
+ appId:"1:225590526871:web:7508681d425906ad8ffad2"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+
+const botoes=document.querySelectorAll("[data-jogo]");
+const carregando=document.getElementById("carregando");
+
+let verificacaoConcluida=false;
+
+function bloquearTudo(){
+ botoes.forEach(botao=>{
+  botao.dataset.bloqueado="true";
+  botao.classList.add("bloqueado");
+  botao.classList.remove("verificando");
+ });
+}
+
+function atualizarMenu(dados){
+
+ botoes.forEach(botao=>{
+
+  const id=botao.dataset.jogo;
+
+  // Somente false bloqueia.
+  // true ou valor ausente libera.
+  const bloqueado=dados[id]===false;
+
+  botao.dataset.bloqueado=bloqueado?"true":"false";
+
+  botao.classList.toggle("bloqueado",bloqueado);
+  botao.classList.remove("verificando");
+
+  botao.setAttribute("aria-disabled",bloqueado?"true":"false");
+
+ });
+
+ verificacaoConcluida=true;
+ carregando.style.display="none";
+}
+
+// Inicialmente, impede abertura até receber resposta.
+bloquearTudo();
+
+botoes.forEach(botao=>{
+
+ botao.classList.add("verificando");
+
+ botao.addEventListener("click",evento=>{
+
+  if(!verificacaoConcluida){
+   evento.preventDefault();
+   evento.stopPropagation();
+   alert("Aguarde a verificação dos jogos.");
+   return;
+  }
+
+  if(botao.dataset.bloqueado==="true"){
+   evento.preventDefault();
+   evento.stopPropagation();
+   alert("🔒 ESTE JOGO ESTÁ TEMPORARIAMENTE BLOQUEADO.");
+  }
+
+ });
+
+});
+
+// Escuta alterações em tempo real no mesmo caminho do ADMIN.
+onValue(
+ ref(db,"menuMultijogo/botoes"),
+
+ snapshot=>{
+
+  const dados=snapshot.val()||{};
+
+  console.log(
+ "MULTIJOGO - Dados recebidos:",
+ JSON.stringify(dados,null,2)
+);
+  atualizarMenu(dados);
+
+ },
+
+ erro=>{
+
+  console.error("Erro Firebase:",erro);
+
+  verificacaoConcluida=false;
+
+  bloquearTudo();
+
+  carregando.style.display="block";
+  carregando.textContent="Erro ao verificar os jogos. Atualize a página.";
+
+ }
+
+);
+
+</script>
+
 </body>
 </html>
