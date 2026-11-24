@@ -72,6 +72,48 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
  .top{align-items:flex-start}
  .logo{font-size:19px}
 }
+/* BLOQUEIO DE QUANTIDADE DE DEZENAS */
+.bloqueio-dezenas{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin:12px 0;
+}
+
+.opcao-dezena{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:12px 6px;
+  background:#2c1833;
+  border:1px solid #65416c;
+  border-radius:10px;
+  color:#fff;
+  font-size:14px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.opcao-dezena input{
+  width:18px;
+  height:18px;
+  accent-color:#ff39b8;
+  margin:0;
+  cursor:pointer;
+}
+
+.opcao-dezena:has(input:checked){
+  background:#642039;
+  border-color:#ff526b;
+  color:#ffb5c5;
+}
+
+@media(max-width:450px){
+  .bloqueio-dezenas{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
 </style>
 </head>
 
@@ -255,17 +297,32 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
 <label>Bloquear quantidade de dezenas</label>
 
 <div class="notice">
-  Marque as opções que deseja bloquear para os clientes.
+  Marque as quantidades que deseja bloquear para os clientes.
 </div>
 
-<div class="row" style="gap:8px">
-  <label><input type="checkbox" id="bloquear17" style="width:auto"> Bloquear 17</label>
-  <label><input type="checkbox" id="bloquear18" style="width:auto"> Bloquear 18</label>
-  <label><input type="checkbox" id="bloquear19" style="width:auto"> Bloquear 19</label>
-  <label><input type="checkbox" id="bloquear20" style="width:auto"> Bloquear 20</label>
-  <label><input type="checkbox" id="bloquear21" style="width:auto"> Bloquear 21</label>
-  <label><input type="checkbox" id="bloquear22" style="width:auto"> Bloquear 22</label>
-  <label><input type="checkbox" id="bloquear23" style="width:auto"> Bloquear 23</label>
+<div class="bloqueio-dezenas">
+  <label class="opcao-dezena">
+    <input type="checkbox" id="bloquear17"> 17 DEZENAS
+  </label>
+  <label class="opcao-dezena">
+    <input type="checkbox" id="bloquear18"> 18 DEZENAS
+  </label>
+  <label class="opcao-dezena">
+    <input type="checkbox" id="bloquear19"> 19 DEZENAS
+  </label>
+  <label class="opcao-dezena">
+    <input type="checkbox" id="bloquear20"> 20 DEZENAS
+  </label>
+  <label class="opcao-dezena">
+    <input type="checkbox" id="bloquear21"> 21 DEZENAS
+  </label>
+  <label class="opcao-dezena">
+    <input type="checkbox" id="bloquear22"> 22 DEZENAS
+  </label>
+  <label class="opcao-dezena">
+    <input type="checkbox" id="bloquear23"> 23 DEZENAS
+  </label>
+</div>
 </div>
 <footer>LOTINHA ADMIN • MULTIJOGO</footer>
 </div>
