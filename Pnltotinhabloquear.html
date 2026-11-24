@@ -1,0 +1,844 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#180018">
+<title>LOTINHA ADMIN</title>
+
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-database-compat.js"></script>
+
+<style>
+*{box-sizing:border-box}
+:root{
+ --bg:#100812;--panel:#211326;--panel2:#2c1833;
+ --pink:#ff39b8;--yellow:#ffd447;--green:#20d69a;
+ --red:#ff526b;--text:#fff;--muted:#bdaabd;
+}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+button,input,select{font:inherit}
+button{border:0;border-radius:10px;padding:12px 14px;font-weight:bold;cursor:pointer}
+header{background:#210d28;border-bottom:1px solid #4b2852;padding:15px;position:sticky;top:0;z-index:5}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:1200px;margin:auto}
+.logo{font-size:22px;font-weight:900;color:var(--yellow)}
+.logo span{color:var(--pink)}
+.container{max-width:1200px;margin:auto;padding:16px}
+.hidden{display:none!important}
+.login{max-width:390px;margin:12vh auto;padding:25px;background:var(--panel);border:1px solid #56305d;border-radius:18px}
+.login h1{text-align:center;color:var(--yellow)}
+input,select{width:100%;padding:13px;border-radius:9px;border:1px solid #62456a;background:#160c1b;color:white;outline:none}
+input:focus,select:focus{border-color:var(--pink)}
+label{display:block;color:var(--muted);font-size:13px;margin:12px 0 6px}
+.primary{background:var(--pink);color:white}
+.yellow{background:var(--yellow);color:#261326}
+.green{background:var(--green);color:#06251b}
+.red{background:var(--red);color:white}
+.gray{background:#49334e;color:white}
+button:disabled{opacity:.45;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.stat{background:var(--panel);padding:17px;border:1px solid #432649;border-radius:14px;min-width:0}
+.stat small{color:var(--muted)}
+.stat strong{display:block;font-size:25px;margin-top:8px;overflow-wrap:anywhere}
+.stat.pink strong{color:var(--pink)}
+.stat.green strong{color:var(--green)}
+.stat.yellow strong{color:var(--yellow)}
+.panel{background:var(--panel);border:1px solid #432649;border-radius:14px;padding:16px;margin:15px 0}
+.panel h2{font-size:18px;margin:0 0 14px;color:var(--yellow)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row>*{flex:1}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:850px}
+th,td{padding:12px 9px;border-bottom:1px solid #422849;text-align:left;font-size:13px;vertical-align:top}
+th{color:var(--yellow);background:#2a1630}
+td small{color:var(--muted)}
+.status{display:inline-block;padding:6px 9px;border-radius:20px;font-size:11px;font-weight:bold}
+.pendente{background:#604816;color:#ffe18a}
+.pago{background:#07543c;color:#7bffca}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.actions button{padding:8px 10px;font-size:11px}
+.numbers{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.number{width:38px;height:38px;border-radius:50%;background:#39223f;border:1px solid #65416c;color:white;padding:0}
+.number.selected{background:var(--pink);border-color:white;color:white}
+.help{font-size:12px;color:var(--muted);line-height:1.5}
+.notice{padding:12px;border-radius:10px;background:#35233b;color:#f6dff9;margin:10px 0;font-size:13px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#fff;color:#180018;padding:13px 18px;border-radius:10px;font-weight:bold;z-index:20;display:none;max-width:90%;text-align:center}
+footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
+@media(max-width:750px){
+ .grid{grid-template-columns:repeat(2,1fr)}
+ .filters{grid-template-columns:1fr}
+ .top{align-items:flex-start}
+ .logo{font-size:19px}
+}
+</style>
+</head>
+
+<body>
+
+<section id="loginArea" class="login">
+ <h1>LOTINHA ADMIN</h1>
+ <p class="help" style="text-align:center">Acesso restrito ao administrador</p>
+ <label>Senha de administrador</label>
+ <input id="senha" type="password" placeholder="Digite sua senha">
+ <button class="primary" style="width:100%;margin-top:14px" onclick="entrar()">ENTRAR NO PAINEL</button>
+ <p id="erroLogin" class="help" style="color:#ff7185;text-align:center"></p>
+</section>
+
+<div id="app" class="hidden">
+<header>
+ <div class="top">
+  <div class="logo">LOTINHA <span>ADMIN</span></div>
+  <button class="gray" onclick="sair()">SAIR</button>
+ </div>
+</header>
+
+<main class="container">
+
+ <div class="row">
+  <div>
+   <h2 style="margin-bottom:3px">Painel de controle</h2>
+   <div class="help">Acompanhamento das apostas em tempo real</div>
+  </div>
+  <button class="yellow" onclick="carregarTudo()">ATUALIZAR</button>
+ </div>
+
+ <section class="grid">
+  <div class="stat pink"><small>Total de apostas</small><strong id="totalApostas">0</strong></div>
+  <div class="stat yellow"><small>Aguardando pagamento</small><strong id="totalPendentes">0</strong></div>
+  <div class="stat green"><small>Apostas pagas</small><strong id="totalPagas">0</strong></div>
+  <div class="stat green"><small>Valor recebido</small><strong id="valorRecebido">R$ 0,00</strong></div>
+ </section>
+
+ <section class="grid">
+  <div class="stat"><small>Valor pendente</small><strong id="valorPendente">R$ 0,00</strong></div>
+  <div class="stat"><small>Valor total registrado</small><strong id="valorTotal">R$ 0,00</strong></div>
+  <div class="stat"><small>Quantidade de jogos</small><strong id="totalJogos">0</strong></div>
+  <div class="stat"><small>Última atualização</small><strong id="ultimaAtualizacao" style="font-size:15px">--</strong></div>
+ </section>
+
+ <section class="panel">
+  <h2>APOSTAS REGISTRADAS</h2>
+  <div class="filters">
+   <input id="busca" placeholder="Pesquisar nome, código ou cliente..." oninput="renderizarTabela()">
+   <select id="filtroStatus" onchange="renderizarTabela()">
+    <option value="">Todos os pagamentos</option>
+    <option value="PENDENTE">Pendentes</option>
+    <option value="PAGO">Pagos</option>
+   </select>
+   <select id="ordenacao" onchange="renderizarTabela()">
+    <option value="recentes">Mais recentes</option>
+    <option value="antigas">Mais antigas</option>
+    <option value="maior">Maior valor</option>
+    <option value="menor">Menor valor</option>
+   </select>
+  </div>
+
+  <div class="row" style="margin-top:12px">
+   <button class="gray" onclick="limparFiltros()">LIMPAR FILTROS</button>
+   <button class="green" onclick="exportarCSV()">EXPORTAR PLANILHA CSV</button>
+  </div>
+
+  <div class="table-wrap" style="margin-top:14px">
+   <table>
+    <thead>
+     <tr>
+      <th>Código / Data</th>
+      <th>Cliente</th>
+      <th>Jogos</th>
+      <th>Valor</th>
+      <th>Pagamento</th>
+      <th>Extração</th>
+      <th>Ações</th>
+     </tr>
+    </thead>
+    <tbody id="listaApostas">
+     <tr><td colspan="7">Carregando apostas...</td></tr>
+    </tbody>
+   </table>
+  </div>
+  <p class="help" id="contadorLista"></p>
+ </section>
+
+ <section class="panel">
+  <h2>PUBLICAR RESULTADO</h2>
+  <div class="notice">Selecione exatamente 15 números diferentes entre 01 e 25. O resultado será salvo no Firebase para a data e extração escolhidas.</div>
+
+  <div class="row">
+   <div>
+    <label>Data do resultado</label>
+    <input type="date" id="dataResultado">
+   </div>
+   <div>
+    <label>Horário da extração</label>
+    <select id="horarioResultado">
+     <option value="21:00">21:00</option>
+     <option value="11:00">11:00</option>
+    </select>
+   </div>
+  </div>
+
+  <div class="numbers" id="numerosResultado"></div>
+  <p id="contadorNumeros" class="help">0 de 15 números selecionados</p>
+
+  <div class="row">
+   <button class="primary" onclick="publicarResultado()">PUBLICAR RESULTADO</button>
+   <button class="gray" onclick="limparResultado()">LIMPAR SELEÇÃO</button>
+  </div>
+
+  <div id="resultadoAtual" class="notice">Nenhum resultado carregado.</div>
+ </section>
+
+ <section class="panel">
+  <h2>CONFIGURAÇÕES DA LOTINHA</h2>
+
+  <label>Horário padrão da extração</label>
+  <select id="horarioConfig">
+   <option value="21:00">21:00</option>
+   <option value="11:00">11:00</option>
+  </select>
+
+  <label>Bloqueio manual das apostas</label>
+  <select id="bloqueioManual">
+   <option value="false">Apostas liberadas (sem bloqueio manual)</option>
+   <option value="true">Bloquear novas apostas</option>
+  </select>
+
+  <label>Ativar alerta quando as apostas estiverem bloqueadas</label>
+  <select id="alertaBloqueioAtivo">
+   <option value="true">SIM — Mostrar alerta</option>
+   <option value="false">NÃO — Não mostrar alerta</option>
+  </select>
+
+  <label>Título do alerta</label>
+  <input id="tituloAlertaBloqueio" placeholder="Ex.: ATENÇÃO! APOSTAS BLOQUEADAS">
+
+  <label>Mensagem exibida no alerta</label>
+  <input id="mensagemBloqueio" placeholder="Ex.: Apostas encerradas. Aguarde a próxima extração.">
+
+  <label>Tipo do alerta</label>
+  <select id="tipoAlertaBloqueio">
+   <option value="aviso">Aviso</option>
+   <option value="atencao">Atenção</option>
+   <option value="bloqueio">Bloqueio</option>
+  </select>
+
+  <div class="notice">
+   Você poderá alterar o título, a mensagem e o estilo do alerta sempre que quiser.
+  </div>
+
+  <button class="primary" style="width:100%" onclick="salvarConfiguracoes()">SALVAR CONFIGURAÇÕES</button>
+  <p class="help" id="statusConfig"></p>
+ </section>
+
+ <section class="panel">
+  <h2>TABELA DE PRÊMIOS CADASTRADA</h2>
+  <div class="table-wrap">
+   <table style="min-width:300px">
+    <thead><tr><th>Dezenas</th><th>Prêmio informado</th></tr></thead>
+    <tbody>
+     <tr><td>17 números</td><td>R$ 6.000,00</td></tr>
+     <tr><td>18 números</td><td>R$ 1.200,00</td></tr>
+     <tr><td>19 números</td><td>R$ 250,00</td></tr>
+     <tr><td>20 números</td><td>R$ 100,00</td></tr>
+     <tr><td>21 números</td><td>R$ 20,00</td></tr>
+     <tr><td>22 números</td><td>R$ 10,00</td></tr>
+     <tr><td>23 números</td><td>R$ 5,00</td></tr>
+    </tbody>
+   </table>
+  </div>
+  <p class="help">Tabela informativa do painel. A conferência considera 15 acertos.</p>
+ </section>
+
+</main>
+<label>Bloquear quantidade de dezenas</label>
+
+<div class="notice">
+  Marque as opções que deseja bloquear para os clientes.
+</div>
+
+<div class="row" style="gap:8px">
+  <label><input type="checkbox" id="bloquear17" style="width:auto"> Bloquear 17</label>
+  <label><input type="checkbox" id="bloquear18" style="width:auto"> Bloquear 18</label>
+  <label><input type="checkbox" id="bloquear19" style="width:auto"> Bloquear 19</label>
+  <label><input type="checkbox" id="bloquear20" style="width:auto"> Bloquear 20</label>
+  <label><input type="checkbox" id="bloquear21" style="width:auto"> Bloquear 21</label>
+  <label><input type="checkbox" id="bloquear22" style="width:auto"> Bloquear 22</label>
+  <label><input type="checkbox" id="bloquear23" style="width:auto"> Bloquear 23</label>
+</div>
+<footer>LOTINHA ADMIN • MULTIJOGO</footer>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* FIREBASE */
+const firebaseConfig = {
+ databaseURL:"https://loteriasmj-274f9-default-rtdb.firebaseio.com/",
+ projectId:"loteriasmj-274f9"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+
+const REF_APOSTAS=db.ref("apostas/LOTINHA");
+const REF_RESULTADOS=db.ref("resultados/LOTINHA");
+const REF_CONFIG=db.ref("configuracoes/LOTINHA");
+
+/* ALTERE A SENHA */
+const SENHA_ADMIN="12345";
+
+let apostas={};
+let resultados={};
+let configuracoes={};
+let selecionados=[];
+let listenersIniciados=false;
+
+const $=id=>document.getElementById(id);
+
+function dinheiro(v){
+ return Number(v||0).toLocaleString("pt-BR",{
+  style:"currency",currency:"BRL"
+ });
+}
+
+function escapar(v){
+ return String(v??"").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+function toast(msg){
+ const t=$("toast");
+ t.textContent=msg;
+ t.style.display="block";
+ clearTimeout(window.toastTimer);
+ window.toastTimer=setTimeout(()=>t.style.display="none",2800);
+}
+
+function dataHoje(){
+ const d=new Date();
+ const local=new Date(d.getTime()-d.getTimezoneOffset()*60000);
+ return local.toISOString().slice(0,10);
+}
+
+/* LOGIN */
+function entrar(){
+ if($("senha").value!==SENHA_ADMIN){
+  $("erroLogin").textContent="Senha incorreta.";
+  return;
+ }
+
+ sessionStorage.setItem("lotinhaAdminLogado","sim");
+ abrirPainel();
+}
+
+function abrirPainel(){
+ $("loginArea").classList.add("hidden");
+ $("app").classList.remove("hidden");
+ $("dataResultado").value=dataHoje();
+
+ if(!listenersIniciados)iniciarListeners();
+}
+
+function sair(){
+ sessionStorage.removeItem("lotinhaAdminLogado");
+ location.reload();
+}
+
+$("senha").addEventListener("keydown",e=>{
+ if(e.key==="Enter")entrar();
+});
+
+/* CARREGAMENTO EM TEMPO REAL */
+function iniciarListeners(){
+ listenersIniciados=true;
+
+ REF_APOSTAS.on("value",snap=>{
+  apostas=snap.val()||{};
+  atualizarDashboard();
+  renderizarTabela();
+  $("ultimaAtualizacao").textContent=new Date().toLocaleTimeString("pt-BR");
+ },err=>toast("Erro ao carregar apostas: "+err.message));
+
+ REF_RESULTADOS.on("value",snap=>{
+  resultados=snap.val()||{};
+  mostrarResultadoSelecionado();
+ },err=>toast("Erro ao carregar resultados: "+err.message));
+
+ REF_CONFIG.on("value",snap=>{
+  configuracoes=snap.val()||{};
+  preencherConfiguracoes();
+ },err=>toast("Erro nas configurações: "+err.message));
+}
+
+/* ATUALIZAR DADOS */
+function carregarTudo(){
+ REF_APOSTAS.once("value").then(s=>{
+  apostas=s.val()||{};
+  atualizarDashboard();
+  renderizarTabela();
+ }).catch(e=>toast("Erro: "+e.message));
+
+ REF_RESULTADOS.once("value").then(s=>{
+  resultados=s.val()||{};
+  mostrarResultadoSelecionado();
+ }).catch(e=>toast("Erro: "+e.message));
+
+ REF_CONFIG.once("value").then(s=>{
+  configuracoes=s.val()||{};
+  preencherConfiguracoes();
+ }).catch(e=>toast("Erro: "+e.message));
+}
+
+/* CONFIGURAÇÕES */
+function preencherConfiguracoes(){
+const bloqueadas = configuracoes.quantidadesBloqueadas || {};
+
+[17,18,19,20,21,22,23].forEach(n=>{
+  const campo = $("bloquear"+n);
+  if(campo){
+    campo.checked = bloqueadas[n] === true;
+  }
+});
+ $("horarioConfig").value=configuracoes.horarioExtracao||"21:00";
+
+ $("bloqueioManual").value=
+  String(!!configuracoes.bloqueioManual);
+
+ $("mensagemBloqueio").value=
+  configuracoes.mensagemBloqueio||"";
+
+ $("alertaBloqueioAtivo").value=
+  String(configuracoes.alertaBloqueioAtivo!==false);
+
+ $("tituloAlertaBloqueio").value=
+  configuracoes.tituloAlertaBloqueio||"ATENÇÃO! APOSTAS BLOQUEADAS";
+
+ $("tipoAlertaBloqueio").value=
+  configuracoes.tipoAlertaBloqueio||"bloqueio";
+}
+
+async function salvarConfiguracoes(){
+
+ const dados={
+ quantidadesBloqueadas: {
+  17: $("bloquear17").checked,
+  18: $("bloquear18").checked,
+  19: $("bloquear19").checked,
+  20: $("bloquear20").checked,
+  21: $("bloquear21").checked,
+  22: $("bloquear22").checked,
+  23: $("bloquear23").checked
+},
+  horarioExtracao:$("horarioConfig").value,
+  bloqueioManual:$("bloqueioManual").value==="true",
+  alertaBloqueioAtivo:$("alertaBloqueioAtivo").value==="true",
+  tituloAlertaBloqueio:$("tituloAlertaBloqueio").value.trim(),
+  mensagemBloqueio:$("mensagemBloqueio").value.trim(),
+  tipoAlertaBloqueio:$("tipoAlertaBloqueio").value,
+  atualizadoEm:new Date().toISOString()
+ };
+
+ try{
+  await REF_CONFIG.update(dados);
+  configuracoes={...configuracoes,...dados};
+  $("statusConfig").textContent="Configurações salvas com sucesso.";
+  toast("Configurações atualizadas!");
+ }catch(e){
+  $("statusConfig").textContent="Erro: "+e.message;
+  toast("Não foi possível salvar.");
+ }
+}
+
+/* DADOS DAS APOSTAS */
+function valorAposta(a){
+ return Number(a.totalReceber??a.valorTotal??a.total??a.valor??0)||0;
+}
+
+function jogosDaAposta(a){
+ if(Array.isArray(a.jogos))return a.jogos;
+
+ if(a.jogos&&typeof a.jogos==="object"){
+  return Object.values(a.jogos);
+ }
+
+ if(Array.isArray(a.numeros)&&a.numeros.length){
+  return [{numeros:a.numeros,valor:a.valor}];
+ }
+
+ return [];
+}
+
+function statusAposta(a){
+ return String(a.statusPagamento||a.status||"PENDENTE").toUpperCase();
+}
+
+/* INDICADORES */
+function atualizarDashboard(){
+ const lista=Object.values(apostas);
+
+ let pagas=0;
+ let pendentes=0;
+ let recebido=0;
+ let pendente=0;
+ let total=0;
+ let qtdJogos=0;
+
+ lista.forEach(a=>{
+  const v=valorAposta(a);
+  total+=v;
+
+  qtdJogos+=Number(
+   a.quantidadeJogos||jogosDaAposta(a).length||1
+  );
+
+  if(statusAposta(a)==="PAGO"){
+   pagas++;
+   recebido+=v;
+  }else{
+   pendentes++;
+   pendente+=v;
+  }
+ });
+
+ $("totalApostas").textContent=lista.length;
+ $("totalPendentes").textContent=pendentes;
+ $("totalPagas").textContent=pagas;
+ $("valorRecebido").textContent=dinheiro(recebido);
+ $("valorPendente").textContent=dinheiro(pendente);
+ $("valorTotal").textContent=dinheiro(total);
+ $("totalJogos").textContent=qtdJogos;
+}
+
+function dataFormatada(a){
+ const d=a.dataISO||a.data||a.dataAposta||"";
+ if(!d)return "--";
+
+ if(String(d).includes("-")){
+  return String(d).split("-").reverse().join("/");
+ }
+
+ return d;
+}
+
+/* TABELA */
+function renderizarTabela(){
+ const termo=$("busca").value.trim().toLowerCase();
+ const filtro=$("filtroStatus").value;
+ const ordem=$("ordenacao").value;
+
+ let lista=Object.entries(apostas).map(([id,a])=>({
+  id,
+  ...a
+ }));
+
+ lista=lista.filter(a=>{
+  const texto=[
+   a.nome,a.cliente,a.clienteNome,a.numeroControle,
+   a.controle,a.clienteId,a.telefone,a.pix,a.numero
+  ].join(" ").toLowerCase();
+
+  return (!termo||texto.includes(termo))&&
+   (!filtro||statusAposta(a)===filtro);
+ });
+
+ lista.sort((a,b)=>{
+  if(ordem==="maior")return valorAposta(b)-valorAposta(a);
+  if(ordem==="menor")return valorAposta(a)-valorAposta(b);
+
+  const da=String(a.criadoEm||a.timestamp||a.dataHora||a.dataISO||"");
+  const dbb=String(b.criadoEm||b.timestamp||b.dataHora||b.dataISO||"");
+
+  return ordem==="antigas"
+   ?da.localeCompare(dbb)
+   :dbb.localeCompare(da);
+ });
+
+ $("contadorLista").textContent=
+  lista.length+" aposta(s) exibida(s).";
+
+ if(!lista.length){
+  $("listaApostas").innerHTML=
+   '<tr><td colspan="7">Nenhuma aposta encontrada.</td></tr>';
+  return;
+ }
+
+ $("listaApostas").innerHTML=lista.map(a=>{
+  const status=statusAposta(a);
+  const jogos=jogosDaAposta(a);
+
+  const numeros=jogos.map(j=>{
+   const ns=Array.isArray(j.numeros)?j.numeros:[];
+   return ns.map(n=>String(n).padStart(2,"0")).join(" ");
+  }).join("<br>");
+
+  const nome=a.nome||a.cliente||a.clienteNome||"Cliente";
+  const codigo=a.numeroControle||a.controle||a.id||a.id;
+  const extracao=a.extracao||a.horarioExtracao||"--";
+  const classe=status==="PAGO"?"pago":"pendente";
+
+  /* Codifica o ID para evitar problemas com caracteres especiais */
+  const idSeguro=encodeURIComponent(a.id);
+
+  return `<tr>
+   <td><b>${escapar(codigo)}</b><br>
+    <small>${escapar(dataFormatada(a))}</small>
+   </td>
+
+   <td><b>${escapar(nome)}</b><br>
+    <small>${escapar(a.clienteId||"")}</small>
+   </td>
+
+   <td>${jogos.length||1} jogo(s)<br>
+    <small>${numeros||"Números não informados"}</small>
+   </td>
+
+   <td><b>${dinheiro(valorAposta(a))}</b></td>
+
+   <td><span class="status ${classe}">${escapar(status)}</span></td>
+
+   <td>${escapar(extracao)}<br>
+    <small>${escapar(a.dataExtracao||a.dataISO||"")}</small>
+   </td>
+
+   <td>
+    <div class="actions">
+     ${status==="PAGO"
+      ?`<button class="yellow" onclick="alterarStatus(decodeURIComponent('${idSeguro}'),'PENDENTE')">PENDENTE</button>`
+      :`<button class="green" onclick="alterarStatus(decodeURIComponent('${idSeguro}'),'PAGO')">MARCAR PAGO</button>`}
+
+     <button class="red" onclick="excluirAposta(decodeURIComponent('${idSeguro}'))">EXCLUIR</button>
+    </div>
+   </td>
+  </tr>`;
+ }).join("");
+}
+
+function limparFiltros(){
+ $("busca").value="";
+ $("filtroStatus").value="";
+ $("ordenacao").value="recentes";
+ renderizarTabela();
+}
+
+/* ALTERAR PAGAMENTO */
+async function alterarStatus(id,status){
+ if(!id||!apostas[id]){
+  return toast("Aposta não encontrada.");
+ }
+
+ if(!confirm("Confirma alterar o pagamento para "+status+"?")){
+  return;
+ }
+
+ try{
+  await REF_APOSTAS.child(id).update({
+   statusPagamento:status,
+   status:status,
+   atualizadoEm:new Date().toISOString(),
+   atualizadoPor:"ADMIN"
+  });
+
+  toast("Pagamento atualizado!");
+ }catch(e){
+  toast("Erro: "+e.message);
+ }
+}
+
+/* EXCLUIR APOSTA */
+async function excluirAposta(id){
+ if(!id)return toast("Código da aposta não encontrado.");
+
+ if(!confirm("ATENÇÃO! Deseja excluir definitivamente esta aposta?")){
+  return;
+ }
+
+ if(!confirm("Confirma novamente a exclusão?")){
+  return;
+ }
+
+ try{
+  await REF_APOSTAS.child(id).remove();
+  toast("Aposta excluída!");
+ }catch(e){
+  toast("Erro ao excluir: "+e.message);
+ }
+}
+
+/* PUBLICAR RESULTADOS */
+function montarSeletorNumeros(){
+ const el=$("numerosResultado");
+ el.innerHTML="";
+
+ for(let n=1;n<=25;n++){
+  const b=document.createElement("button");
+  b.type="button";
+  b.className="number";
+  b.textContent=String(n).padStart(2,"0");
+  b.onclick=()=>alternarNumero(n,b);
+  el.appendChild(b);
+ }
+
+ atualizarContador();
+}
+
+function alternarNumero(n,botao){
+ if(selecionados.includes(n)){
+  selecionados=selecionados.filter(x=>x!==n);
+  botao.classList.remove("selected");
+ }else{
+  if(selecionados.length>=15){
+   return toast("Você só pode selecionar 15 números.");
+  }
+
+  selecionados.push(n);
+  botao.classList.add("selected");
+ }
+
+ atualizarContador();
+}
+
+function atualizarContador(){
+ $("contadorNumeros").textContent=
+  selecionados.length+" de 15 números selecionados";
+}
+
+function limparResultado(){
+ selecionados=[];
+ document.querySelectorAll(".number").forEach(b=>{
+  b.classList.remove("selected");
+ });
+ atualizarContador();
+}
+
+function chaveResultado(data,horario){
+ return data+"_"+horario.replace(":","");
+}
+
+function mostrarResultadoSelecionado(){
+ const data=$("dataResultado").value;
+ const hora=$("horarioResultado").value;
+
+ if(!data)return;
+
+ const r=resultados[chaveResultado(data,hora)]||resultados[data];
+
+ if(r){
+  const nums=Array.isArray(r.numeros)?r.numeros:[];
+
+  $("resultadoAtual").innerHTML=
+   "<b>Resultado publicado:</b> "+
+   nums.map(n=>String(n).padStart(2,"0")).join(" - ")+
+   "<br><small>"+escapar(r.data||data)+
+   " • "+escapar(r.extracao||hora)+"</small>";
+ }else{
+  $("resultadoAtual").textContent=
+   "Nenhum resultado publicado para esta data e extração.";
+ }
+}
+
+$("dataResultado").addEventListener("change",mostrarResultadoSelecionado);
+$("horarioResultado").addEventListener("change",mostrarResultadoSelecionado);
+
+async function publicarResultado(){
+ const data=$("dataResultado").value;
+ const hora=$("horarioResultado").value;
+ const nums=[...selecionados].sort((a,b)=>a-b);
+
+ if(!data)return toast("Selecione a data.");
+ if(nums.length!==15)return toast("Selecione exatamente 15 números.");
+ if(new Set(nums).size!==15)return toast("Existem números repetidos.");
+
+ const chave=chaveResultado(data,hora);
+
+ const registro={
+  data:data,
+  dataISO:data,
+  extracao:hora,
+  horario:hora,
+  numeros:nums,
+  quantidade:15,
+  publicado:true,
+  publicadoEm:new Date().toISOString(),
+  atualizadoEm:Date.now()
+ };
+
+ if(!confirm(
+  "Publicar este resultado?\n\n"+
+  nums.map(n=>String(n).padStart(2,"0")).join(" - ")
+  )){
+  return;
+ }
+
+ try{
+  await REF_RESULTADOS.child(chave).set(registro);
+
+  /* Compatibilidade com versões antigas do aplicativo */
+  await REF_RESULTADOS.child(data).set(registro);
+
+  resultados[chave]=registro;
+  resultados[data]=registro;
+
+  toast("Resultado publicado com sucesso!");
+
+  mostrarResultadoSelecionado();
+ }catch(e){
+  toast("Erro ao publicar: "+e.message);
+ }
+}
+
+/* EXPORTAÇÃO CSV */
+function exportarCSV(){
+ const linhas=[[
+  "Controle","Cliente","Cliente ID","Data","Extração",
+  "Quantidade de jogos","Valor","Pagamento","Pix"
+ ]];
+
+ Object.entries(apostas).forEach(([id,a])=>{
+  linhas.push([
+   a.numeroControle||a.controle||id,
+   a.nome||a.cliente||a.clienteNome||"",
+   a.clienteId||"",
+   dataFormatada(a),
+   a.extracao||"",
+   a.quantidadeJogos||jogosDaAposta(a).length,
+   valorAposta(a).toFixed(2).replace(".",","),
+   statusAposta(a),
+   a.pix||a.chavePix||""
+  ]);
+ });
+
+ const csv="\uFEFF"+linhas.map(l=>
+  l.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(";")
+ ).join("\n");
+
+ const blob=new Blob([csv],{
+  type:"text/csv;charset=utf-8;"
+ });
+
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+
+ a.href=url;
+ a.download="lotinha-apostas-"+dataHoje()+".csv";
+
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+
+ URL.revokeObjectURL(url);
+ toast("Planilha exportada!");
+}
+
+/* INICIALIZAÇÃO */
+montarSeletorNumeros();
+
+if(sessionStorage.getItem("lotinhaAdminLogado")==="sim"){
+ abrirPainel();
+}
+</script>
+
+</body>
+</html>
