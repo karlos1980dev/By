@@ -184,6 +184,21 @@ const resultadoLink="https://www.oresultado.com.br";
 const $=id=>document.getElementById(id);
 
 let db=null,perfil=null,clientId=null,apostaAtual=null,salvando=false;
+let bloqueioPixAte=Number(localStorage.getItem("lotinha_bloqueio_pix_ate")||0);
+
+function emBloqueioPix(){
+ return Date.now()<bloqueioPixAte;
+}
+
+function iniciarBloqueioPix(){
+ bloqueioPixAte=Date.now()+60000;
+ localStorage.setItem("lotinha_bloqueio_pix_ate",String(bloqueioPixAte));
+ atualizarHorarioMarcacao();
+}
+
+function tempoBloqueioPix(){
+ return Math.max(0,Math.ceil((bloqueioPixAte-Date.now())/1000));
+}
 let apostasCliente={},resultadosLotinha={},quantidadesBloqueadas={};
 let marcacaoBloqueada=false,jogosPreparados=[],codigoPixAtual="";
 let refApostasCliente=null,listenerApostas=null,toastTimer=null;
@@ -220,13 +235,34 @@ function obterDestinoExtracao(){
 }
 function marcacaoEstaAberta(){
  const h=horarioBrasilia(),m=h.hora*60+h.minuto;
+
+ if(emBloqueioPix())return false;
  if(marcacaoBloqueada)return false;
  if(h.dia==="Sun"&&m>=660&&m<690)return false;
  if(m>=1250&&m<1290)return false;
+
  return m>=1;
 }
 function atualizarHorarioMarcacao(){
  const aviso=$("avisoHorario"),h=horarioBrasilia(),m=h.hora*60+h.minuto,aberto=marcacaoEstaAberta();
+ if(emBloqueioPix()){
+ const segundos=tempoBloqueioPix();
+ const minutos=Math.floor(segundos/60);
+ const resto=segundos%60;
+
+ aviso.style.display="block";
+ aviso.className="horario-marcacao fechado";
+ aviso.textContent="⏳ FACA O PAGAMENTO PARA FAZER OUTRA APOSTA: "+
+ String(minutos).padStart(2,"0")+":"+
+ String(resto).padStart(2,"0");
+
+ $("btnGerarAposta").disabled=true;
+ $("btnGerarAposta").textContent="🔒 AGUARDE "+String(minutos).padStart(2,"0")+":"+String(resto).padStart(2,"0");
+
+ document.querySelectorAll("#buttonContainer button,.number-button,.opcoes-jogos button,.btn-adicionar-jogo").forEach(b=>b.disabled=true);
+
+ return;
+}
  if(marcacaoBloqueada){aviso.style.display="block";aviso.className="horario-marcacao fechado";aviso.textContent="🔴 MARCAÇÕES BLOQUEADAS PELO ADMINISTRADOR.";}
  else if(h.dia==="Sat"){aviso.style.display="block";aviso.className="horario-marcacao aberto";aviso.innerHTML="⚠️ ATENÇÃO! OS JOGOS DE HOJE CONCORREM AMANHÃ.<br>🎯 EXTRAÇÃO: DOMINGO ÀS 11:00.";}
  else if(h.dia==="Sun"&&m<660){aviso.style.display="block";aviso.className="horario-marcacao aberto";aviso.innerHTML="🎯 EXTRAÇÃO DE HOJE: DOMINGO ÀS 11:00.<br>⏰ ENCERRAMENTO ÀS 11:00.";}
@@ -440,7 +476,21 @@ async function copiarTexto(texto){
  const campo=document.createElement("textarea");campo.value=texto;campo.setAttribute("readonly","");campo.style.position="fixed";campo.style.left="-9999px";document.body.appendChild(campo);campo.select();campo.setSelectionRange(0,campo.value.length);
  let ok=false;try{ok=document.execCommand("copy");}catch(e){}campo.remove();return ok;
 }
-async function copiarPixModal(){if(!codigoPixAtual){toast("Nenhum Pix foi gerado.");return;}const ok=await copiarTexto(codigoPixAtual);toast(ok?"Pix Copia e Cola copiado!":"Não foi possível copiar. Tente novamente.");}
+async function copiarPixModal(){
+ if(!codigoPixAtual){
+  toast("Nenhum Pix foi gerado.");
+  return;
+ }
+
+ const ok=await copiarTexto(codigoPixAtual);
+
+ if(ok){
+  iniciarBloqueioPix();
+  toast("Pix copiado! Aguarde 2 minutos para fazer outra aposta.");
+ }else{
+  toast("Não foi possível copiar. Tente novamente.");
+ }
+}
 function mostrarPix(a){
  $("pixSemAposta").style.display="none";$("pixArea").style.display="block";
  $("pixControle").textContent=a.numeroControle||"-";$("pixData").textContent=a.dataHora||"-";
@@ -448,8 +498,23 @@ function mostrarPix(a){
  $("pixCopiaCola").value=a.pixCopiaECola||"";$("qrcode").innerHTML="";
  if(a.pixCopiaECola&&typeof QRCode!=="undefined")new QRCode($("qrcode"),{text:a.pixCopiaECola,width:200,height:200,correctLevel:QRCode.CorrectLevel.M});
 }
-async function copiarPixMenu(){const t=$("pixCopiaCola").value;if(!t){toast("Selecione uma aposta primeiro.");return;}toast(await copiarTexto(t)?"Pix Copia e Cola copiado!":"Não foi possível copiar o Pix.");}
+async function copiarPixMenu(){
+ const t=$("pixCopiaCola").value;
 
+ if(!t){
+  toast("Selecione uma aposta primeiro.");
+  return;
+ }
+
+ const ok=await copiarTexto(t);
+
+ if(ok){
+  iniciarBloqueioPix();
+  toast("Pix copiado! Novas apostas bloqueadas por 2 minutos.");
+ }else{
+  toast("Não foi possível copiar o Pix.");
+ }
+}
 /* RESULTADOS E CONFERÊNCIA */
 function normalizarISO(v){
  const s=String(v||"").trim();if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;
