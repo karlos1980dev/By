@@ -1,0 +1,18 @@
+TIME CERTO - PACOTE PARA HOSPEDAGEM NO RENDER
+
+1. Extraia este ZIP e envie os arquivos para um repositório GitHub.
+2. No Render, crie um Web Service conectado ao repositório.
+3. Build Command: npm install
+4. Start Command: npm start
+5. Configure as variáveis de ambiente:
+   FIREBASE_PROJECT_ID=placarexato-97966
+   FIREBASE_DATABASE_URL=https://placarexato-97966-default-rtdb.asia-southeast1.firebasedatabase.app
+   FIREBASE_SERVICE_ACCOUNT_JSON=cole o JSON completo da conta de serviço do Firebase no painel do Render
+   POLL_MS=5000
+6. Opcional: TELEGRAM_BOT_TOKEN e TELEGRAM_CHAT_ID.
+
+SEGURANÇA: não envie .env nem serviceAccountKey.json ao GitHub ou em chats. Cole o JSON de credenciais somente no campo privado de variáveis do Render.
+
+TESTE: após iniciar, abra a URL do serviço com /health.
+
+OBSERVAÇÃO: este pacote contém o servidor. A página do site servida em /timecertotop precisa do arquivo timecertotop/index.html original. Esse HTML não foi incluído porque não veio junto com o server.js enviado.

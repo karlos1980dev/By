@@ -1,0 +1,17 @@
+{
+  "name": "time-certo-scheduler",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Motor de sorteios automáticos 24h do TIME CERTO com Firebase Realtime Database e notificações opcionais no Telegram.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "firebase-admin": "^13.0.0"
+  }
+}
