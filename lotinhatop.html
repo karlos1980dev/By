@@ -1,4147 +1,544 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#101522">
-<title>TIME CERTO</title>
-
+<meta name="theme-color" content="#180018">
+<title>LOTINHA</title>
+<link rel="icon" href="https://res.cloudinary.com/dtw3turzb/image/upload/v1794066370/lotinha.gif">
 <style>
-
-:root{
-  --bg:#0c1220;
-  --panel:#172238;
-  --gold:#f5c451;
-  --green:#18c889;
-  --muted:#aab7ca;
-  --red:#ff6678;
-}
-
-*{
-  box-sizing:border-box;
-}
-
-html{
-  width:100%;
-  min-height:100%;
-  overflow-x:hidden;
-}
-
-body{
-  margin:0;
-  width:100%;
-  min-height:100vh;
-  padding-top:125px;
-  padding-bottom:100px;
-  background:radial-gradient(circle at top,#1c2941,#0c1220 65%);
-  color:#fff;
-  font-family:Arial,sans-serif;
-  overflow-x:hidden;
-}
-
-button,input,textarea{
-  font-family:inherit;
-}
-
-header{
-  position:fixed;
-  z-index:1000;
-  top:0;
-  left:0;
-  right:0;
-  background:#101a2c;
-  border-bottom:1px solid #39465d;
-  padding:9px 12px;
-}
-
-.header-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
-}
-
-.logo{
-  color:var(--gold);
-  font-size:23px;
-  font-weight:900;
-  letter-spacing:3px;
-}
-
-.menu-area{
-  position:relative;
-}
-
-.menu-button{
-  background:#263751;
-  color:white;
-  border:1px solid #52627b;
-  border-radius:9px;
-  padding:9px 12px;
-  font-size:20px;
-}
-
-.dropdown{
-  display:none;
-  position:absolute;
-  right:0;
-  top:45px;
-  width:210px;
-  background:#1b2940;
-  border:1px solid #52627b;
-  border-radius:12px;
-  padding:7px;
-  box-shadow:0 10px 30px #0009;
-}
-
-.dropdown.show{
-  display:block;
-}
-
-.dropdown button{
-  width:100%;
-  padding:13px 12px;
-  text-align:left;
-  background:transparent;
-  border:0;
-  color:white;
-  border-radius:8px;
-  font-weight:bold;
-}
-
-.header-stats{
-  display:grid;
-  grid-template-columns:1.2fr 1fr 1fr;
-  gap:6px;
-  margin-top:8px;
-}
-
-.stat{
-  min-width:0;
-  background:#0c1626;
-  border:1px solid #34445d;
-  border-radius:9px;
-  padding:6px 4px;
-  text-align:center;
-}
-
-.stat small{
-  display:block;
-  color:var(--muted);
-  font-size:10px;
-}
-
-.stat strong{
-  display:block;
-  color:var(--gold);
-  font-size:13px;
-  margin-top:3px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-
-.player-top strong{
-  color:var(--green);
-}
-
-main{
-  width:100%;
-  max-width:1400px;
-  margin:0 auto;
-  padding:10px;
-}
-
-.panel{
-  width:100%;
-   background:linear-gradient(145deg,#1b2940,#141e30);
-  border:1px solid #33435d;
-  border-radius:15px;
-  padding:12px;
-  margin-bottom:12px;
-  box-shadow:0 8px 25px #0003;
-}
-
-.heading{
-  font-weight:800;
-  color:var(--gold);
-  font-size:16px;
-  margin:0 0 12px;
-}
-
-.muted{
-  color:var(--muted);
-  font-size:12px;
-}
-
-.counter{
-  font-size:23px;
-  color:var(--gold);
-  font-weight:900;
-}
-
-/* GRADE DOS ESCUDOS */
-
-.teams{
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:8px;
-  width:100%;
-}
-
-.team{
-  position:relative;
-  min-width:0;
-  min-height:105px;
-  padding:9px 5px;
-  border:2px solid #34445d;
-  border-radius:12px;
-  background:#26344c;
-  text-align:center;
-  cursor:pointer;
-  user-select:none;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:5px;
-}
-
-.team img{
-  display:block;
-  width:100%;
-  max-width:75px;
-  height:65px;
-  object-fit:contain;
-  object-position:center;
-  pointer-events:none;
-}
-
-.team span{
-  display:block;
-  width:100%;
-  font-size:10px;
-  font-weight:700;
-  line-height:1.2;
-  overflow-wrap:anywhere;
-  text-align:center;
-}
-
-.team.selected{
-  border-color:var(--gold);
-  background:#493d20;
-  box-shadow:0 0 13px #f5c45155;
-}
-
-.team.selected:after{
-  content:"✓";
-  position:absolute;
-  right:4px;
-  top:4px;
-  width:19px;
-  height:19px;
-  line-height:19px;
-  border-radius:50%;
-  background:var(--green);
-  color:#062015;
-  font-weight:bold;
-}
-
-.times{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:8px;
-}
-
-.slot{
-  border:1px solid #465773;
-  background:#26344c;
-  color:white;
-  border-radius:10px;
-  padding:13px 4px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.slot.active{
-  background:var(--gold);
-  color:#191919;
-  border-color:var(--gold);
-}
-
-.status{
-  font-size:12px;
-  color:var(--muted);
-  text-align:center;
-  margin-top:10px;
-}
-
-.history-panel{
-  display:none;
-}
-
-.history-panel.show{
-  display:block;
-}
-
-.history-item{
-  border-top:1px solid #34435b;
-  padding:10px 0;
-  font-size:12px;
-  line-height:1.6;
-}
-
-.playerline{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  background:#101a2b;
-  padding:12px;
-  border-radius:11px;
-  margin-bottom:12px;
-}
-
-.playerline strong{
-  color:var(--gold);
-}
-
-.change-name{
-  background:#30415c;
-  border:0;
-  color:white;
-  padding:10px;
-  border-radius:8px;
-}
-
-.field{
-  width:100%;
-  padding:13px;
-  border-radius:10px;
-  border:1px solid #43536d;
-  background:#0e1829;
-  color:#fff;
-  font-size:16px;
-  margin-top:6px;
-  outline:none;
-}
-
-.row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.metric{
-  background:#101a2b;
-  border-radius:12px;
-  padding:12px;
-  text-align:center;
-}
-
-.metric small{
-  color:var(--muted);
-}
-
-.metric strong{
-  display:block;
-  color:var(--green);
-  font-size:20px;
-  margin-top:5px;
-}
-
-.btn{
-  width:100%;
-  border:0;
-  border-radius:11px;
-  padding:15px;
-  font-weight:900;
-  font-size:15px;
-  cursor:pointer;
-  margin-top:10px;
-}
-
-.primary{
-  background:linear-gradient(135deg,#ffdc78,#e9aa27);
-  color:#171717;
-}
-
-.secondary{
-  background:#30415c;
-  color:#fff;
-}
-
-.btn:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-}
-
-.notice{
-  padding:11px;
-  border-radius:10px;
-  background:#332d1d;
-  color:#ffe3a1;
-  font-size:12px;
-  line-height:1.5;
-}
-
-.pixbox{
-  display:none;
-  text-align:center;
-}
-
-.pixbox.show{
-  display:block;
-}
-
-.qr{
-  display:inline-block;
-  background:#fff;
-  padding:12px;
-  border-radius:12px;
-  margin:10px auto;
-}
-
-.pixcode{
-  width:100%;
-  min-height:85px;
-  background:#0c1626;
-  color:#dce6f5;
-  border:1px solid #40516d;
-  border-radius:9px;
-  padding:10px;
-  font-size:11px;
-  word-break:break-all;
-}
-
-.modal-backdrop{
-  position:fixed;
-  inset:0;
-  background:#050914ed;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:12px;
-  z-index:9999;
-}
-
-.modal-backdrop.show{
-  display:flex;
-}
-
-.name-modal,
-.bet-modal{
-  width:100%;
-  max-width:500px;
-  background:linear-gradient(145deg,#1d2b43,#111b2c);
-  border:1px solid #52627b;
-  border-radius:18px;
-  padding:18px;
-  box-shadow:0 20px 70px #0009;
-}
-
-.name-modal h2{
-  text-align:center;
-  color:var(--gold);
-}
-
-.name-modal p{
-  text-align:center;
-  color:var(--muted);
-  font-size:13px;
-}
-
-.bet-modal{
-  max-height:90vh;
-  overflow-y:auto;
-}
-
-.bet-modal-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  margin-bottom:12px;
-}
-
-.close-bet{
-  background:#a52e40;
-  color:white;
-  border:0;
-  border-radius:8px;
-  padding:10px 14px;
-  font-weight:bold;
-}
-
-.bottom-bar{
-  position:fixed;
-  z-index:1001;
-  left:0;
-  right:0;
-  bottom:0;
-  background:#101a2c;
-  border-top:1px solid #465773;
-  padding:9px 12px calc(9px + env(safe-area-inset-bottom));
-  box-shadow:0 -8px 25px #0006;
-}
-
-.bottom-inner{
-  width:100%;
-  max-width:900px;
-  margin:auto;
-  display:grid;
-  grid-template-columns:1fr 1.3fr;
-  gap:9px;
-  align-items:center;
-}
-
-.bottom-inner input{
-  width:100%;
-  min-width:0;
-  padding:13px 10px;
-  border:1px solid #52627b;
-  border-radius:10px;
-  background:#0c1626;
-  color:white;
-  font-size:17px;
-  font-weight:bold;
-}
-
-.bottom-inner button{
-  border:0;
-  border-radius:10px;
-  padding:15px 8px;
-  background:linear-gradient(135deg,#ffdc78,#e9aa27);
-  color:#171717;
-  font-weight:900;
-  font-size:14px;
-}
-
-.bottom-inner button:disabled{
-  opacity:.55;
-}
-
-/* CELULARES PEQUENOS */
-
-@media(max-width:380px){
-  body{
-    padding-top:132px;
-    padding-bottom:95px;
-  }
-
-  .teams{
-    grid-template-columns:repeat(5,minmax(0,1fr));
-    gap:5px;
-  }
-
-  .team{
-    min-height:91px;
-    padding:6px 2px;
-  }
-
-  .team img{
-    height:52px;
-  }
-
-  .team span{
-    font-size:9px;
-  }
-
-  .times{
-    grid-template-columns:repeat(5,minmax(0,1fr));
-  }
-
-  .logo{
-    font-size:19px;
-  }
-}
-
-/* CELULARES GRANDES */
-
-@media(min-width:381px) and (max-width:600px){
-  .teams{
-    grid-template-columns:repeat(5,minmax(0,1fr));
-  }
-
-  .team{
-    min-height:100px;
-  }
-}
-
-/* TABLETS */
-
-@media(min-width:601px){
-  body{
-    padding-top:130px;
-  }
-
-  main{
-    padding:16px;
-  }
-
-  .teams{
-    grid-template-columns:repeat(7,minmax(0,1fr));
-    gap:12px;
-  }
-
-  .team{
-    min-height:125px;
-    padding:12px 6px;
-  }
-
-  .team img{
-    max-width:90px;
-    height:82px;
-  }
-
-  .team span{
-    font-size:11px;
-  }
-
-  .times{
-    grid-template-columns:repeat(6,minmax(0,1fr));
-  }
-}
-
-/* COMPUTADORES */
-
-@media(min-width:1000px){
-  main{
-    max-width:1400px;
-  }
-
-  .teams{
-    grid-template-columns:repeat(10,minmax(0,1fr));
-    gap:12px;
-  }
-
-  .team{
-    min-height:135px;
-  }
-
-  .team img{
-    max-width:100px;
-    height:90px;
-  }
-
-  .team span{
-    font-size:11px;
-  }
-
-  .times{
-    grid-template-columns:repeat(8,minmax(0,1fr));
-  }
-}
-.results-title{
-  color:var(--gold);
-  font-size:16px;
-  font-weight:900;
-  margin:0 0 10px;
-}
-
-.results-textarea{
-  width:100%;
-  min-height:120px;
-  resize:vertical;
-  padding:13px;
-  border:1px solid #40516d;
-  border-radius:11px;
-  background:#0c1626;
-  color:#18c889;
-  font-family:monospace;
-  font-size:13px;
-  line-height:1.7;
-  outline:none;
-  white-space:pre;
-  overflow:auto;
-}
-
-.results-status{
-  text-align:center;
-  color:var(--muted);
-  font-size:11px;
-  margin-top:8px;
-}
-#saqueMenu:disabled{
-  opacity:.4;
-  cursor:not-allowed;
-  color:#aab7ca;
-}
-
-#saqueMenu:not(:disabled){
-  background:#176b4e;
-  color:#fff;
-}
-.resultado-roleta{
-  background:linear-gradient(145deg,#101a32,#202d4b);
-  border:2px solid var(--gold);
-  border-radius:18px;
-  padding:20px 12px;
-  margin:12px 0;
-  text-align:center;
-  box-shadow:0 0 15px #f5c45155;
-}
-
-.roleta-titulo{
-  color:var(--gold);
-  font-weight:900;
-  letter-spacing:2px;
-}
-
-.roleta-numero{
-  font-size:65px;
-  font-weight:1000;
-  color:#fff;
-  margin:10px 0;
-  text-shadow:0 0 18px var(--gold);
-}
-
-.roleta-time{
-  color:var(--gold);
-  font-size:19px;
-  font-weight:900;
-}
-
-.roleta-horario{
-  color:#fff;
-  font-size:13px;
-  margin-top:8px;
-}
-
-.roleta-girando{
-  animation:roletaGiro .12s infinite alternate;
-}
-
-.roleta-revelado{
-  animation:revelarResultado .8s ease-out;
-}
-
-@keyframes roletaGiro{
-  from{transform:scale(1);filter:brightness(1)}
-  to{transform:scale(1.12);filter:brightness(1.8)}
-}
-
-@keyframes revelarResultado{
-  0%{transform:scale(.4);opacity:0}
-  60%{transform:scale(1.2);opacity:1}
-  100%{transform:scale(1);opacity:1}
-}
-#resultsLista,
-#resultsStatus{
-  display:none;
-}
-
-#resultsLista.show,
-#resultsStatus.show{
-  display:block;
-}
-.bottom-inner input{
-  text-align:center;
-}.resultado-item{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:12px;
-  margin-bottom:9px;
-  background:#101a2b;
-  border:1px solid #394b67;
-  border-radius:12px;
-}
-
-.resultado-item img{
-  width:52px;
-  height:52px;
-  object-fit:contain;
-  flex-shrink:0;
-}
-
-.resultado-item .numero{
-  color:var(--gold);
-  font-size:25px;
-  font-weight:900;
-  min-width:32px;
-}
-
-.resultado-item .nome{
-  color:#fff;
-  font-weight:900;
-  font-size:14px;
-}
-
-.resultado-item .data{
-  color:var(--muted);
-  font-size:11px;
-  margin-top:5px;
-}
-
-#resultsLista{
-  margin-top:12px;
-}
-.resultado-item{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:12px;
-  margin-bottom:9px;
-  background:#101a2b;
-  border:1px solid #394b67;
-  border-radius:12px;
-}
-
-.resultado-item img{
-  width:52px;
-  height:52px;
-  object-fit:contain;
-  flex-shrink:0;
-}
-
-.resultado-item .numero{
-  color:var(--gold);
-  font-size:25px;
-  font-weight:900;
-  min-width:32px;
-}
-
-.resultado-item .nome{
-  color:#fff;
-  font-weight:900;
-  font-size:14px;
-}
-
-.resultado-item .data{
-  color:var(--muted);
-  font-size:11px;
-  margin-top:5px;
-}
-
-#resultsLista{
-  margin-top:12px;
-}
-
-.modal-overlay{
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:99999;
-  background:rgba(0,0,0,.85);
-  backdrop-filter:blur(6px);
-  align-items:center;
-  justify-content:center;
-  padding:18px;
-}
-
-.modal-overlay.ativo{
-  display:flex;
-}
-
-.modal-como-jogar{
-  position:relative;
-  width:100%;
-  max-width:420px;
-  background:linear-gradient(145deg,#171d35,#0b1020);
-  border:1px solid #8b5cf6;
-  border-radius:22px;
-  padding:28px 22px;
-  text-align:center;
-  color:#fff;
-  box-shadow:0 0 35px rgba(139,92,246,.3);
-  animation:entrarModal .25s ease;
-}
-
-@keyframes entrarModal{
-  from{opacity:0;transform:scale(.9)}
-  to{opacity:1;transform:scale(1)}
-}
-
-.fechar-como-jogar{
-  position:absolute;
-  right:14px;
-  top:12px;
-  background:#303751;
-  color:#fff;
-  border:0;
-  border-radius:50%;
-  width:34px;
-  height:34px;
-  font-size:17px;
-}
-
-.icone-como-jogar{
-  font-size:48px;
-  margin-bottom:10px;
-}
-
-.modal-como-jogar h2{
-  color:#c084fc;
-  font-size:21px;
-  margin:8px 0 20px;
-}
-
-.modal-como-jogar p{
-  color:#e2e8f0;
-  font-size:15px;
-  line-height:1.6;
-  margin:12px 0;
-}
-
-.premio-como-jogar{
-  background:linear-gradient(135deg,#422006,#854d0e);
-  border:1px solid #facc15;
-  border-radius:15px;
-  padding:16px 10px;
-  margin:18px 0;
-}
-
-.premio-como-jogar span{
-  display:block;
-  color:#fde68a;
-  font-size:12px;
-  font-weight:bold;
-}
-
-.premio-como-jogar strong{
-  display:block;
-  color:#facc15;
-  font-size:23px;
-  margin-top:7px;
-}
-
-.btn-entendi{
-  width:100%;
-  padding:15px;
-  border:0;
-  border-radius:12px;
-  background:linear-gradient(90deg,#7c3aed,#c026d3);
-  color:white;
-  font-size:16px;
-  font-weight:bold;
-  margin-top:12px;
-}
-#pixCopiaCola {
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  pointer-events: none;
-}
-
-#pixPayload{
-  user-select:none;
-  -webkit-user-select:none;
-  -webkit-touch-callout:none;
-  pointer-events:none;
-  caret-color:transparent;
-}
-
-/* ESCUDOS PREMIUM TIME CERTO */
-
-.teams{
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:9px;
-  width:100%;
-}
-
-.team{
-  position:relative;
-  min-width:0;
-  min-height:112px;
-  padding:9px 4px;
-  border:1px solid #465773;
-  border-radius:15px;
-  background:linear-gradient(145deg,#263954,#111c30);
-  text-align:center;
-  cursor:pointer;
-  user-select:none;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:7px;
-  overflow:hidden;
-  transition:transform .2s,border-color .2s,box-shadow .2s;
-}
-
-.team:active{
-  transform:scale(.94);
-}
-
-.team img{
-  display:block;
-  width:76px;
-  max-width:100%;
-  height:67px;
-  object-fit:contain;
-  object-position:center;
-  pointer-events:none;
-  filter:drop-shadow(0 4px 5px #0009);
-  transition:transform .25s,filter .25s;
-}
-
-.team span{
-  display:block;
-  width:100%;
-  color:#f1f5f9;
-  font-size:10px;
-  font-weight:800;
-  line-height:1.25;
-  overflow-wrap:anywhere;
-  text-align:center;
-}
-
-.team.selected{
-  border:2px solid #f5c451;
-  background:linear-gradient(145deg,#51421e,#26344c);
-  box-shadow:
-    0 0 7px #f5c451,
-    0 0 18px #f5c45166;
-}
-
-.team.selected img{
-  transform:scale(1.08);
-  filter:drop-shadow(0 0 8px #f5c451);
-}
-
-.team.selected span{
-  color:#ffdf82;
-}
-
-.team.selected:after{
-  content:"✓";
-  position:absolute;
-  right:5px;
-  top:5px;
-  width:20px;
-  height:20px;
-  line-height:20px;
-  border-radius:50%;
-  background:#18c889;
-  color:#062015;
-  font-weight:bold;
-  font-size:13px;
-}
-/* COMEMORAÇÃO DE VITÓRIA */
-
-.win-modal{
-  position:relative;
-  overflow:hidden;
-  width:100%;
-  max-width:420px;
-  max-height:90vh;
-  overflow-y:auto;
-  padding:25px 18px;
-  text-align:center;
-  border:2px solid #f5c451;
-  border-radius:22px;
-  background:
-    radial-gradient(circle at top,#574318,#1b2940 48%,#101522);
-  box-shadow:0 0 35px #f5c45166;
-  animation:winEntrada .55s ease;
-}
-
-@keyframes winEntrada{
-  0%{transform:scale(.5) rotate(-5deg);opacity:0}
-  70%{transform:scale(1.06);opacity:1}
-  100%{transform:scale(1);opacity:1}
-}
-
-.win-trophy{
-  font-size:75px;
-  animation:winTrophy 1s infinite alternate;
-  filter:drop-shadow(0 0 15px #f5c451);
-}
-
-@keyframes winTrophy{
-  from{transform:scale(1) rotate(-8deg)}
-  to{transform:scale(1.15) rotate(8deg)}
-}
-
-.win-subtitle{
-  color:#f5c451;
-  font-weight:900;
-  letter-spacing:5px;
-  font-size:12px;
-  margin-top:8px;
-}
-
-.win-modal h2{
-  color:#fff;
-  font-size:32px;
-  margin:8px 0 0;
-  font-weight:1000;
-}
-
-.win-modal h3{
-  color:#f5c451;
-  font-size:23px;
-  margin:3px 0 18px;
-}
-
-.win-team{
-  background:#101a2b;
-  border:1px solid #f5c451;
-  border-radius:12px;
-  padding:13px 8px;
-  color:#fff;
-  font-weight:900;
-  font-size:15px;
-  line-height:1.6;
-}
-
-.win-label{
-  color:#dce6f5;
-  font-size:12px;
-  font-weight:bold;
-  margin-top:20px;
-}
-
-.win-prize{
-  color:#18c889;
-  font-size:36px;
-  font-weight:1000;
-  margin:8px 0;
-  text-shadow:0 0 15px #18c88966;
-}
-
-.win-message{
-  color:#dce6f5;
-  font-size:13px;
-  line-height:1.5;
-}
-
-.win-confetti{
-  pointer-events:none;
-  position:absolute;
-  inset:0;
-  overflow:hidden;
-}
-
-.win-confetti span{
-  position:absolute;
-  top:-25px;
-  width:9px;
-  height:15px;
-  border-radius:3px;
-  animation:confettiFall linear forwards;
-}
-
-@keyframes confettiFall{
-  0%{
-    transform:translateY(-20px) rotate(0deg);
-    opacity:1;
-  }
-  100%{
-    transform:translateY(650px) rotate(720deg);
-    opacity:0;
-  }
-}
-
-/* ==========================================
-   TIME CERTO — DESIGN PREMIUM GOLD
-   CAMADA VISUAL COMPLETA
-   PRESERVA O JAVASCRIPT E O FIREBASE
-========================================== */
-
-:root{
-  --bg:#080a0e;
-  --panel:#15171d;
-  --gold:#e8bd61;
-  --green:#20c987;
-  --muted:#a6a6ad;
-  --red:#ff6678;
-  --gold-light:#ffe5a0;
-  --gold-dark:#98702c;
-}
-
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-
-html{
-  scroll-behavior:smooth;
-  background:#080a0e;
-}
-
-body{
-  background:
-    radial-gradient(ellipse at 50% -10%,#45331a 0%,transparent 40%),
-    radial-gradient(ellipse at bottom,#17130c 0%,#080a0e 65%);
-  color:#fff;
-  font-family:Arial,Helvetica,sans-serif;
-}
-
-/* CABEÇALHO */
-
-header{
-  background:linear-gradient(135deg,#171717,#080808);
-  border-bottom:1px solid #9e7836;
-  box-shadow:0 5px 25px #000b;
-  padding:11px 13px;
-}
-
-.header-top{
-  min-height:43px;
-}
-
-.logo{
-  font-size:25px;
-  font-weight:1000;
-  letter-spacing:3px;
-  background:linear-gradient(
-    180deg,
-    #fff3c4,
-    #e8bd61 45%,
-    #9b6d26
-  );
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  filter:drop-shadow(0 2px 5px #e8bd6144);
-}
-
-.menu-button{
-  background:linear-gradient(145deg,#34302a,#171717);
-  color:var(--gold-light);
-  border:1px solid #9b783d;
-  border-radius:11px;
-  width:46px;
-  height:43px;
-  font-size:22px;
-  box-shadow:0 3px 10px #0008;
-}
-
-.dropdown{
-  background:linear-gradient(145deg,#24221d,#101114);
-  border:1px solid #a17c3e;
-  border-radius:13px;
-  box-shadow:0 15px 35px #000e;
-  z-index:2000;
-}
-
-.dropdown button{
-  border-bottom:1px solid #ffffff12;
-  padding:14px 12px;
-  color:#f7e5bd;
-  transition:.2s;
-}
-
-.dropdown button:active{
-  background:#46371f;
-}
-
-/* INDICADORES */
-
-.stat{
-  background:linear-gradient(145deg,#24231f,#101114);
-  border:1px solid #5c4929;
-  border-radius:11px;
-  padding:8px 5px;
-  box-shadow:inset 0 1px 0 #ffffff0a;
-}
-
-.stat small{
-  color:#b9ad96;
-  letter-spacing:1px;
-  font-size:9px;
-  font-weight:bold;
-}
-
-.stat strong{
-  color:#f2ce7c;
-  font-size:13px;
-}
-
-/* PAINÉIS */
-
-main{
-  padding:12px;
-}
-
-.panel{
-  background:
-    linear-gradient(145deg,#202126,#111216);
-  border:1px solid #594729;
-  border-radius:17px;
-  padding:14px;
-  box-shadow:
-    0 9px 25px #0008,
-    inset 0 1px 0 #ffffff0b;
-  margin-bottom:15px;
-}
-
-.heading,
-.results-title{
-  color:var(--gold);
-  font-size:16px;
-  font-weight:900;
-  letter-spacing:.7px;
-}
-
-.muted{
-  color:#aaa7a0;
-}
-
-/* ESCUDOS DOS TIMES */
-
-.teams{
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:9px;
-}
-
-.team{
-  min-height:112px;
-  padding:9px 3px;
-  border:1px solid #594a32;
-  border-radius:15px;
-  background:
-    radial-gradient(circle at top,#383027,#17181c 75%);
-  box-shadow:
-    0 5px 12px #0008,
-    inset 0 1px 0 #ffffff12;
-  transition:
-    transform .2s,
-    border-color .2s,
-    box-shadow .2s,
-    background .2s;
-}
-
-.team img{
-  width:76px;
-  height:65px;
-  max-width:100%;
-  object-fit:contain;
-  filter:drop-shadow(0 4px 7px #000);
-}
-
-.team span{
-  color:#e9e2d4;
-  font-size:9px;
-  font-weight:900;
-  letter-spacing:.2px;
-}
-
-.team.selected{
-  border:2px solid #f3ca70;
-  background:
-    radial-gradient(circle at top,#735727,#272015);
-  box-shadow:
-    0 0 7px #e8bd61,
-    0 0 19px #e8bd6155,
-    inset 0 0 15px #e8bd6122;
-}
-
-.team.selected span{
-  color:#ffe7ad;
-}
-
-.team.selected:after{
-  background:linear-gradient(135deg,#ffe8a0,#c79536);
-  color:#17120a;
-  box-shadow:0 0 10px #e8bd61;
-}
-
-/* HORÁRIOS */
-
-.times{
-  gap:8px;
-}
-
-.slot{
-  background:linear-gradient(145deg,#27282c,#15161a);
-  border:1px solid #635033;
-  color:#f1d69b;
-  border-radius:11px;
-  padding:14px 4px;
-  font-size:13px;
-  font-weight:900;
-  box-shadow:0 3px 8px #0007;
-  transition:.2s;
-}
-
-.slot.active{
-  background:linear-gradient(135deg,#ffe6a2,#c08b32);
-  color:#17120a;
-  border:1px solid #fff0b7;
-  box-shadow:0 0 13px #e8bd6166;
-}
-
-/* RESULTADO DA ROLETA */
-
-.resultado-roleta{
-  background:
-    radial-gradient(circle at top,#4b3820,#171717 65%);
-  border:2px solid #d6a94d;
-  border-radius:20px;
-  padding:22px 12px;
-  box-shadow:
-    0 0 20px #d6a94d33,
-    inset 0 0 25px #d6a94d12;
-}
-
-.roleta-titulo{
-  color:#ffe5a0;
-  font-size:13px;
-  letter-spacing:3px;
-}
-
-.roleta-numero{
-  font-size:76px;
-  font-weight:1000;
-  color:#ffe5a0;
-  text-shadow:
-    0 0 10px #e8bd61,
-    0 0 30px #e8bd6188;
-}
-
-.roleta-time{
-  color:#fff0c9;
-  font-size:21px;
-  font-weight:1000;
-  letter-spacing:1px;
-}
-
-.roleta-horario{
-  color:#c8b58f;
-  margin-top:10px;
-}
-
-.resultado-item{
-  background:linear-gradient(145deg,#25231f,#111216);
-  border:1px solid #594729;
-  border-radius:13px;
-  box-shadow:0 4px 12px #0006;
-}
-
-.resultado-item .numero{
-  color:#f5ce7a;
-  font-size:27px;
-}
-
-.resultado-item .nome{
-  color:#fff0ce;
-}
-
-.resultado-item .data{
-  color:#aaa39a;
-}
-
-/* BOTÕES */
-
-.btn{
-  border-radius:12px;
-  font-weight:1000;
-  letter-spacing:.5px;
-  transition:transform .15s,filter .15s;
-}
-
-.btn:active,
-.bottom-inner button:active{
-  transform:scale(.97);
-}
-
-.primary,
-.bottom-inner button{
-  background:linear-gradient(
-    135deg,
-    #fff0b5 0%,
-    #e8bd61 45%,
-    #a87528 100%
-  );
-  color:#17110a;
-  border:1px solid #ffe9ae;
-  box-shadow:
-    0 5px 15px #b88a3844,
-    inset 0 1px 0 #ffffff88;
-}
-
-.secondary{
-  background:linear-gradient(145deg,#38352f,#1b1b1d);
-  border:1px solid #78613c;
-  color:#f5d99e;
-}
-
-.btn:disabled{
-  filter:grayscale(.6);
-  opacity:.55;
-}
-
-/* BARRA INFERIOR */
-
-.bottom-bar{
-  background:linear-gradient(135deg,#1a1916,#080808);
-  border-top:1px solid #987438;
-  box-shadow:0 -7px 25px #000c;
-  padding-top:11px;
-}
-
-.bottom-inner{
-  max-width:900px;
-}
-
-.bottom-inner input{
-  background:#111216;
-  border:1px solid #a07b3d;
-  color:#ffe4a0;
-  border-radius:11px;
-  font-size:19px;
-}
-
-.bottom-inner button{
-  min-height:48px;
-  font-size:14px;
-  border-radius:11px;
-}
-
-.bottom-bar p{
-  color:#d7b66f;
-  font-size:10px;
-  font-weight:900;
-  letter-spacing:2px;
-  margin:8px 0 2px;
-}
-
-/* CAMPOS */
-
-.field,
-.pixcode,
-.results-textarea{
-  background:#0d0e11;
-  border:1px solid #675334;
-  border-radius:11px;
-  color:#fff0c9;
-}
-
-.field:focus,
-.pixcode:focus,
-.results-textarea:focus,
-.bottom-inner input:focus{
-  border-color:#e8bd61;
-  box-shadow:0 0 0 3px #e8bd6122;
-}
-
-/* MODAIS */
-
-.modal-backdrop{
-  background:#000e;
-  backdrop-filter:blur(9px);
-}
-
-.name-modal,
-.bet-modal{
-  background:
-    radial-gradient(circle at top,#45341d,#1c1b1a 55%,#101114);
-  border:1px solid #b18a45;
-  border-radius:20px;
-  box-shadow:
-    0 20px 65px #000,
-    0 0 20px #d6a94d22;
-}
-
-.name-modal h2{
-  color:#f2cc78;
-  letter-spacing:1px;
-}
-
-.bet-modal{
-  max-width:550px;
-}
-
-.close-bet{
-  background:#642c28;
-  border:1px solid #b55b46;
-  border-radius:10px;
-}
-
-.metric{
-  background:linear-gradient(145deg,#292720,#111216);
-  border:1px solid #594729;
-  border-radius:13px;
-}
-
-.metric strong{
-  color:#f1ce7b;
-}
-
-.playerline{
-  background:#111216;
-  border:1px solid #57462b;
-  border-radius:12px;
-}
-
-/* PIX */
-
-.pixbox{
-  background:linear-gradient(145deg,#1d201d,#101114);
-  border:1px solid #9d793c;
-}
-
-.qr{
-  border:4px solid #e8bd61;
-  box-shadow:0 0 18px #e8bd6133;
-}
-
-.pixcode{
-  color:#d8e9dd;
-}
-
-.notice{
-  background:#302719;
-  border:1px solid #8e6c34;
-  color:#ffe5a0;
-}
-
-/* HISTÓRICO */
-
-.history-item{
-  border-top:1px solid #54452d;
-  color:#e5dfd2;
-  padding:13px 3px;
-}
-
-.history-item strong{
-  color:#f1ce7b;
-}
-
-/* SAQUE */
-
-#saqueMenu:not(:disabled){
-  background:linear-gradient(135deg,#176b4e,#0e4736);
-  color:#fff;
-  border:1px solid #24c98c;
-}
-
-#saqueMenu:disabled{
-  opacity:.4;
-}
-
-/* VITÓRIA */
-
-.win-modal{
-  background:
-    radial-gradient(circle at top,#755526,#292016 42%,#111216);
-  border:2px solid #f5ce78;
-  border-radius:24px;
-  box-shadow:
-    0 0 25px #e8bd6188,
-    0 20px 60px #000;
-}
-
-.win-trophy{
-  filter:drop-shadow(0 0 20px #ffe09a);
-}
-
-.win-subtitle{
-  color:#ffe3a0;
-}
-
-.win-modal h3{
-  color:#f5ce78;
-}
-
-.win-team{
-  background:#111216;
-  border:1px solid #e1b85d;
-  border-radius:13px;
-}
-
-.win-prize{
-  color:#36e5a2;
-  text-shadow:0 0 18px #18c88988;
-}
-
-/* COMO JOGAR */
-
-.modal-como-jogar{
-  background:
-    radial-gradient(circle at top,#49351b,#171717 65%);
-  border:1px solid #e3b65b;
-  box-shadow:0 0 35px #d6a94d44;
-}
-
-.modal-como-jogar h2{
-  color:#f5ce78;
-}
-
-.premio-como-jogar{
-  background:linear-gradient(135deg,#49351b,#17130b);
-  border:1px solid #e8bd61;
-}
-
-.premio-como-jogar strong{
-  color:#ffe09a;
-}
-
-.btn-entendi{
-  background:linear-gradient(135deg,#ffe6a2,#b78330);
-  color:#17110a;
-  font-weight:1000;
-}
-
-/* ANIMAÇÕES */
-
-.team.selected img{
-  filter:
-    drop-shadow(0 0 8px #e8bd61)
-    drop-shadow(0 4px 5px #000);
-}
-
-@keyframes brilhoPremium{
-  0%,100%{box-shadow:0 0 7px #e8bd6133}
-  50%{box-shadow:0 0 19px #e8bd61aa}
-}
-
-.resultado-roleta{
-  animation:brilhoPremium 3s infinite;
-}
-
-/* TABLETS */
-
-@media(min-width:601px){
-  .teams{
-    grid-template-columns:repeat(7,minmax(0,1fr));
-  }
-
-  .team{
-    min-height:130px;
-  }
-}
-
-/* COMPUTADORES */
-
-@media(min-width:1000px){
-  main{
-    max-width:1400px;
-    padding:20px;
-  }
-
-  .teams{
-    grid-template-columns:repeat(10,minmax(0,1fr));
-    gap:13px;
-  }
-
-  .team{
-    min-height:145px;
-  }
-
-  .team:hover{
-    border-color:#e8bd61;
-    transform:translateY(-3px);
-    box-shadow:0 8px 20px #e8bd6122;
-  }
-
-  .team img{
-    height:90px;
-  }
-
-  .panel{
-    padding:20px;
-  }
-}
-
-/* CELULARES */
-
-@media(max-width:380px){
-  .logo{
-    font-size:20px;
-  }
-
-  .teams{
-    grid-template-columns:repeat(5,minmax(0,1fr));
-    gap:5px;
-  }
-
-  .team{
-    min-height:94px;
-    padding:6px 2px;
-  }
-
-  .team img{
-    height:53px;
-  }
-
-  .team span{
-    font-size:8px;
-  }
-
-  .panel{
-    padding:10px;
-  }
-
-  .roleta-numero{
-    font-size:62px;
-  }
-}
-
-/* ACABAMENTO */
-
-button{
-  cursor:pointer;
-}
-
-button:focus-visible,
-.team:focus-visible{
-  outline:2px solid #ffe5a0;
-  outline-offset:3px;
-}
-
-::selection{
-  background:#e8bd61;
-  color:#17110a;
-}
-
+*{box-sizing:border-box}
+body{margin:0;padding:10px;font-family:Arial,sans-serif;background:radial-gradient(circle at top,#3b0035,#150015 40%,#000 80%);color:#fff}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+.container{width:100%;max-width:520px;margin:0 auto;padding:14px;background:linear-gradient(180deg,#ff009f,#a90075);border-radius:18px;box-shadow:0 0 25px #ff009f55}
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.logo{text-align:center;flex:1}.logo h1{margin:0;font-size:30px;color:#ffdd00;text-shadow:2px 2px #000;letter-spacing:2px}.logo p{margin:3px 0;font-size:12px;font-weight:bold}
+.icon-btn{width:43px;height:43px;border:1px solid #ffdd00;border-radius:10px;background:#160014;color:#ffdd00;font-size:24px}
+.seletor-jogos,.area-adicionar-jogo{margin:12px 0;padding:12px;background:#160014;border:1px solid #ffdd00;border-radius:10px}
+.seletor-jogos h3{text-align:center;margin:0 0 10px;color:#ffdd00;font-size:14px}
+.opcoes-jogos{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.opcoes-jogos button{padding:11px 2px;border:1px solid #ffdd00;border-radius:8px;background:#050505;color:#fff;font-weight:900}
+.opcoes-jogos button.ativo{background:#00c853;border-color:#7cffb2}
+.resumo-jogos{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;margin-top:10px;font-size:11px;text-align:center}
+.resumo-jogos strong{display:block;color:#ffdd00;font-size:13px}
+.titulo-jogo{text-align:center;font-size:13px;font-weight:bold;margin:10px 0 7px}
+.button-container{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px}
+.button-container button{padding:6px 1px;border:1px solid #ffdd00;border-radius:7px;background:#050505;color:white}
+.button-container .tipo{display:block;font-size:15px;font-weight:900}.button-container .valor{display:block;margin-top:3px;font-size:8px;color:#ffdd00}
+.numeros-box{background:#0005;border-radius:12px;padding:8px;border:1px solid #ffdd0080}
+.numeros-titulo{text-align:center;font-size:13px;font-weight:bold;margin-bottom:8px;color:#ffdd00}
+.linha-numeros{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:5px}
+.number-button{width:100%;aspect-ratio:1;border:2px solid #ffdd00;border-radius:8px;background:#050505;color:white;font-size:18px;font-weight:900}
+.number-button.selecionado{background:linear-gradient(145deg,#00e676,#008f3d);border-color:#7cffb2}
+.info-box{margin-top:10px;background:#050505;border-radius:10px;padding:10px;border:1px solid #ffdd00}
+.resultado{margin:5px 0;font-size:13px;font-weight:bold;overflow-wrap:anywhere}#contadorSelecionados{color:#ffdd00}
+.linha-adicionar{display:flex;gap:8px;width:100%;align-items:center}
+.linha-adicionar input{flex:1;min-width:0;width:0;height:52px;padding:10px;border:2px solid #ffdd00;border-radius:9px;background:#08060a;color:#fff;text-align:center;font-size:18px}
+.btn-adicionar-jogo{flex:0 0 40%;height:52px;padding:8px;background:linear-gradient(135deg,#00e676,#008f3d);color:#fff;border:0;border-radius:10px;font-weight:900}
+.lista-jogos-adicionados{margin-top:10px}.jogo-adicionado{padding:10px;margin-top:7px;background:#08060a;border:1px solid #ffdd00;border-radius:8px;font-size:12px;line-height:1.7;overflow-wrap:anywhere}.jogo-adicionado strong{color:#00ff88}
+.btn-remover-jogo{float:right;background:#b00020;color:white;border:0;border-radius:6px;padding:5px 9px}
+.btn-principal{width:100%;margin-top:10px;padding:13px;border:0;border-radius:10px;background:#25d366;color:#fff;font-size:15px;font-weight:900}
+.btn-pix{background:#ffdd00;color:#160014}.btn-secundario{background:#29202d;color:#fff}
+.aviso{font-size:12px;line-height:1.5;color:#ffe5f6;margin-top:9px}
+.horario-marcacao{display:none;margin:10px 0;padding:12px;border:2px solid #ffdd00;border-radius:10px;background:#160014;text-align:center;font-size:13px;font-weight:bold;line-height:1.6}
+.horario-marcacao.aberto{border-color:#00e676;color:#00ff88}.horario-marcacao.fechado{border-color:#ff3333;color:#ff7777}
+button:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.6)}
+.overlay{display:none;position:fixed;inset:0;background:#000c;z-index:1000;overflow-y:auto;padding:18px 10px}
+.menu-panel{position:relative;width:100%;max-width:390px;min-height:100%;margin:0 0 0 auto;background:#150b19;border-left:2px solid #ff27cf;padding:15px}
+.menu-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.menu-top h2{margin:0;color:#ffdd00;font-size:21px}.menu-top button{border:1px solid #ffdd00;border-radius:8px;background:#160014;color:#ffdd00;font-size:25px;width:40px;height:40px}
+.bloco{background:#25152a;border:1px solid #55305b;border-radius:12px;padding:12px;margin:10px 0}.bloco h3{font-size:14px;color:#ffdd00;margin:0 0 9px}
+.linha-info{font-size:12px;line-height:1.6;overflow-wrap:anywhere;white-space:pre-line;margin:5px 0}
+.status{display:inline-block;border-radius:20px;padding:5px 9px;background:#713f12;color:#ffdf9a;font-size:11px;font-weight:bold}.status.pago{background:#00c853;color:#fff;border:1px solid #69f0ae}
+.vazio{text-align:center;color:#c5b2ca;font-size:13px;padding:20px 5px}
+.pix-codigo{display:block;width:100%;min-height:85px;resize:vertical;padding:10px;border-radius:8px;border:1px solid #604363;background:#08060a;color:#fff;font-size:11px;overflow-wrap:anywhere}
+.qr{background:#fff;border-radius:10px;padding:10px;text-align:center;margin:10px auto;max-width:240px;min-height:20px}.qr img,.qr canvas{max-width:100%;height:auto}
+.aposta-item{background:linear-gradient(145deg,#25152a,#120b17);border:1px solid #ff27cf;border-radius:12px;padding:12px;margin:12px 0}
+.aposta-cabecalho{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid #55305b}.aposta-cabecalho strong{color:#ffdd00;font-size:14px}
+.historico-jogo{background:#08060a;border:1px solid #55305b;border-radius:9px;padding:10px;margin-top:9px}.historico-jogo-titulo{color:#00ff88;font-weight:900;font-size:13px;margin-bottom:8px}.historico-jogo-numeros{font-size:13px;font-weight:bold;line-height:1.9;overflow-wrap:anywhere}.historico-jogo-valor{margin-top:8px;padding-top:7px;border-top:1px solid #55305b;font-size:12px;line-height:1.8}
+.historico-totais{margin-top:10px;padding:11px;background:#160014;border:1px solid #ffdd00;border-radius:9px;font-size:13px;line-height:2}.historico-totais strong{color:#ffdd00}.historico-premio{color:#00ff88!important}
+.btn-ver-pix{width:100%;margin-top:10px;padding:11px;border:0;border-radius:9px;background:#ffdd00;color:#160014;font-size:13px;font-weight:900}
+.carrossel{width:100%;margin:10px auto;overflow:hidden;border-radius:12px;position:relative}.carrossel-imagens{display:flex;transition:transform .5s ease}.carrossel-imagens img{width:100%;height:150px;object-fit:cover;flex-shrink:0}
+.carrossel-indicadores{position:absolute;bottom:8px;left:0;width:100%;display:flex;justify-content:center;gap:7px}.carrossel-indicadores span{width:8px;height:8px;border-radius:50%;background:#ffffff80}.carrossel-indicadores span.ativo{background:#ff00cc}
+.btn-ajudar{display:block;width:100%;padding:13px;border-radius:10px;background:linear-gradient(135deg,#ff00cc,#9900ff);color:#fff;text-align:center;text-decoration:none;font-weight:bold;box-shadow:0 0 10px #ff00cc}
+.modal{width:100%;max-width:390px;margin:7vh auto;background:#1c1020;border:1px solid #ff27cf;border-radius:16px;padding:18px;box-shadow:0 0 25px #ff00a533}
+.modal h2{font-size:20px;margin:0 0 12px;color:#ffdd00}.modal p{font-size:13px;line-height:1.5;color:#e9dbe9}.modal label{display:block;margin:12px 0 6px;font-size:12px;font-weight:bold}
+.modal input,.modal select{width:100%;;padding:12px;border:1px solid #69426c;border-radius:8px;background:#09060b;color:white}
+.close{float:right;background:none;color:white;border:0;font-size:26px}
+.modal-aposta,.modal-pix{display:none;position:fixed;inset:0;z-index:2000;background:#000e;padding:15px;align-items:center;justify-content:center;overflow-y:auto}
+.modal-aposta.aberto,.modal-pix.aberto{display:flex}
+.modal-aposta-conteudo{width:100%;max-width:380px;background:#1c1020;border:2px solid #ffdd00;border-radius:16px;padding:20px}
+.modal-aposta-conteudo h2{color:#ffdd00;text-align:center;margin:0 0 15px}
+.modal-aposta-conteudo label{display:block;margin:12px 0 6px;font-weight:bold;font-size:13px}
+.resumo-aposta-modal{background:#08060a;border:1px solid #ffdd00;border-radius:10px;padding:13px;margin-top:15px;line-height:2;font-size:13px}
+.resumo-aposta-modal strong{color:#00ff88}
+.btn-confirmar-modal,.btn-cancelar-modal{width:100%;padding:14px;margin-top:15px;border:0;border-radius:10px;font-size:16px;font-weight:900}
+.btn-confirmar-modal{background:#00c853;color:white}.btn-cancelar-modal{margin-top:8px;background:#38283d;color:white}
+.modal-pix{z-index:3000;padding:12px}.modal-pix-conteudo{position:relative;width:100%;max-width:330px;background:#fff;color:#160014;border-radius:16px;padding:31px 17px 18px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.fechar-pix{position:absolute;top:3px;right:8px;width:34px;height:32px;border:0;background:transparent;color:#222;font-size:29px}
+.qrcode-pix{width:240px;height:240px;max-width:100%;display:flex;align-items:center;justify-content:center}.qrcode-pix img,.qrcode-pix canvas{max-width:100%;height:auto}
+.codigo-pix-texto{width:100%;height:78px;resize:none;padding:9px;border:1px solid #bbb;border-radius:8px;background:#f6f6f6;color:#222;font-size:11px}
+.btn-copiar-pix{width:100%;min-height:47px;padding:12px;border:0;border-radius:9px;background:#ffdd00;color:#160014;font-size:15px;font-weight:900}
+#toast{display:none;position:fixed;z-index:4000;bottom:20px;left:50%;transform:translateX(-50%);width:max-content;max-width:90%;padding:12px 16px;border-radius:10px;background:#211325;border:1px solid #ff27cf;font-size:13px}
+@media(max-width:360px){body{padding:5px}.container{padding:9px}.logo h1{font-size:25px}.number-button{font-size:15px;border-width:1px}.linha-numeros{gap:4px}.button-container{gap:3px}}
 </style>
-</head>
-
-<body>
-
-<div class="modal-overlay" id="modalComoJogar">
-  <div class="modal-como-jogar">
-
-    <button class="fechar-como-jogar" id="fecharComoJogar">✕</button>
-
-    <div class="icone-como-jogar">🎯</div>
-
-    <h2>COMO JOGAR NA TIME CERTO</h2>
-
-    <p>
-      Já pensou em vibrar apostando no seu time ou liga do coração
-      sem ele nem estar jogando?! Aqui você pode!
-    </p>
-
-    <p>
-      No <strong>TIME CERTO</strong>, a cada 30 minutos é sorteado
-      um time/liga em uma roleta com 50 times.
-    </p>
-
-    <div class="premio-como-jogar">
-      <span>🏆 PRÊMIO MÁXIMO</span>
-      <strong>ATÉ R$ 120.000,00</strong>
-    </div>
-
-    <p>
-      O prêmio é baseado no time/liga escolhido e no valor apostado.
-    </p>
-
-    <button class="btn-entendi" id="entendiComoJogar">
-      ENTENDI!
-    </button>
-
-  </div>
-</div>
-
-<header>
-  <div class="header-top">
-      
-    <div class="logo">TIME CERTO</div>
-    
-    <div class="menu-area">
-      <button class="menu-button" id="menuButton" type="button">☰</button>
-      <div class="dropdown" id="dropdown">
-        <button type="button" id="betMenu">💰 SUA APOSTA</button>
-        <button type="button" id="historyMenu">📋 MINHAS APOSTA</button>
-        <button type="button" id="resumoMenu">📋 RESULTADO</button>
-        <button type="button" id="saqueMenu" disabled>
-  💸 SAQUE
-</button>
-<button class="menu-item" id="comoJogarMenu">
-  📖 COMO JOGAR
-</button>
-        <button style="display:none"type="button" id="changeNameMenu">👤 Alterar nome</button>
-        <button type="button" id="clearMenu">🧹 Limpar seleção</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="header-stats">
-    <div class="stat player-top">
-      <small>JOGADOR</small>
-      <strong id="playerDisplay">Nome não informado</strong>
-    </div>
-    <div class="stat">
-      <small>TIMES</small>
-      <strong><span id="count">0</span>/10</strong>
-    </div>
-    <div class="stat">
-      <small>VALOR</small>
-      <strong id="topValue">R$ 1,00</strong>
-    </div>
-  </div>
-</header>
-
-<!-- MODAL DO NOME -->
-<div class="modal-backdrop" id="nameModal">
-  <div class="name-modal">
-    <h2>IDENTIFIQUE-SE</h2>
-    <p>Informe seu nome para começar a jogar.</p>
-
-    <input class="field" id="playerNameInput"
-      maxlength="70" placeholder="Nome do jogador">
-
-    <button class="btn primary" id="saveName" type="button">
-      SALVAR E CONTINUAR
-    </button>
-
-    <div id="nameError" class="status"></div>
-  </div>
-</div>
-
-<!-- MODAL SUA APOSTA E PIX -->
-<div class="modal-backdrop" id="betModal">
-  <div class="bet-modal">
-
-    <div class="bet-modal-header">
-      <h2 class="heading" style="margin:0">💰 SUA APOSTA</h2>
-      <button class="close-bet" id="closeBet" type="button">
-        FECHAR ✕
-      </button>
-    </div>
-
-    <div class="playerline">
-      <div>
-        <span class="muted">JOGADOR</span><br>
-        <strong id="playerDisplayPanel">Nome não informado</strong>
-      </div>
-      <button style="display:none" class="change-name" id="changeName" type="button">
-        ALTERAR NOME
-      </button>
-    </div>
-
-    <div class="row">
-      <div class="metric">
-        <small>VALOR DIGITADO</small>
-        <strong id="amountDisplay">R$ 1,00</strong>
-      </div>
-      <div class="metric">
-        <small>PRÊMIO POTENCIAL (35x)</small>
-        <strong id="prizeValue">R$ 35,00</strong>
-      </div>
-    </div>
-
-    <div class="metric" style="margin-top:10px">
-      <small>VALOR A PAGAR</small>
-      <strong id="payValue">R$ 1,00</strong>
-    </div>
-
-    <button class="btn secondary" id="clear" type="button">
-      LIMPAR SELEÇÃO
-    </button>
-
-    <!-- PIX -->
-    <section class="panel pixbox" id="pixPanel" style="margin-top:15px">
-      <h2 class="heading">PAGAMENTO VIA PIX</h2>
-      <div id="qr" class="qr"></div>
-      <div class="muted" id="pixAmount"></div>
-      <label for="pixPayload">PIX COPIA E COLA</label>
-      <textarea
-  id="pixPayload"
-  class="pixcode"
-  readonly
-  oncopy="return false"
-  oncut="return false"
-  oncontextmenu="return false"
-  style="user-select:none;-webkit-user-select:none;"
-  tabindex="-1"
-  spellcheck="false"
-  autocomplete="off"
-  aria-label="Código Pix"
-></textarea>
-      <button class="btn primary" id="copyPix" type="button">
-        COPIAR CÓDIGO PIX
-      </button>
-      <div class="status" id="copyStatus"></div>
-      <div class="notice" style="margin-top:12px">
-        Sua aposta fica PENDENTE até a confirmação do pagamento.
-      </div>
-    </section>
-
-  </div>
-</div>
-<div class="modal-backdrop" id="withdrawModal">
-  <div class="name-modal">
-
-    <h2 style="color:var(--gold)">💸 SOLICITAR SAQUE</h2>
-
-    <p id="withdrawDescription">
-      Informe sua chave Pix para receber seu prêmio.
-    </p>
-
-    <div class="metric">
-      <small>VALOR DO PRÊMIO</small>
-      <strong id="withdrawAmount">R$ 0,00</strong>
-    </div>
-
-    <label class="muted" for="withdrawPix">
-      SUA CHAVE PIX PARA RECEBIMENTO
-    </label>
-
-    <input class="field" id="withdrawPix"
-      maxlength="150"
-      placeholder="CPF, telefone, e-mail ou chave aleatória">
-
-    <button class="btn primary" id="confirmWithdraw" type="button">
-      CONFIRMAR SOLICITAÇÃO
-    </button>
-
-    <button class="btn secondary" id="cancelWithdraw" type="button">
-      CANCELAR
-    </button>
-
-    <div id="withdrawError" class="status"></div>
-
-  </div>
-</div>
-<!-- MODAL DE VITÓRIA -->
-<div class="modal-backdrop" id="winModal">
-  <div class="win-modal">
-    <div class="win-confetti" id="winConfetti"></div>
-
-    <div class="win-trophy">🏆</div>
-
-    <div class="win-subtitle">TIME CERTO</div>
-    <h2>PARABÉNS!</h2>
-    <h3>VOCÊ GANHOU!</h3>
-
-    <div class="win-team" id="winTeam">
-      RESULTADO PREMIADO
-    </div>
-
-    <div class="win-label">SEU PRÊMIO</div>
-    <div class="win-prize" id="winPrize">R$ 0,00</div>
-
-    <p class="win-message">
-      Seu prêmio está disponível para solicitação.
-    </p>
-
-    <button class="btn primary" id="winWithdraw" type="button">
-      💸 SOLICITAR MEU PIX
-    </button>
-
-    <button class="btn secondary" id="winClose" type="button">
-      FECHAR
-    </button>
-  </div>
-</div>
-<main>
-<section class="panel history-panel" id="withdrawPanel">
-  <h2 class="heading">💸 MEUS SAQUES</h2>
-  <div id="withdrawList">
-    Nenhum prêmio disponível.
-  </div>
-</section>
-  <section class="panel">
-  <h2 class="results-title">🏆 RESULTADOS DO TIME CERTO</h2>
-<div class="resultado-roleta" id="resultadoRoleta">
-  <div class="roleta-titulo">🏆 ÚLTIMO RESULTADO</div>
-
-  <img id="roletaEscudo"
-       src=""
-       alt="Escudo do time"
-       style="width:90px;height:90px;object-fit:contain;margin:12px auto;display:none">
-
-  <div class="roleta-numero" id="roletaNumero">--</div>
-
-  <div class="roleta-time" id="roletaTime">
-    AGUARDANDO RESULTADO
-  </div>
-
-  <div class="roleta-horario" id="roletaHorario"></div>
-</div>
-  <div id="resultsLista"></div>
-
-  <div class="results-status" id="resultsStatus">
-    Conectando ao Firebase...
-  </div>
-</section>
-
-  <section class="panel">
-    <h2 class="heading">⚽ ESCOLHA ATÉ 10 TIMES</h2>
-    <div class="teams" id="teams"></div>
-  </section>
-
-  <section class="panel">
-    <h2 class="heading">🕒 HORÁRIOS DISPONÍVEIS</h2>
-    <div class="times" id="slots"></div>
-    <div class="status" id="slotInfo">Carregando horários...</div>
-  </section>
-
-  <section class="panel history-panel" id="historyPanel">
-    <h2 class="heading">📋 MINHAS APOSTAS</h2>
-    <div id="history"></div>
-  </section>
-
-</main>
-
-<!-- BARRA FIXA INFERIOR -->
-<div class="bottom-bar">
-  <div class="bottom-inner">
-    <input
-      id="amount"
-      type="number"
-      min="1"
-      max="1000"
-      step="0.01"
-      value="1.00"
-      inputmode="decimal"
-      aria-label="Valor da aposta"
-    >
-    <button id="createBet" type="button">
-      APOSTAR • PIX
-    </button>
-    
-  </div>
-  <div style="text-align:center;padding:20px;">
-  <p>A SORTE E SUA A GARANTIA E NOSSA</p>
-</div>
-</div>
-
-
 <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<div class="container">
+  <div class="topbar">
+    <button class="icon-btn" onclick="abrirMenu()" aria-label="Abrir menu">☰</button>
+    <div class="logo"><h1>🍀 LOTINHA</h1><p>JOGUE DE 17 A 23 NÚMEROS</p></div>
+  </div>
+  <div id="avisoHorario" class="horario-marcacao">Verificando horário...</div>
+  <div class="seletor-jogos">
+    <h3>🎲 SURPRESINHA JOGOS ALEATÓRIOS</h3>
+    <div class="opcoes-jogos">
+      <button type="button" data-sorteio="2" onclick="selecionarQuantidadeJogos(2,this)">2</button>
+      <button type="button" data-sorteio="5" onclick="selecionarQuantidadeJogos(5,this)">5</button>
+      <button type="button" data-sorteio="10" onclick="selecionarQuantidadeJogos(10,this)">10</button>
+      <button type="button" data-sorteio="20" onclick="selecionarQuantidadeJogos(20,this)">20</button>
+      <button type="button" data-sorteio="25" onclick="selecionarQuantidadeJogos(25,this)">25</button>
+    </div>
+    <div class="resumo-jogos" id="resumoJogos">
+      <div>Jogos<strong id="resumoQtd">0</strong></div>
+      <div>Total<strong id="resumoTotal">R$ 0,00</strong></div>
+      <div>Dezenas<strong id="resumoDezenas">-</strong></div>
+    </div>
+  </div>
+  <div class="titulo-jogo">ESCOLHA A QUANTIDADE DE DEZENAS</div>
+  <div class="button-container" id="buttonContainer"></div>
+  <div class="info-box">
+    <div class="resultado" id="contadorSelecionados">Números Marcados: 0</div>
+    <div class="resultado" id="resultado">Marque entre 17 e 23 números.</div>
+    <div class="area-adicionar-jogo">
+      <label for="valorJogoAtual" style="display:block;margin-bottom:8px;color:#ffdd00;font-weight:bold">💵 VALOR DESTE JOGO (R$)</label>
+      <div class="linha-adicionar">
+        <input type="number" id="valorJogoAtual" placeholder="Valor (R$)" min="0.01" max="100000" step="0.01" inputmode="decimal">
+        <button type="button" class="btn-adicionar-jogo" onclick="adicionarJogo()">+ ADD JOGO</button>
+      </div>
+      <div id="listaJogosAdicionados" class="lista-jogos-adicionados"></div>
+      <div id="totalJogosAdicionados" style="margin-top:10px;text-align:center;color:#ffdd00;font-weight:bold">0 JOGOS ADICIONADOS</div>
+    </div>
+  </div>
+  <div class="numeros-box"><div class="numeros-titulo">🔢 MARQUE SEUS NÚMEROS</div><div id="checkboxContainer"></div></div>
+  <button class="btn-principal" id="btnGerarAposta" onclick="enviarAposta()">📲 APOSTA E REGISTRA</button>
+  <div style="text-align:center"><p><b>A SORTE É SUA, A GARANTIA É NOSSA<br>JOGOU, PAGOU, GANHOU, PIX NA HORA</b></p></div>
+</div>
+
+<div id="menuOverlay" class="overlay" onclick="fecharMenuFundo(event)">
+ <aside class="menu-panel">
+  <div class="menu-top"><h2>🍀 LOTINHA</h2><button onclick="fecharMenu()" aria-label="Fechar menu">×</button></div>
+  <div class="carrossel"><div class="carrossel-imagens" id="carrosselImagens">
+   <img src="https://res.cloudinary.com/dtw3turzb/image/upload/v1794066370/lotinha.gif" alt="Lotinha">
+   <img src="https://res.cloudinary.com/dtw3turzb/image/upload/v1794130105/1000777604.png" alt="Divulgação">
+   <img src="https://res.cloudinary.com/dtw3turzb/image/upload/v1794130440/1000435921.jpg" alt="Divulgação">
+   <img src="https://res.cloudinary.com/dtw3turzb/image/upload/v1794130520/1000007728.jpg" alt="Divulgação">
+  </div><div class="carrossel-indicadores" id="carrosselIndicadores"><span class="ativo"></span><span></span><span></span><span></span></div></div>
+  <div class="bloco"><h3>🎯 RESULTADO LOTINHA</h3><div id="resultadoMenu" class="linha-info">Aguardando resultado...</div><div id="dataResultadoMenu" style="font-size:11px;color:#cbb9ca;margin-top:8px"></div></div>
+  <div class="bloco"><h3>👤 Dados do cliente</h3><div class="linha-info">Nome: <strong id="menuNome">-</strong></div><div class="linha-info">Chave Pix: <span id="menuPixCliente">-</span></div><button class="btn-principal btn-secundario" onclick="abrirPerfil()">Editar cadastro</button></div>
+  <div class="bloco"><h3>💳 Pix da aposta selecionada</h3><div id="pixSemAposta" class="vazio">Selecione uma aposta no histórico para visualizar o Pix aqui.</div>
+   <div id="pixArea" style="display:none"><div class="linha-info">Código: <strong id="pixControle">-</strong></div><div class="linha-info">Data: <span id="pixData">-</span></div><div class="linha-info">Valor: <strong id="pixValor">-</strong></div><div class="linha-info">Recebedor: <span id="pixRecebedor">-</span></div><div id="qrcode" class="qr"></div><textarea id="pixCopiaCola" class="pix-codigo" readonly></textarea><button class="btn-principal btn-pix" onclick="copiarPixMenu()">📋 COPIAR PIX COPIA E COLA</button></div>
+  </div>
+  <div class="bloco"><h3>📋 Minhas apostas</h3><div id="listaApostas" class="vazio">Abra o menu para carregar suas apostas.</div></div>
+  <a class="btn-ajudar" href="https://chat.whatsapp.com/GXhm6QBjEIW3f8C5YdyxoK?s=cl&p=a&iam=2" target="_blank" rel="noopener">❤️ AJUDAR</a>
+ </aside>
+</div>
+
+<div id="perfilOverlay" class="overlay" style="z-index:2500" onclick="fecharPerfilFundo(event)">
+ <div class="modal"><button class="close" onclick="fecharPerfil()" aria-label="Fechar cadastro">×</button><h2>👤 Cadastro do cliente</h2><p>Informe seu nome e sua chave Pix. Os dados serão salvos junto com cada aposta.</p>
+  <label for="nomeCliente">Seu nome completo</label><input id="nomeCliente" maxlength="80" placeholder="Digite seu nome" autocomplete="name">
+  <label for="pixCliente">Sua chave Pix</label><input id="pixCliente" maxlength="150" placeholder="CPF, telefone, e-mail ou chave aleatória">
+  <button class="btn-principal" onclick="salvarPerfil()">SALVAR CADASTRO</button><button id="cancelarPerfil" class="btn-principal btn-secundario" onclick="fecharPerfil()">Cancelar</button>
+ </div>
+</div>
+
+<div id="modalAposta" class="modal-aposta" onclick="fecharModalApostaFora(event)">
+ <div class="modal-aposta-conteudo"><h2>🍀 CONFIRMAR APOSTA</h2><p style="text-align:center">Confira os jogos e os valores antes de registrar.</p>
+  <div class="resumo-aposta-modal">
+   <div>🔢 Dezenas por jogo: <strong id="modalDezenas">-</strong></div>
+   <div>🎲 Quantidade de jogos: <strong id="modalQuantidadeJogos">0</strong></div>
+   <div>💵 Valores individuais: <strong id="modalValorJogo">-</strong></div>
+   <div>🏆 Prêmio possível total: <strong id="modalPremioTotal">R$ 0,00</strong></div>
+   <div style="border-top:1px solid #ffdd00;padding-top:8px">💳 TOTAL A PAGAR: <strong id="modalTotalPagar">R$ 0,00</strong></div>
+  </div>
+  <button class="btn-confirmar-modal" id="btnConfirmarModal" onclick="confirmarAposta()">CONFIRMAR E GERAR PIX</button><button class="btn-cancelar-modal" onclick="fecharModalAposta()">VOLTAR</button>
+ </div>
+</div>
+
+<div id="modalPix" class="modal-pix" onclick="fecharModalPixFora(event)">
+ <div class="modal-pix-conteudo"><button class="fechar-pix" onclick="fecharModalPix()" aria-label="Fechar Pix">×</button><div id="qrcodePix" class="qrcode-pix"></div><textarea id="codigoPixTexto" class="codigo-pix-texto" readonly aria-label="Pix Copia e Cola"></textarea><button id="btnCopiarPix" class="btn-copiar-pix" onclick="copiarPixModal()">COPIAR PIX</button></div>
+</div>
+<div id="toast" role="status"></div>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAGOy5lPtqjSTtZpyFX7xtGGy3P2nYA77U",
-  authDomain: "placarexato-97966.firebaseapp.com",
-  databaseURL: "https://placarexato-97966-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "placarexato-97966",
-  storageBucket: "placarexato-97966.firebasestorage.app",
-  messagingSenderId: "942191850183",
-  appId: "1:942191850183:web:9870fab0d09044b11004e2"
-};
+"use strict";
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const $ = id => document.getElementById(id);
+/* CONFIGURAÇÃO */
+const firebaseConfig={databaseURL:"https://loteriasmj-274f9-default-rtdb.firebaseio.com/"};
+const PIX_CONFIG={chave:"6f360f91-71c7-40da-b610-5a70ba3213dd",nome:"MULTIJOGO",cidade:"SALVADOR"};
+const valores={17:6000,18:1200,19:250,20:100,21:20,22:10,23:5};
+const gruposValidos=[17,18,19,20,21,22,23];
+const resultadoLink="https://www.oresultado.com.br";
+const $=id=>document.getElementById(id);
 
-// FUNÇÃO GLOBAL PARA ACESSAR ELEMENTOS
-const chosen = new Set();
+let db=null,perfil=null,clientId=null,apostaAtual=null,salvando=false;
+let apostasCliente={},resultadosLotinha={},quantidadesBloqueadas={};
+let marcacaoBloqueada=false,jogosPreparados=[],codigoPixAtual="";
+let refApostasCliente=null,listenerApostas=null,toastTimer=null;
 
+function reais(v){return Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});}
+function toast(msg){const el=$("toast");el.textContent=msg;el.style.display="block";clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display="none",3200);}
+function semAcentos(s){return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"");}
+function criarIdCliente(){return window.crypto?.randomUUID?crypto.randomUUID().replace(/-/g,""):"C"+Date.now().toString(36)+Math.random().toString(36).slice(2,14);}
+function horarioBrasilia(){
+ const p=new Intl.DateTimeFormat("en-US",{timeZone:"America/Sao_Paulo",weekday:"short",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date());
+ const o={};p.forEach(x=>o[x.type]=x.value);return{dia:o.weekday,hora:+o.hour,minuto:+o.minute};
+}
+function dataHojeBRISO(){
+ const p=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+ const o={};p.forEach(x=>o[x.type]=x.value);return `${o.year}-${o.month}-${o.day}`;
+}
+function somarDiasISO(iso,n){const d=new Date(iso+"T12:00:00");d.setDate(d.getDate()+n);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
+function formatarDataBR(iso){if(!iso)return"-";const p=String(iso).split("-");return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:iso;}
 
-const BETS_PATH = "palpites";
-const PIX_KEY = "6f360f91-71c7-40da-b610-5a70ba3213dd";
-const PIX_NAME = "MULTIJOGO";
-const PIX_CITY = "SALVADOR";
-/* RESULTADOS DIRETAMENTE DO FIREBASE */
+/* CALENDÁRIO:
+   Sábado: apostas para domingo às 11h.
+   Domingo até 11h: extração domingo às 11h.
+   Domingo após 11h30: apostas para segunda às 21h.
+   Nos demais dias: extração do próprio dia às 21h.
+   Bloqueio diário 20h50-21h29; domingo 11h-11h29.
+*/
+function obterDestinoExtracao(){
+ const h=horarioBrasilia(),m=h.hora*60+h.minuto,hoje=dataHojeBRISO();
+ if(h.dia==="Sat")return{data:somarDiasISO(hoje,1),hora:"11:00"};
+ if(h.dia==="Sun"&&m<690)return{data:hoje,hora:"11:00"};
+ if(h.dia==="Sun")return{data:somarDiasISO(hoje,1),hora:"21:00"};
+ if(m>=1290)return{data:somarDiasISO(hoje,1),hora:"21:00"};
+ return{data:hoje,hora:"21:00"};
+}
+function marcacaoEstaAberta(){
+ const h=horarioBrasilia(),m=h.hora*60+h.minuto;
+ if(marcacaoBloqueada)return false;
+ if(h.dia==="Sun"&&m>=660&&m<690)return false;
+ if(m>=1250&&m<1290)return false;
+ return m>=1;
+}
+function atualizarHorarioMarcacao(){
+ const aviso=$("avisoHorario"),h=horarioBrasilia(),m=h.hora*60+h.minuto,aberto=marcacaoEstaAberta();
+ if(marcacaoBloqueada){aviso.style.display="block";aviso.className="horario-marcacao fechado";aviso.textContent="🔴 MARCAÇÕES BLOQUEADAS PELO ADMINISTRADOR.";}
+ else if(h.dia==="Sat"){aviso.style.display="block";aviso.className="horario-marcacao aberto";aviso.innerHTML="⚠️ ATENÇÃO! OS JOGOS DE HOJE CONCORREM AMANHÃ.<br>🎯 EXTRAÇÃO: DOMINGO ÀS 11:00.";}
+ else if(h.dia==="Sun"&&m<660){aviso.style.display="block";aviso.className="horario-marcacao aberto";aviso.innerHTML="🎯 EXTRAÇÃO DE HOJE: DOMINGO ÀS 11:00.<br>⏰ ENCERRAMENTO ÀS 11:00.";}
+ else if(h.dia==="Sun"&&m<690){aviso.style.display="block";aviso.className="horario-marcacao fechado";aviso.textContent="🔴 MARCAÇÕES ENCERRADAS! AGUARDE ATÉ 11:30.";}
+ else if(m>=1250&&m<1290){aviso.style.display="block";aviso.className="horario-marcacao fechado";aviso.textContent="🔴 MARCAÇÕES ENCERRADAS! VOLTAREMOS ÀS 21:30.";}
+ else if(h.dia==="Sun"){aviso.style.display="block";aviso.className="horario-marcacao aberto";aviso.innerHTML="🟢 MARCAÇÕES LIBERADAS!<br>🎯 PRÓXIMA EXTRAÇÃO: SEGUNDA-FEIRA ÀS 21:00.";}
+ else if(m>=1290){aviso.style.display="none";}
+ else{aviso.style.display="none";}
+ const bloqueio=!aberto||salvando;
+ document.querySelectorAll("#buttonContainer button,.number-button,.opcoes-jogos button,.btn-adicionar-jogo").forEach(b=>b.disabled=bloqueio);
+ $("btnGerarAposta").disabled=bloqueio;
+ $("btnGerarAposta").textContent=marcacaoBloqueada?"🔒 BLOQUEADO PELO ADMIN":!aberto?"🔒 MARCAÇÕES ENCERRADAS":salvando?"REGISTRANDO APOSTA...":"📲 APOSTA E REGISTRA";
+ atualizarBloqueiosDezenas();
+}
+function quantidadeEstaBloqueada(q){return quantidadesBloqueadas[String(q)]===true;}
+function atualizarBloqueiosDezenas(){
+ document.querySelectorAll("#buttonContainer button").forEach(b=>{
+  const q=Number(b.dataset.quantidade),bloq=quantidadeEstaBloqueada(q);
+  b.disabled=bloq||!marcacaoEstaAberta()||salvando;b.style.opacity=bloq?".35":"1";b.title=bloq?"Esta quantidade está bloqueada":"Escolher "+q+" dezenas";
+ });
+}
+function agoraFormatado(){const d=new Date();return{data:d.toLocaleDateString("pt-BR",{timeZone:"America/Sao_Paulo"}),hora:d.toLocaleTimeString("pt-BR",{timeZone:"America/Sao_Paulo"}),dataHora:d.toLocaleString("pt-BR",{timeZone:"America/Sao_Paulo"}),timestamp:Date.now()};}
 
-const RESULTS_PATH = "timeCerto/resultados";
-/* CONFERÊNCIA DE ACERTOS E SAQUES */
+/* FIREBASE */
+try{
+ if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+ db=firebase.database();
+ db.ref("configuracoes/LOTINHA").on("value",s=>{
+  const c=s.val()||{};marcacaoBloqueada=c.bloqueioManual===true||c.bloqueioAutomatico===true;
+  quantidadesBloqueadas=c.quantidadesBloqueadas||{};atualizarHorarioMarcacao();
+ },e=>console.error("Configuração LOTINHA:",e));
+}catch(e){console.error("Firebase:",e);}
 
-function encontrarAcertos(aposta){
-
-  if(!aposta || !Array.isArray(aposta.times)) return [];
-
-  const horarios = Array.isArray(aposta.horarios) && aposta.horarios.length
-    ? aposta.horarios
-    : (aposta.horario ? [aposta.horario] : []);
-
-  return resultadosCache.filter(resultado=>{
-
-    if(resultado.data !== aposta.dataHorario) return false;
-    if(!horarios.includes(resultado.horario)) return false;
-
-    return aposta.times.some(time=>
-      Number(time.numero) === Number(resultado.numero)
-    );
-
-  });
+/* CADASTRO LOCAL */
+function carregarPerfil(){
+ try{
+  clientId=localStorage.getItem("lotinha_clientId");
+  if(!clientId){clientId=criarIdCliente();localStorage.setItem("lotinha_clientId",clientId);}
+  const salvo=localStorage.getItem("lotinha_perfil");if(salvo)perfil=JSON.parse(salvo);
+ }catch(e){console.error(e);toast("Não foi possível carregar o cadastro local.");}
+ atualizarDadosPerfil();
+ if(!perfil?.nome){$("cancelarPerfil").style.display="none";$("perfilOverlay").style.display="block";}
+ else $("perfilOverlay").style.display="none";
+}
+function atualizarDadosPerfil(){
+ $("menuNome").textContent=perfil?.nome||"-";$("menuPixCliente").textContent=perfil?.pix||"Não informado";
+ $("nomeCliente").value=perfil?.nome||"";$("pixCliente").value=perfil?.pix||"";
+}
+function abrirPerfil(){$("cancelarPerfil").style.display=perfil?.nome?"block":"none";$("perfilOverlay").style.display="block";atualizarDadosPerfil();}
+function fecharPerfil(){if(!perfil?.nome){toast("Cadastre seu nome para continuar.");return;}$("perfilOverlay").style.display="none";}
+function fecharPerfilFundo(e){if(e.target.id==="perfilOverlay"&&perfil?.nome)fecharPerfil();}
+function salvarPerfil(){
+ const nome=$("nomeCliente").value.trim(),pix=$("pixCliente").value.trim();
+ if(nome.length<2){toast("Informe seu nome corretamente.");return;}
+ if(!pix){toast("Informe sua chave Pix para continuar.");$("pixCliente").focus();return;}
+ perfil={nome,pix};
+ try{localStorage.setItem("lotinha_perfil",JSON.stringify(perfil));localStorage.setItem("lotinha_clientId",clientId);}
+ catch(e){toast("Não foi possível salvar o cadastro.");return;}
+ atualizarDadosPerfil();$("perfilOverlay").style.display="none";toast("Cadastro salvo com sucesso!");
 }
 
-function atualizarSaques(){
-
-  const botao = $("saqueMenu");
-  const lista = $("withdrawList");
-
-  if(!botao || !lista) return;
-
-  const premiadas = apostasDoJogador.filter(aposta=>
-  String(aposta.status || "").toUpperCase() === "PAGO" &&
-  encontrarAcertos(aposta).length > 0
-);
-
-/* DETECTAR UMA NOVA VITÓRIA */
-
-if(!vitoriaEmExibicao){
-
-  for(const aposta of premiadas){
-
-    const acertos = encontrarAcertos(aposta);
-
-    const premioPorAcerto =
-      Number(aposta.valorPorTime || 0) * 35;
-
-    const premioTotal =
-      premioPorAcerto * acertos.length;
-
-    const identificadorResultados = acertos
-      .map(r=>
-        r.data+"_"+r.horario+"_"+r.numero
-      )
-      .sort()
-      .join("|");
-
-    const chave =
-      aposta.id+"_"+identificadorResultados;
-
-    if(!vitoriasNotificadas.has(chave)){
-
-      mostrarVitoria(
-        aposta,
-        acertos,
-        premioTotal,
-        chave
-      );
-
-      break;
-    }
-  }
+/* BOTÕES DE DEZENAS E NÚMEROS */
+gruposValidos.forEach(q=>{
+ const b=document.createElement("button");b.type="button";b.dataset.quantidade=String(q);
+ b.innerHTML=`<span class="tipo">${q}</span><span class="valor">${reais(valores[q])}</span>`;
+ b.addEventListener("click",()=>executarJogo(q));$("buttonContainer").appendChild(b);
+});
+for(let i=1;i<=25;i+=5){
+ const linha=document.createElement("div");linha.className="linha-numeros";
+ for(let j=i;j<i+5&&j<=25;j++){
+  const n=String(j).padStart(2,"0"),b=document.createElement("button");
+  b.type="button";b.className="number-button";b.id="num"+n;b.textContent=n;
+  b.addEventListener("click",()=>{
+   if(!marcacaoEstaAberta()){atualizarHorarioMarcacao();toast("Marcações encerradas!");return;}
+   if(b.classList.contains("selecionado"))b.classList.remove("selecionado");
+   else if(numerosSelecionados().length>=23){toast("Máximo de 23 números.");return;}
+   else b.classList.add("selecionado");
+   atualizarContador();
+  });linha.appendChild(b);
+ }$("checkboxContainer").appendChild(linha);
+}
+function numerosSelecionados(){return Array.from(document.querySelectorAll(".number-button.selecionado")).map(b=>b.textContent);}
+function limparSelecao(){document.querySelectorAll(".number-button").forEach(b=>b.classList.remove("selecionado"));}
+function atualizarContador(){
+ const ns=numerosSelecionados(),q=ns.length;$("contadorSelecionados").textContent="Números Marcados: "+q;
+ if(!gruposValidos.includes(q)){$("resultado").textContent="Marque entre 17 e 23 números.";return;}
+ $("resultado").textContent="Prêmio possível por jogo (multiplicador): "+reais(valores[q]);
+}
+function gerarNumerosAleatorios(q){
+ const s=new Set();while(s.size<q)s.add(String(Math.floor(Math.random()*25)+1).padStart(2,"0"));
+ return [...s].sort((a,b)=>Number(a)-Number(b));
+}
+function executarJogo(q){
+ if(quantidadeEstaBloqueada(q)){toast("Esta quantidade de dezenas está bloqueada.");return;}
+ if(!marcacaoEstaAberta()){atualizarHorarioMarcacao();toast("Marcações encerradas!");return;}
+ limparSelecao();gerarNumerosAleatorios(q).forEach(n=>$("num"+n).classList.add("selecionado"));
+ atualizarContador();$("valorJogoAtual").focus();toast(q+" números gerados. Digite o valor e adicione o jogo.");
 }
 
-const disponiveis = premiadas.filter(aposta=>
-  aposta.saqueSolicitado !== true
-);
-
-  botao.disabled = disponiveis.length === 0;
-
-  lista.innerHTML = "";
-
-  if(!premiadas.length){
-    lista.textContent = "Você ainda não possui apostas premiadas.";
-    return;
-  }
-
-  premiadas.forEach(aposta=>{
-
-    const acertos = encontrarAcertos(aposta);
-
-    const premioPorAcerto = Number(aposta.valorPorTime || 0) * 35;
-    const premioTotal = premioPorAcerto * acertos.length;
-
-    const solicitado = aposta.saqueSolicitado === true;
-
-    const item = document.createElement("div");
-    item.className = "history-item";
-
-    const titulo = document.createElement("strong");
-    titulo.textContent = "🏆 "+acertos.length+" COMBINAÇÃO(ÕES) PREMIADA(S)";
-
-    const detalhes = document.createElement("div");
-
-    detalhes.textContent =
-      "Horários premiados: "+
-      acertos.map(r=>r.horario+" • "+r.time).join(" | ");
-
-    const valor = document.createElement("div");
-    valor.style.color = "var(--green)";
-    valor.style.fontWeight = "bold";
-    valor.textContent = "Prêmio total: "+brl(premioTotal);
-
-    const status = document.createElement("div");
-
-    status.textContent = solicitado
-      ? "SAQUE SOLICITADO • "+(aposta.saqueStatus || "PENDENTE")
-      : "PRÊMIO DISPONÍVEL PARA SAQUE";
-
-    item.append(titulo,detalhes,valor,status);
-
-    if(!solicitado){
-
-      const botaoSaque = document.createElement("button");
-
-      botaoSaque.type = "button";
-      botaoSaque.className = "btn primary";
-      botaoSaque.textContent = "SOLICITAR SAQUE";
-
-      botaoSaque.onclick = ()=>{
-        solicitarSaque(aposta.id);
-      };
-
-      item.appendChild(botaoSaque);
-    }
-
-    lista.appendChild(item);
-  });
+/* JOGOS MONTADOS */
+function validarValor(v){return Number.isFinite(v)&&v>=0.01&&v<=100000;}
+function adicionarJogo(){
+ if(!marcacaoEstaAberta()){toast("Marcações encerradas!");return;}
+ const ns=numerosSelecionados(),q=ns.length,v=Number($("valorJogoAtual").value);
+ if(!gruposValidos.includes(q)){toast("Marque entre 17 e 23 números!");return;}
+ if(quantidadeEstaBloqueada(q)){toast("Esta quantidade de dezenas está bloqueada.");return;}
+ if(!validarValor(v)){toast("Digite um valor válido para este jogo!");$("valorJogoAtual").focus();return;}
+ if(jogosPreparados.length>=100){toast("Limite de 100 jogos por aposta.");return;}
+ jogosPreparados.push({numeros:[...ns],quantidade:q,valorAposta:v,premioPossivel:v*valores[q]});
+ limparSelecao();$("valorJogoAtual").value="";atualizarContador();renderizarJogosPreparados();toast("Jogo adicionado: "+reais(v));
 }
-function solicitarSaque(id){
+function selecionarQuantidadeJogos(qtd,botao){
+ if(!marcacaoEstaAberta()){toast("Marcações encerradas!");return;}
+ const v=Number($("valorJogoAtual").value);
+ if(!validarValor(v)){toast("Digite primeiro o valor de cada jogo!");$("valorJogoAtual").focus();return;}
+ let q=numerosSelecionados().length;
+ if(!gruposValidos.includes(q))q=17;
+ if(quantidadeEstaBloqueada(q)){toast("A quantidade de "+q+" dezenas está bloqueada.");return;}
+ if(jogosPreparados.length+qtd>100){toast("Limite de 100 jogos por aposta.");return;}
+ for(let i=0;i<qtd;i++){const ns=gerarNumerosAleatorios(q);jogosPreparados.push({numeros:ns,quantidade:q,valorAposta:v,premioPossivel:v*valores[q]});}
+ document.querySelectorAll(".opcoes-jogos button").forEach(b=>b.classList.remove("ativo"));botao.classList.add("ativo");
+ limparSelecao();$("valorJogoAtual").value="";atualizarContador();renderizarJogosPreparados();toast(qtd+" jogos aleatórios adicionados.");
+}
+function removerJogo(i){jogosPreparados.splice(i,1);renderizarJogosPreparados();toast("Jogo removido.");}
+function renderizarJogosPreparados(){
+ const lista=$("listaJogosAdicionados");lista.innerHTML="";let total=0,premio=0;
+ jogosPreparados.forEach((j,i)=>{
+  total+=j.valorAposta;premio+=j.premioPossivel;
+  const el=document.createElement("div");el.className="jogo-adicionado";
+  const excluir=document.createElement("button");excluir.className="btn-remover-jogo";excluir.textContent="EXCLUIR";excluir.onclick=()=>removerJogo(i);
+  const texto=document.createElement("div");texto.innerHTML=`<strong>JOGO ${i+1}</strong><br>Dezenas: ${j.quantidade}<br>Números: ${j.numeros.join(" - ")}<br>Valor: <strong>${reais(j.valorAposta)}</strong><br>Prêmio possível: <strong>${reais(j.premioPossivel)}</strong>`;
+  el.append(excluir,texto);lista.appendChild(el);
+ });
+ $("totalJogosAdicionados").textContent=`${jogosPreparados.length} JOGOS | TOTAL: ${reais(total)} | PRÊMIO POSSÍVEL: ${reais(premio)}`;
+ $("resumoQtd").textContent=jogosPreparados.length;$("resumoTotal").textContent=reais(total);
+ $("resumoDezenas").textContent=jogosPreparados.length?jogosPreparados.map(j=>j.quantidade).join("/"):"-";
+}
 
-  const aposta = apostasDoJogador.find(item=>item.id === id);
-
-  if(!aposta || aposta.saqueSolicitado === true){
-    alert("Este saque já foi solicitado ou não está disponível.");
-    return;
-  }
-
-  const resultados = encontrarAcertos(aposta);
-
-  if(!resultados.length){
-    alert("Não foi encontrado acerto para esta aposta.");
-    return;
-  }
-
-  const premioPorAcerto = Number(aposta.valorPorTime || 0) * 35;
-  const premio = premioPorAcerto * resultados.length;
-
-  saqueSelecionado = {
-    aposta,
-    resultados,
-    premio
+/* PIX BR CODE - cobrança manual, não confirma pagamento automaticamente */
+function tlv(id,v){v=String(v);return id+String(v.length).padStart(2,"0")+v;}
+function crc16(s){let crc=0xFFFF;for(let i=0;i<s.length;i++){crc^=s.charCodeAt(i)<<8;for(let j=0;j<8;j++)crc=crc&0x8000?(crc<<1)^0x1021:crc<<1;crc&=0xFFFF;}return crc.toString(16).toUpperCase().padStart(4,"0");}
+function montarPix(valor,txid){
+ const chave=PIX_CONFIG.chave.trim(),nome=semAcentos(PIX_CONFIG.nome).replace(/[^a-zA-Z0-9 ]/g,"").toUpperCase().slice(0,25),cidade=semAcentos(PIX_CONFIG.cidade).replace(/[^a-zA-Z0-9 ]/g,"").toUpperCase().slice(0,15);
+ if(!chave||!nome||!cidade||!validarValor(valor))throw new Error("Confira a configuração Pix e o valor da cobrança.");
+ const conta=tlv("00","BR.GOV.BCB.PIX")+tlv("01",chave);
+ const adicional=tlv("05",String(txid).replace(/[^A-Za-z0-9]/g,"").slice(0,25));
+ const payload=tlv("00","01")+tlv("01","11")+tlv("26",conta)+tlv("52","0000")+tlv("53","986")+tlv("54",valor.toFixed(2))+tlv("58","BR")+tlv("59",nome)+tlv("60",cidade)+tlv("62",adicional)+"6304";
+ return payload+crc16(payload);
+}
+function gerarControle(){return String(Math.floor(100000+Math.random()*900000));}
+function enviarAposta(){
+ if(!perfil?.nome){abrirPerfil();toast("Cadastre seu nome antes de apostar.");return;}
+ if(!marcacaoEstaAberta()){atualizarHorarioMarcacao();toast("Marcações encerradas!");return;}
+ if(numerosSelecionados().length){adicionarJogo();}
+ if(!jogosPreparados.length){toast("Adicione pelo menos um jogo!");return;}
+ atualizarResumoModal();$("modalAposta").classList.add("aberto");document.body.style.overflow="hidden";
+}
+function atualizarResumoModal(){
+ const total=jogosPreparados.reduce((s,j)=>s+j.valorAposta,0),premio=jogosPreparados.reduce((s,j)=>s+j.premioPossivel,0);
+ $("modalDezenas").textContent=jogosPreparados.map(j=>j.quantidade).join(" / ")||"-";
+ $("modalQuantidadeJogos").textContent=jogosPreparados.length;
+ $("modalValorJogo").textContent=jogosPreparados.map(j=>reais(j.valorAposta)).join(" + ")||"-";
+ $("modalPremioTotal").textContent=reais(premio);$("modalTotalPagar").textContent=reais(total);
+}
+function fecharModalAposta(){$("modalAposta").classList.remove("aberto");document.body.style.overflow="";}
+function fecharModalApostaFora(e){if(e.target.id==="modalAposta")fecharModalAposta();}
+async function confirmarAposta(){
+ if(salvando)return;
+ if(!perfil?.nome||!perfil?.pix){toast("Complete seu cadastro com nome e chave Pix.");abrirPerfil();return;}
+ if(!marcacaoEstaAberta()){toast("Marcações encerradas!");atualizarHorarioMarcacao();return;}
+ if(!db){toast("Firebase não está disponível.");return;}
+ if(!jogosPreparados.length){toast("Adicione pelo menos um jogo!");return;}
+ const jogos=jogosPreparados.map((j,i)=>({numeroJogo:i+1,numeros:[...j.numeros],quantidade:j.quantidade,valorDigitado:j.valorAposta,valorAposta:j.valorAposta,premioPossivel:j.valorAposta*valores[j.quantidade]}));
+ const total=jogos.reduce((s,j)=>s+j.valorAposta,0),premioTotal=jogos.reduce((s,j)=>s+j.premioPossivel,0);
+ if(!validarValor(total)){toast("Valor total inválido.");return;}
+ salvando=true;atualizarHorarioMarcacao();$("btnConfirmarModal").disabled=true;
+ try{
+  const horario=agoraFormatado(),destino=obterDestinoExtracao();let controle="",ref=null;
+  for(let t=0;t<15;t++){controle=gerarControle();const tentativa=db.ref("apostas/LOTINHA/"+controle);const snap=await tentativa.once("value");if(!snap.exists()){ref=tentativa;break;}}
+  if(!ref)throw new Error("Não foi possível gerar um código único. Tente novamente.");
+  const pix=montarPix(total,controle);
+  const aposta={
+   nomeJogo:"LOTINHA",clienteId:clientId,nome:perfil.nome,nomeCliente:perfil.nome,
+   chavePixCliente:perfil.pix,telefone:"",jogos,quantidadeJogos:jogos.length,
+   numeros:jogos[0].numeros,quantidade:jogos[0].quantidade,
+   valorDigitado:total,valorPorJogo:null,valorTotal:total,valorCobrancaPix:total,totalReceber:premioTotal,
+   pixCopiaECola:pix,status:"AGUARDANDO PAGAMENTO",statusPagamento:"PENDENTE",
+   data:horario.data,dataISO:dataHojeBRISO(),dataExtracao:destino.data,dataExtracaoBR:formatarDataBR(destino.data),
+   hora:horario.hora,dataHora:horario.dataHora,criadoEm:horario.timestamp,timestamp:horario.timestamp,
+   extracao:destino.hora,numeroControle:controle,resultadoLink
   };
-
-  $("withdrawAmount").textContent = brl(premio);
-  $("withdrawPix").value = "";
-  $("withdrawError").textContent = "";
-
-  $("withdrawModal").classList.add("show");
-}
-async function confirmarSaque(){
-
-  if(!saqueSelecionado){
-    alert("Nenhum prêmio selecionado.");
-    return;
-  }
-
-  const chavePix = $("withdrawPix").value.trim();
-
-  if(!chavePix){
-    $("withdrawError").textContent =
-      "Informe sua chave Pix para receber.";
-    return;
-  }
-
-  const {aposta,resultados,premio} = saqueSelecionado;
-
-const primeiroResultado = resultados[0];
-  const btn = $("confirmWithdraw");
-
-  btn.disabled = true;
-  btn.textContent = "ENVIANDO...";
-
-  const solicitacao = {
-  id: aposta.id,
-  apostaId: aposta.id,
-  jogadorId: playerId,
-  nome: playerName,
-  chavePix: chavePix,
-  valor: premio,
-
-  quantidadeAcertos: resultados.length,
-
-  resultados: resultados.map(resultado=>({
-    numero: resultado.numero,
-    time: resultado.time,
-    data: resultado.data,
-    horario: resultado.horario
-  })),
-
-  resultado: primeiroResultado.numero,
-  time: primeiroResultado.time,
-  data: primeiroResultado.data,
-  horario: primeiroResultado.horario,
-
-  status: "PENDENTE",
-  solicitadoEm: new Date().toISOString(),
-  timestamp: Date.now()
-};
-  try{
-
-    const atualizacoes = {};
-
-    atualizacoes["solicitacoesSaque/"+aposta.id] = solicitacao;
-
-    atualizacoes[BETS_PATH+"/"+aposta.id+"/saqueSolicitado"] = true;
-
-    atualizacoes[BETS_PATH+"/"+aposta.id+"/saqueStatus"] = "PENDENTE";
-
-    await db.ref().update(atualizacoes);
-
-    $("withdrawModal").classList.remove("show");
-
-    saqueSelecionado = null;
-
-    alert("Solicitação de saque enviada ao painel com sucesso!");
-
-    atualizarSaques();
-
-  }catch(error){
-
-    console.error("Erro ao solicitar saque:",error);
-
-    $("withdrawError").textContent =
-      "Erro ao enviar. Verifique sua conexão e tente novamente.";
-
-  }finally{
-
-    btn.disabled = false;
-    btn.textContent = "CONFIRMAR SOLICITAÇÃO";
-
-  }
+  await ref.set(aposta);
+  apostaAtual={...aposta,firebaseId:controle};apostasCliente[controle]=apostaAtual;
+  jogosPreparados=[];renderizarJogosPreparados();fecharModalAposta();mostrarPix(apostaAtual);abrirModalPix(pix);
+  toast(jogos.length+" jogos registrados! Total: "+reais(total));
+ }catch(e){console.error(e);toast("Erro ao registrar: "+(e.message||"verifique o Firebase."));}
+ finally{salvando=false;$("btnConfirmarModal").disabled=false;atualizarHorarioMarcacao();}
 }
 
-$("confirmWithdraw").onclick = confirmarSaque;
+/* MODAL E CÓPIA PIX */
+function abrirModalPix(codigo){
+ if(!codigo){toast("Não foi possível gerar o Pix.");return;}
+ if(typeof QRCode==="undefined"){toast("Biblioteca de QR Code não carregou. O código Pix está disponível no histórico.");return;}
+ codigoPixAtual=codigo;$("qrcodePix").innerHTML="";$("codigoPixTexto").value=codigo;$("btnCopiarPix").disabled=false;$("btnCopiarPix").textContent="COPIAR PIX";
+ new QRCode($("qrcodePix"),{text:codigo,width:240,height:240,correctLevel:QRCode.CorrectLevel.M});$("modalPix").classList.add("aberto");document.body.style.overflow="hidden";
+}
+function fecharModalPix(){$("modalPix").classList.remove("aberto");document.body.style.overflow="";}
+function fecharModalPixFora(e){if(e.target.id==="modalPix")fecharModalPix();}
+async function copiarTexto(texto){
+ try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(texto);return true;}}catch(e){}
+ const campo=document.createElement("textarea");campo.value=texto;campo.setAttribute("readonly","");campo.style.position="fixed";campo.style.left="-9999px";document.body.appendChild(campo);campo.select();campo.setSelectionRange(0,campo.value.length);
+ let ok=false;try{ok=document.execCommand("copy");}catch(e){}campo.remove();return ok;
+}
+async function copiarPixModal(){if(!codigoPixAtual){toast("Nenhum Pix foi gerado.");return;}const ok=await copiarTexto(codigoPixAtual);toast(ok?"Pix Copia e Cola copiado!":"Não foi possível copiar. Tente novamente.");}
+function mostrarPix(a){
+ $("pixSemAposta").style.display="none";$("pixArea").style.display="block";
+ $("pixControle").textContent=a.numeroControle||"-";$("pixData").textContent=a.dataHora||"-";
+ $("pixValor").textContent=reais(Number(a.valorCobrancaPix));$("pixRecebedor").textContent=PIX_CONFIG.nome;
+ $("pixCopiaCola").value=a.pixCopiaECola||"";$("qrcode").innerHTML="";
+ if(a.pixCopiaECola&&typeof QRCode!=="undefined")new QRCode($("qrcode"),{text:a.pixCopiaECola,width:200,height:200,correctLevel:QRCode.CorrectLevel.M});
+}
+async function copiarPixMenu(){const t=$("pixCopiaCola").value;if(!t){toast("Selecione uma aposta primeiro.");return;}toast(await copiarTexto(t)?"Pix Copia e Cola copiado!":"Não foi possível copiar o Pix.");}
 
-$("cancelWithdraw").onclick = ()=>{
-  $("withdrawModal").classList.remove("show");
-  saqueSelecionado = null;
-};
-
-$("withdrawModal").addEventListener("click",e=>{
-  if(e.target === $("withdrawModal")){
-    $("withdrawModal").classList.remove("show");
-    saqueSelecionado = null;
-  }
-});
-
-function salvarNome(){
-
-  const nome = $("playerNameInput").value.trim();
-
-  if(!nome){
-    $("nameError").textContent = "Digite seu nome.";
-    return;
-  }
-
-  playerName = nome;
-
-  localStorage.setItem("timeCertoPlayerName",nome);
-
-  updatePlayerDisplay();
-
-  $("nameModal").classList.remove("show");
+/* RESULTADOS E CONFERÊNCIA */
+function normalizarISO(v){
+ const s=String(v||"").trim();if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;
+ const m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);return m?`${m[3]}-${m[2]}-${m[1]}`:"";
+}
+function conferirResultadoCliente(aposta){
+ const data=aposta.dataExtracao||normalizarISO(aposta.dataISO||aposta.data);if(!data)return null;
+ const resultado=resultadosLotinha[data];if(!resultado||!Array.isArray(resultado.numeros))return null;
+ const hora=aposta.extracao||"";
+ if(hora&&resultado.extracao&&hora!==resultado.extracao)return null;
+ const sorteados=new Set(resultado.numeros.map(n=>String(n).padStart(2,"0")));
+ const jogos=Array.isArray(aposta.jogos)?aposta.jogos:[{numeros:aposta.numeros||[]}];
+ const conferencias=jogos.map((j,i)=>{
+  const ns=(j.numeros||[]).map(n=>String(n).padStart(2,"0"));const acertos=ns.filter(n=>sorteados.has(n)).length;
+  return{jogo:i+1,acertos,status:acertos>=15?"GANHOU":"NÃO PREMIADO"};
+ });
+ return{jogos:conferencias,ganhadores:conferencias.filter(j=>j.status==="GANHOU").length};
+}
+function carregarResultadoLotinha(){
+ if(!db)return;
+ db.ref("resultados/LOTINHA").on("value",s=>{
+  resultadosLotinha=s.val()||{};const hoje=dataHojeBRISO(),r=resultadosLotinha[hoje];
+  $("resultadoMenu").textContent=r&&Array.isArray(r.numeros)?r.numeros.map(n=>String(n).padStart(2,"0")).join(" - "):"Resultado de hoje ainda não publicado.";
+  $("dataResultadoMenu").textContent="Data: "+formatarDataBR(hoje)+" • Extração: "+(r?.extracao|| (horarioBrasilia().dia==="Sun"?"11:00":"21:00"));
+  renderizarApostas(apostasCliente);
+ },e=>{$("resultadoMenu").textContent="Não foi possível carregar o resultado.";console.error(e);});
 }
 
-$("saveName").onclick = salvarNome;
-function animarResultado(numero,time,horario){
-
-  const numeroEl = $("roletaNumero");
-  const timeEl = $("roletaTime");
-  const horarioEl = $("roletaHorario");
-  const escudoEl = $("roletaEscudo");
-  const caixa = $("resultadoRoleta");
-
-  const escudos = {
-    1:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794519241/atletico-paranaense.png",
-    2:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784507594/atletico-mineiro.png",
-    3:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197838/bahia.jpg",
-    4:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794522877/botafo.jpg",
-    5:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794523405/bragantino.png",
-    6:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784512917/chapecoense.png",
-    7:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794523484/corinthians.png",
-    8:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197703/coritiba.jpg",
-    9:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198371/cruzeiro.png",
-    10:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513564/flamengo.png",
-    11:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778195735/fluminense.jpg",
-    12:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786830843/gremio.png",
-    13:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198189/internacional.jpg",
-    14:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786831074/mirassol.png",
-    15:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513469/palmeiras.png",
-    16:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786926638/remo.png",
-    17:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778195807/santos.jpg",
-    18:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513002/sao-paulo.png",
-    19:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794524604/vasco.png",
-    20:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198343/vitoria.png",
-    21:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784508008/america-mg.png",
-    22:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794524959/athletic-mg.png",
-    23:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786746932/atletico-goianiense.png",
-    24:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784507675/avai.png",
-    25:"https://res.cloudinary.com/dtw3turzb/image/upload/v1787081047/botafogo-sp.png",
-    26:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198001/ceara.png",
-    27:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198031/crb.jpg",
-    28:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198777/criciuma.jpg",
-    29:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198491/cuiaba.jpg",
-    30:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784508115/fortaleza.png",
-    31:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197882/goias.png",
-    32:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197334/juventude.jpg",
-    33:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513960/londrina.png",
-    34:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513173/nautico.png",
-    35:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784507748/novo-horizontino.png",
-    36:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198743/operario.png",
-    37:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197963/ponte-preta.png",
-    38:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786636721/sao-bernardo.png",
-    39:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198657/sport-recife.jpg",
-    40:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198422/vila-nova.jpg",
-    41:"https://res.cloudinary.com/dtw3turzb/image/upload/v1788145764/arsenal.png",
-    42:"https://res.cloudinary.com/dtw3turzb/image/upload/v1788052987/chelsea.png",
-    43:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526766/liverpool.jpg",
-    44:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526804/mancheste-united.png",
-    45:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526879/atletico-de-madrid.webp",
-    46:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526928/barcelonasportingclubbarcelona-sporting-club-logo.png",
-    47:"https://res.cloudinary.com/dtw3turzb/image/upload/v1787701694/real-madrid.png",
-    48:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794527212/internazionale.png",
-    49:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794527240/juventus.png",
-    50:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794527271/psg.png"
-  };
-
-  const url = escudos[Number(numero)];
-
-  numeroEl.classList.remove("roleta-revelado");
-  numeroEl.classList.add("roleta-girando");
-
-  let contador = 0;
-
-  const intervalo = setInterval(()=>{
-
-    numeroEl.textContent =
-      String(Math.floor(Math.random()*50)+1).padStart(2,"0");
-
-    contador++;
-
-    if(contador >= 20){
-
-      clearInterval(intervalo);
-
-      numeroEl.classList.remove("roleta-girando");
-
-      numeroEl.textContent =
-        String(numero).padStart(2,"0");
-
-      timeEl.textContent = time;
-      horarioEl.textContent = horario;
-
-      if(url){
-        escudoEl.src = url;
-        escudoEl.style.display = "block";
-      }else{
-        escudoEl.style.display = "none";
-      }
-
-      void caixa.offsetWidth;
-      caixa.classList.add("roleta-revelado");
-    }
-
-  },100);
+/* MENU E HISTÓRICO */
+function abrirMenu(){$("menuOverlay").style.display="block";carregarApostasCliente();}
+function fecharMenu(){$("menuOverlay").style.display="none";}
+function fecharMenuFundo(e){if(e.target.id==="menuOverlay")fecharMenu();}
+function navegar(url){window.location.href=url;}
+function carregarApostasCliente(){
+ if(!db||!clientId||!perfil){$("listaApostas").textContent="Cadastre seu nome para visualizar suas apostas.";return;}
+ const ref=db.ref("apostas/LOTINHA");if(refApostasCliente&&listenerApostas)refApostasCliente.off("value",listenerApostas);
+ refApostasCliente=ref;
+ listenerApostas=s=>{
+  const todas=s.val()||{},minhas={};
+  Object.entries(todas).forEach(([id,a])=>{if(a&&a.clienteId===clientId)minhas[id]=a;});
+  apostasCliente=minhas;renderizarApostas(minhas);
+ };
+ ref.on("value",listenerApostas,e=>{$("listaApostas").textContent="Não foi possível carregar o histórico. Verifique as regras do Firebase.";console.error(e);});
 }
-
-function mostrarResultados(dados){
-
-  const status = $("resultsStatus");
-const listaHTML = $("resultsLista");
-  const escudos = {
-    1:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794519241/atletico-paranaense.png",
-    2:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784507594/atletico-mineiro.png",
-    3:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197838/bahia.jpg",
-    4:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794522877/botafo.jpg",
-    5:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794523405/bragantino.png",
-    6:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784512917/chapecoense.png",
-    7:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794523484/corinthians.png",
-    8:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197703/coritiba.jpg",
-    9:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198371/cruzeiro.png",
-    10:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513564/flamengo.png",
-    11:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778195735/fluminense.jpg",
-    12:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786830843/gremio.png",
-    13:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198189/internacional.jpg",
-    14:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786831074/mirassol.png",
-    15:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513469/palmeiras.png",
-    16:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786926638/remo.png",
-    17:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778195807/santos.jpg",
-    18:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513002/sao-paulo.png",
-    19:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794524604/vasco.png",
-    20:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198343/vitoria.png",
-    21:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784508008/america-mg.png",
-    22:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794524959/athletic-mg.png",
-    23:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786746932/atletico-goianiense.png",
-    24:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784507675/avai.png",
-    25:"https://res.cloudinary.com/dtw3turzb/image/upload/v1787081047/botafogo-sp.png",
-    26:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198001/ceara.png",
-    27:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198031/crb.jpg",
-    28:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198777/criciuma.jpg",
-    29:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198491/cuiaba.jpg",
-    30:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784508115/fortaleza.png",
-    31:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197882/goias.png",
-    32:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197334/juventude.jpg",
-    33:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513960/londrina.png",
-    34:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784513173/nautico.png",
-    35:"https://res.cloudinary.com/dtw3turzb/image/upload/v1784507748/novo-horizontino.png",
-    36:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198743/operario.png",
-    37:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778197963/ponte-preta.png",
-    38:"https://res.cloudinary.com/dtw3turzb/image/upload/v1786636721/sao-bernardo.png",
-    39:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198657/sport-recife.jpg",
-    40:"https://res.cloudinary.com/dtw3turzb/image/upload/v1778198422/vila-nova.jpg",
-    41:"https://res.cloudinary.com/dtw3turzb/image/upload/v1788145764/arsenal.png",
-    42:"https://res.cloudinary.com/dtw3turzb/image/upload/v1788052987/chelsea.png",
-    43:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526766/liverpool.jpg",
-    44:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526804/mancheste-united.png",
-    45:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526879/atletico-de-madrid.webp",
-    46:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794526928/barcelonasportingclubbarcelona-sporting-club-logo.png",
-    47:"https://res.cloudinary.com/dtw3turzb/image/upload/v1787701694/real-madrid.png",
-    48:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794527212/internazionale.png",
-    49:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794527240/juventus.png",
-    50:"https://res.cloudinary.com/dtw3turzb/image/upload/v1794527271/psg.png"
-  };
-
-  if(!dados || typeof dados !== "object"){
-
-  listaHTML.innerHTML = "";
-  status.textContent = "Nenhum resultado publicado ainda.";
-
-  resultadosCache = [];
-  atualizarSaques();
-  return;
-}
-
-  const lista = [];
-
-  Object.keys(dados).forEach(data=>{
-
-    const resultadosDoDia = dados[data];
-
-    if(!resultadosDoDia || typeof resultadosDoDia !== "object") return;
-
-    Object.keys(resultadosDoDia).forEach(horarioKey=>{
-
-      const resultado = resultadosDoDia[horarioKey];
-
-      if(!resultado || typeof resultado !== "object") return;
-
-      const numero = Number(resultado.numero);
-
-      const time = resultado.time ||
-                   resultado.nome ||
-                   teamNames[numero-1] ||
-                   "TIME NÃO INFORMADO";
-
-      const horario = resultado.horario ||
-                      horarioKey.replace("-",":");
-
-      const dataResultado = resultado.data || data;
-
-      if(!Number.isInteger(numero) || numero < 1 || numero > 50) return;
-
-      lista.push({
-        data:dataResultado,
-        horario,
-        numero,
-        time
-      });
-
-    });
-
+function renderizarApostas(dados){
+ const lista=$("listaApostas");lista.innerHTML="";
+ const entradas=Object.entries(dados||{}).sort((a,b)=>Number(b[1].criadoEm||b[1].timestamp||0)-Number(a[1].criadoEm||a[1].timestamp||0));
+ if(!entradas.length){lista.innerHTML='<div class="vazio">Nenhuma aposta registrada neste aparelho.</div>';return;}
+ entradas.forEach(([id,a])=>{
+  const item=document.createElement("div");item.className="aposta-item";
+  const jogos=Array.isArray(a.jogos)?a.jogos:[{numeros:a.numeros||[],valorAposta:a.valorPorJogo||a.valorDigitado||0}];
+  const head=document.createElement("div");head.className="aposta-cabecalho";
+  const titulo=document.createElement("strong");titulo.textContent="🎫 APOSTA #"+(a.numeroControle||id);
+  const status=document.createElement("span"),pago=String(a.statusPagamento||"").toUpperCase()==="PAGO";
+  status.className=pago?"status pago":"status";status.textContent=pago?"PAGAMENTO CONFIRMADO":"AGUARDANDO PAGAMENTO";head.append(titulo,status);item.appendChild(head);
+  const info=document.createElement("div");info.className="linha-info";
+  info.textContent=`👤 Cliente: ${a.nome||a.nomeCliente||"-"}\n📅 Data da aposta: ${a.data||"-"}\n🎯 Data da extração: ${formatarDataBR(a.dataExtracao||normalizarISO(a.dataISO||a.data))}\n⏰ Horário: ${a.extracao||"-"}\n🎲 Quantidade de jogos: ${jogos.length}`;item.appendChild(info);
+  let totalJogos=0,premioJogos=0;
+  jogos.forEach((j,i)=>{
+   const ns=Array.isArray(j.numeros)?j.numeros.map(n=>String(n).padStart(2,"0")):[];
+   const q=Number(j.quantidade||ns.length),v=Number(j.valorAposta??j.valorDigitado??0),premio=Number(j.premioPossivel??v*(valores[q]||0));
+   totalJogos+=v;premioJogos+=premio;
+   const bloco=document.createElement("div");bloco.className="historico-jogo";
+   const nome=document.createElement("div");nome.className="historico-jogo-titulo";nome.textContent=`🎲 JOGO ${i+1} — ${q} DEZENAS`;
+   const dezenas=document.createElement("div");dezenas.className="historico-jogo-numeros";dezenas.textContent=ns.join(" - ");
+   const det=document.createElement("div");det.className="historico-jogo-valor";det.innerHTML=`💵 Valor do jogo: <strong>${reais(v)}</strong><br>🏆 Prêmio possível: <strong class="historico-premio">${reais(premio)}</strong>`;
+   bloco.append(nome,dezenas,det);item.appendChild(bloco);
   });
-
-  // ORDEM: MAIS RECENTE PRIMEIRO
-function converterDataHora(data, horario){
-
-  let ano, mes, dia;
-
-  if(data.includes("/")){
-    [dia,mes,ano] = data.split("/");
-  }else{
-    [ano,mes,dia] = data.split("-");
-  }
-
-  return new Date(
-    Number(ano),
-    Number(mes)-1,
-    Number(dia),
-    Number(horario.split(":")[0]),
-    Number(horario.split(":")[1])
-  ).getTime();
+  const totais=document.createElement("div");totais.className="historico-totais";
+  totais.innerHTML=`💳 TOTAL A PAGAR: <strong>${reais(Number(a.valorCobrancaPix??a.valorTotal??totalJogos))}</strong><br>🏆 PRÊMIO TOTAL POSSÍVEL: <strong class="historico-premio">${reais(Number(a.totalReceber??premioJogos))}</strong>`;item.appendChild(totais);
+  const conf=conferirResultadoCliente(a),resultado=document.createElement("div");resultado.className="linha-info";
+  if(pago&&conf){resultado.style.marginTop="10px";resultado.style.padding="10px";resultado.style.borderRadius="8px";resultado.style.background="#064d2b";resultado.textContent="🎯 CONFERÊNCIA DOS JOGOS\n"+conf.jogos.map(j=>`Jogo ${j.jogo}: ${j.acertos} acertos - ${j.status}`).join("\n")+"\n🏆 Jogos premiados: "+conf.ganhadores;}
+  else if(pago)resultado.textContent="⏳ Aguardando publicação do resultado.";
+  else resultado.style.display="none";
+  item.appendChild(resultado);
+  const btn=document.createElement("button");btn.type="button";btn.className="btn-ver-pix";btn.textContent="💳 VER PIX E DETALHES";
+  btn.addEventListener("click",()=>{apostaAtual=a;mostrarPix(a);abrirModalPix(a.pixCopiaECola);});item.appendChild(btn);lista.appendChild(item);
+ });
 }
 
-lista.sort((a,b)=>
-  converterDataHora(b.data,b.horario) -
-  converterDataHora(a.data,a.horario)
-);
-
-  resultadosCache = lista;
-
-  // RESULTADO MAIS RECENTE
-  if(lista.length){
-
-    const ultimo = lista[0];
-
-    const chaveResultado =
-      ultimo.data+"_"+ultimo.horario+"_"+ultimo.numero;
-
-    if(chaveResultado !== ultimoResultadoAnimado){
-
-      ultimoResultadoAnimado = chaveResultado;
-
-      animarResultado(
-        ultimo.numero,
-        ultimo.time,
-        ultimo.data+" • "+ultimo.horario
-      );
-    }
-  }
-
-  // MONTAR RESUMO COM ESCUDO, NÚMERO E NOME
-  listaHTML.innerHTML = "";
-
-  lista.forEach(r=>{
-
-    const item = document.createElement("div");
-    item.className = "resultado-item";
-
-    const img = document.createElement("img");
-    img.src = escudos[r.numero];
-    img.alt = r.time;
-    img.loading = "lazy";
-
-    const numero = document.createElement("div");
-    numero.className = "numero";
-    numero.textContent = String(r.numero).padStart(2,"0");
-
-    const info = document.createElement("div");
-    info.style.flex = "1";
-
-    const nome = document.createElement("div");
-    nome.className = "nome";
-    nome.textContent = r.time;
-
-    const data = document.createElement("div");
-    data.className = "data";
-    data.textContent = r.data+" • "+r.horario;
-
-    info.append(nome,data);
-    item.append(img,numero,info);
-    listaHTML.appendChild(item);
-
-  });
-
-  atualizarSaques();
-
-  
-
-  status.textContent =
-    lista.length+" resultado(s) recebido(s) do Firebase.";
-
-}
-
-/* ESCUTA EM TEMPO REAL */
-db.ref(RESULTS_PATH).on("value",snapshot=>{
-
-  mostrarResultados(snapshot.val());
-
-},error=>{
-
-  console.error("Erro ao carregar resultados:",error);
-
-  $("resultsStatus").textContent =
-    "Erro ao conectar com os resultados do Firebase.";
-
-});
-const teamNames = [
-  // BRASILEIRO - SÉRIE A (1–20)
-  "ATHLETICO PR",
-  "ATLÉTICO MG",
-  "BAHIA",
-  "BOTAFOGO",
-  "RB BRAGANTINO",
-  "CHAPECOENSE",
-  "CORINTHIANS",
-  "CORITIBA",
-  "CRUZEIRO",
-  "FLAMENGO",
-  "FLUMINENSE",
-  "GRÊMIO",
-  "INTERNACIONAL",
-  "MIRASSOL",
-  "PALMEIRAS",
-  "REMO",
-  "SANTOS",
-  "SÃO PAULO",
-  "VASCO",
-  "VITÓRIA",
-
-  // BRASILEIRO - SÉRIE B (21–40)
-  "AMÉRICA MG",
-  "ATHLETIC MG",
-  "ATLÉTICO GO",
-  "AVAÍ",
-  "BOTAFOGO SP",
-  "CEARÁ",
-  "CRB",
-  "CRICIÚMA",
-  "CUIABÁ",
-  "FORTALEZA",
-  "GOIÁS",
-  "JUVENTUDE",
-  "LONDRINA",
-  "NÁUTICO",
-  "NOVORIZONTINO",
-  "OPERÁRIO PR",
-  "PONTE PRETA",
-  "SÃO BERNARDO",
-  "SPORT",
-  "VILA NOVA",
-
-  // INGLATERRA (41–44)
-  "ARSENAL",
-  "CHELSEA",
-  "LIVERPOOL",
-  "MANCHESTER UNITED",
-
-  // ESPANHA (45–47)
-  "ATLÉTICO DE MADRID",
-  "BARCELONA",
-  "REAL MADRID",
-
-  // ITÁLIA (48–49)
-  "INTERNAZIONALE",
-  "JUVENTUS",
-
-  // FRANÇA (50)
-  "PSG"
-];
-let resultadosCache = [];
-let apostasDoJogador = [];
-let ultimoResultadoAnimado = "";
-const selectedSlots = new Set();
-let currentBet = null;
-let currentBetSaved = false;
-let configBlocked = false;
-let configMessage = "";
-let playerName = localStorage.getItem("timeCertoPlayerName") || "";
-let saqueSelecionado = null;
-/* CONTROLE DAS ANIMAÇÕES DE VITÓRIA */
-
-let vitoriaEmExibicao = false;
-
-function carregarVitoriasNotificadas(){
-  try{
-    const dados = JSON.parse(
-      localStorage.getItem("timeCertoVitoriasNotificadas") || "[]"
-    );
-
-    return new Set(Array.isArray(dados) ? dados : []);
-  }catch(e){
-    return new Set();
-  }
-}
-
-const vitoriasNotificadas = carregarVitoriasNotificadas();
-
-function mostrarVitoria(aposta, acertos, premio, chave){
-
-  if(vitoriaEmExibicao) return;
-
-  vitoriaEmExibicao = true;
-
-  vitoriasNotificadas.add(chave);
-
-  localStorage.setItem(
-    "timeCertoVitoriasNotificadas",
-    JSON.stringify([...vitoriasNotificadas])
-  );
-
-  const nomes = acertos.map(resultado=>
-    resultado.horario+" • "+resultado.time+
-    " ("+String(resultado.numero).padStart(2,"0")+")"
-  );
-
-  $("winTeam").textContent = nomes.join(" | ");
-  $("winPrize").textContent = brl(premio);
-
-  const confetti = $("winConfetti");
-  confetti.innerHTML = "";
-
-  const cores = [
-    "#f5c451",
-    "#18c889",
-    "#ff6678",
-    "#ffffff",
-    "#60a5fa",
-    "#c084fc"
-  ];
-
-  for(let i=0;i<55;i++){
-
-    const pedaco = document.createElement("span");
-
-    pedaco.style.left = Math.random()*100+"%";
-    pedaco.style.background =
-      cores[Math.floor(Math.random()*cores.length)];
-
-    pedaco.style.animationDuration =
-      (2+Math.random()*3)+"s";
-
-    pedaco.style.animationDelay =
-      (Math.random()*1.5)+"s";
-
-    pedaco.style.transform =
-      "rotate("+Math.floor(Math.random()*360)+"deg)";
-
-    confetti.appendChild(pedaco);
-  }
-
-  $("winWithdraw").onclick = ()=>{
-
-    $("winModal").classList.remove("show");
-    vitoriaEmExibicao = false;
-
-    solicitarSaque(aposta.id);
-  };
-
-  $("winModal").classList.add("show");
-}
-
-function fecharComemoracao(){
-
-  $("winModal").classList.remove("show");
-  vitoriaEmExibicao = false;
-}
-
-$("winClose").onclick = fecharComemoracao;
-
-$("winModal").addEventListener("click",e=>{
-  if(e.target === $("winModal")){
-    fecharComemoracao();
-  }
-});
-let playerId = localStorage.getItem("timeCertoPlayerId");
-
-/* BLOQUEIO DE NOVO JOGO APÓS COPIAR PIX */
-const PIX_LOCK_DURATION = 10 * 60 * 1000;
-
-function chaveBloqueioPix(){
-  return "timeCertoBloqueioPix_" + playerId;
-}
-
-function tempoBloqueioPix(){
-  const fim = Number(localStorage.getItem(chaveBloqueioPix()) || 0);
-  return Math.max(0, fim - Date.now());
-}
-
-function iniciarBloqueioPix(){
-  const fim = Date.now() + PIX_LOCK_DURATION;
-  localStorage.setItem(chaveBloqueioPix(), String(fim));
-  atualizarBloqueioPix();
-}
-
-function atualizarBloqueioPix(){
-
-  const botao = $("createBet");
-  if(!botao) return;
-
-  const restante = tempoBloqueioPix();
-
-  if(restante > 0){
-
-    const minutos = Math.floor(restante / 60000);
-    const segundos = Math.floor((restante % 60000) / 1000);
-
-    botao.disabled = true;
-    botao.textContent =
-      "AGUARDE " +
-      String(minutos).padStart(2,"0") + ":" +
-      String(segundos).padStart(2,"0");
-
-  }else{
-
-    localStorage.removeItem(chaveBloqueioPix());
-
-    botao.disabled = configBlocked;
-
-    botao.textContent = configBlocked
-      ? "MARCAÇÕES BLOQUEADAS"
-      : "APOSTAR • PIX";
-  }
-}
-
-setInterval(atualizarBloqueioPix, 1000);
-
-if(!playerId){
-  playerId = "J" + Date.now().toString(36).toUpperCase();
-  localStorage.setItem("timeCertoPlayerId",playerId);
-}
-
-let currentDateKey = getTodayKey();
-db.ref(BETS_PATH).on("value",snapshot=>{
-
-  const dados = snapshot.val() || {};
-
-  apostasDoJogador = Object.values(dados).filter(aposta=>
-    aposta && aposta.jogadorId === playerId
-  );
-
-  atualizarSaques();
-
-},error=>{
-
-  console.error("Erro ao consultar apostas:",error);
-
-});
-
-
-const brl = n => Number(n || 0).toLocaleString("pt-BR", {
-  style:"currency",
-  currency:"BRL"
-});
-
-/* NOME DO JOGADOR */
-function updatePlayerDisplay(){
-  const nome = playerName || "Nome não informado";
-  $("playerDisplay").textContent = nome;
-  $("playerDisplayPanel").textContent = nome;
-}
-$("saqueMenu").onclick = ()=>{
-
-  $("dropdown").classList.remove("show");
-
-  $("withdrawPanel").classList.add("show");
-
-  atualizarSaques();
-
-  $("withdrawPanel").scrollIntoView({
-    behavior:"smooth",
-    block:"start"
-  });
-};
-function abrirModalNome(){
-
-  $("playerNameInput").value = playerName;
-
-  $("nameError").textContent = "";
-
-  $("nameModal").classList.add("show");
-
-  $("dropdown").classList.remove("show");
-}
-
-
-/* MENU */
-$("menuButton").onclick = e=>{
-  e.stopPropagation();
-  $("dropdown").classList.toggle("show");
-};
-
-$("betMenu").onclick = ()=>{
-
-  $("dropdown").classList.remove("show");
-
-  if(tempoBloqueioPix() > 0){
-    atualizarBloqueioPix();
-    alert("Você precisa aguardar 10 minutos entre os jogos após copiar o Pix.");
-    return;
-  }
-
-  updatePlayerDisplay();
-  updateValues();
-  $("betModal").classList.add("show");
-};
-
-$("closeBet").onclick = ()=>{
-  $("betModal").classList.remove("show");
-};
-
-$("betModal").addEventListener("click",e=>{
-  if(e.target === $("betModal")){
-    $("betModal").classList.remove("show");
-  }
-});
-
-document.addEventListener("click",e=>{
-  if(!e.target.closest(".menu-area")){
-    $("dropdown").classList.remove("show");
-  }
-});
-
-/* CONTADOR */
-function updateCount(){
-  $("count").textContent = chosen.size;
-  updateValues();
-}
-
-
-/* TIMES */
-function renderTeams(){
-  const root = $("teams");
-  root.innerHTML = "";
-
-  teamNames.forEach((name,i)=>{
-    const el = document.createElement("div");
-    el.className = "team";
-    el.dataset.number = i+1;
-
-    const img = document.createElement("img");
-    const escudos = {
-  1: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794519241/atletico-paranaense.png",
-  2: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784507594/atletico-mineiro.png",
-  3: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778197838/bahia.jpg",
-  4: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794522877/botafo.jpg",
-  5: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794523405/bragantino.png",
-    6: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784512917/chapecoense.png",
-  7: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794523484/corinthians.png",
-  8: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778197703/coritiba.jpg",
-  9: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198371/cruzeiro.png",
-  10: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784513564/flamengo.png",
-  11: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778195735/fluminense.jpg",
-  12: "https://res.cloudinary.com/dtw3turzb/image/upload/v1786830843/gremio.png",
-  13: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198189/internacional.jpg",
-  14: "https://res.cloudinary.com/dtw3turzb/image/upload/v1786831074/mirassol.png",
-  15: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784513469/palmeiras.png",
-  16: "https://res.cloudinary.com/dtw3turzb/image/upload/v1786926638/remo.png",
-  17: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778195807/santos.jpg",
-  18: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784513002/sao-paulo.png",
-  19: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794524604/vasco.png",
-  20: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198343/vitoria.png",
-  21: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784508008/america-mg.png",
-  22: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794524959/athletic-mg.png",
-  23: "https://res.cloudinary.com/dtw3turzb/image/upload/v1786746932/atletico-goianiense.png",
-  24: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784507675/avai.png",
-  25: "https://res.cloudinary.com/dtw3turzb/image/upload/v1787081047/botafogo-sp.png",
-  26: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198001/ceara.png",
-  27: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198031/crb.jpg",
-  28: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198777/criciuma.jpg",
-  29: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198491/cuiaba.jpg",
-  30: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784508115/fortaleza.png",
-  31: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778197882/goias.png",
-  32: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778197334/juventude.jpg",
-  33: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784513960/londrina.png",
-  34: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784513173/nautico.png",
-  35: "https://res.cloudinary.com/dtw3turzb/image/upload/v1784507748/novo-horizontino.png",
-  36: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198743/operario.png",
-  37: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778197963/ponte-preta.png",
-  38: "https://res.cloudinary.com/dtw3turzb/image/upload/v1786636721/sao-bernardo.png",
-  39: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198657/sport-recife.jpg",
-  40: "https://res.cloudinary.com/dtw3turzb/image/upload/v1778198422/vila-nova.jpg",
-  41: "https://res.cloudinary.com/dtw3turzb/image/upload/v1788145764/arsenal.png",
-  42: "https://res.cloudinary.com/dtw3turzb/image/upload/v1788052987/chelsea.png",
-  43: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794526766/liverpool.jpg",
-  44: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794526804/mancheste-united.png",
-  45: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794526879/atletico-de-madrid.webp",
-  46: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794526928/barcelonasportingclubbarcelona-sporting-club-logo.png",
-  47: "https://res.cloudinary.com/dtw3turzb/image/upload/v1787701694/real-madrid.png",
-  48: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794527212/internazionale.png",
-  49: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794527240/juventus.png",
-  50: "https://res.cloudinary.com/dtw3turzb/image/upload/v1794527271/psg.png"
-  // Continue até o time 50
-};
-
-img.src = escudos[i + 1] || `${i + 1}.jpeg`;
-    img.alt = name;
-    img.loading = "lazy";
-
-    const span = document.createElement("span");
-    span.textContent = `${String(i+1).padStart(2,"0")} • ${name}`;
-
-    el.append(img,span);
-
-    el.onclick = ()=>{
-      const number = i+1;
-
-      if(chosen.has(number)){
-        chosen.delete(number);
-        el.classList.remove("selected");
-      }else{
-        if(chosen.size >= 10){
-          alert("Limite de 10 times.");
-          return;
-        }
-
-        chosen.add(number);
-        el.classList.add("selected");
-      }
-
-      updateCount();
-    };
-
-    root.appendChild(el);
-  });
-}
-
-/* HORÁRIOS */
-/* HORÁRIOS — TODOS OS DIAS, SOMENTE HOJE */
-
-function businessDay(){
-  return true;
-}
-
-function getTodayKey(){
-  const d = new Date();
-  const ano = d.getFullYear();
-  const mes = String(d.getMonth()+1).padStart(2,"0");
-  const dia = String(d.getDate()).padStart(2,"0");
-
-  return `${ano}-${mes}-${dia}`;
-}
-
-
-function getAvailableSlots(){
-
-  const agora = new Date();
-  const slots = [];
-
-  for(let hora = 0; hora < 24; hora++){
-
-    for(let minuto of [0,30]){
-
-      const horario =
-        String(hora).padStart(2,"0") + ":" +
-        String(minuto).padStart(2,"0");
-
-      const dataHorario = new Date(
-        agora.getFullYear(),
-        agora.getMonth(),
-        agora.getDate(),
-        hora,
-        minuto,
-        0,
-        0
-      );
-
-      if(dataHorario > agora){
-        slots.push(horario);
-      }
-
-    }
-  }
-
-  return slots;
-}
-
-function renderSlots(){
-
-  const root = $("slots");
-  root.innerHTML = "";
-
-  const hoje = getTodayKey();
-
-  if(hoje !== currentDateKey){
-    currentDateKey = hoje;
-    selectedSlots.clear();
-  }
-
-  const available = getAvailableSlots();
-
-  // Remove horários que já passaram
-  [...selectedSlots].forEach(horario=>{
-    if(!available.includes(horario)){
-      selectedSlots.delete(horario);
-    }
-  });
-
-  // Seleciona o primeiro horário automaticamente
-  if(!selectedSlots.size && available.length){
-    selectedSlots.add(available[0]);
-  }
-
-  available.forEach(value=>{
-
-    const b = document.createElement("button");
-
-    b.type = "button";
-
-    b.className = "slot" +
-      (selectedSlots.has(value) ? " active" : "");
-
-    b.textContent = value;
-
-    b.onclick = ()=>{
-
-      if(selectedSlots.has(value)){
-        selectedSlots.delete(value);
-      }else{
-        selectedSlots.add(value);
-      }
-
-      renderSlots();
-      updateValues();
-    };
-
-    root.appendChild(b);
-  });
-
-  const horariosEscolhidos = [...selectedSlots].sort();
-
-  if(configBlocked){
-
-    $("slotInfo").textContent =
-      configMessage || "Marcações temporariamente encerradas.";
-
-  }else if(!available.length){
-
-    $("slotInfo").textContent =
-      "Todas as extrações de hoje encerradas. Aguarde a meia-noite.";
-
-  }else if(horariosEscolhidos.length){
-
-    $("slotInfo").textContent =
-      horariosEscolhidos.length+
-      " horário(s) selecionado(s): "+
-      horariosEscolhidos.join(" • ");
-
-  }else{
-
-    $("slotInfo").textContent =
-      "Escolha um ou mais horários.";
-  }
-}
-/* CONFIGURAÇÃO DO ADMIN */
-/* CONFIGURAÇÃO DO ADMIN */
-db.ref("timeCerto/configuracao").on("value",snap=>{
-  const cfg = snap.val() || {};
-
-  configBlocked = cfg.bloqueado === true;
-  configMessage = cfg.mensagem || "";
-
-  $("createBet").disabled = configBlocked;
-  $("createBet").textContent = configBlocked
-    ? "MARCAÇÕES BLOQUEADAS"
-    : "APOSTAR • PIX";
-
-  renderSlots();
-});
-
-/* =========================================
-   SORTEIO AUTOMÁTICO — TIME CERTO
-   LÊ A CONFIGURAÇÃO DO ADMIN
-   INTERVALO: 30 MINUTOS
-   FUSO: AMERICA/SAO_PAULO
-========================================= */
-
-const AUTO_CONFIG_PATH = "timeCerto/configuracao";
-const AUTO_RESULTS_PATH = "timeCerto/resultados";
-const AUTO_INTERVAL = 30 * 60 * 1000;
-
-let automaticoAtivo = false;
-let verificacaoEmAndamento = false;
-
-const configAutoRef = db.ref(AUTO_CONFIG_PATH);
-
-/* DATA E HORÁRIO DE BRASÍLIA */
-
-function dataHoraBrasilia(timestamp){
-
-  const partes = new Intl.DateTimeFormat("en-CA",{
-    timeZone:"America/Sao_Paulo",
-    year:"numeric",
-    month:"2-digit",
-    day:"2-digit",
-    hour:"2-digit",
-    minute:"2-digit",
-    hourCycle:"h23"
-  }).formatToParts(new Date(timestamp));
-
-  const p = {};
-
-  partes.forEach(item=>{
-    p[item.type] = item.value;
-  });
-
-  return {
-    data:p.year+"-"+p.month+"-"+p.day,
-    horario:p.hour+":"+p.minute
-  };
-}
-
-/* NÚMERO ALEATÓRIO CRIPTOGRÁFICO */
-
-function sortearNumero(){
-
-  if(!window.crypto || !window.crypto.getRandomValues){
-    throw new Error("Gerador aleatório seguro indisponível.");
-  }
-
-  const limite = Math.floor(4294967296 / 50) * 50;
-  const buffer = new Uint32Array(1);
-
-  let numero;
-
-  do{
-    window.crypto.getRandomValues(buffer);
-    numero = buffer[0];
-  }while(numero >= limite);
-
-  return (numero % 50) + 1;
-}
-
-/* AVANÇA O PRÓXIMO HORÁRIO
-   SOMENTE SE A CONFIGURAÇÃO AINDA
-   APONTAR PARA O HORÁRIO PROCESSADO */
-
-async function avancarProximoHorario(timestamp){
-
-  await configAutoRef.transaction(config=>{
-
-    if(!config || config.sorteioAutomatico !== true){
-      return;
-    }
-
-    const proximo = Number(
-      config.sorteioAutomaticoProximo || 0
-    );
-
-    if(proximo !== timestamp){
-      return;
-    }
-
-    return {
-      ...config,
-      sorteioAutomaticoProximo:timestamp + AUTO_INTERVAL,
-      atualizadoEm:new Date().toISOString()
-    };
-
-  });
-}
-
-/* PUBLICA UM RESULTADO */
-
-async function processarSorteioAutomatico(timestamp){
-
-  const momento = dataHoraBrasilia(timestamp);
-
-  const numero = sortearNumero();
-  const time = teamNames[numero - 1];
-
-  if(!time){
-    throw new Error("Time não encontrado para o número sorteado.");
-  }
-
-  const horarioKey = momento.horario.replace(":","-");
-
-  const resultado = {
-
-    data:momento.data,
-    horario:momento.horario,
-
-    numero:numero,
-    time:time,
-
-    publicadoEm:new Date().toISOString(),
-    timestamp:timestamp,
-
-    automatico:true
-
-  };
-
-  const caminho =
-    AUTO_RESULTS_PATH + "/" +
-    momento.data + "/" +
-    horarioKey;
-
-  /*
-    A TRANSAÇÃO IMPEDE QUE DOIS
-    DISPOSITIVOS GRAVEM RESULTADOS
-    DIFERENTES NO MESMO HORÁRIO.
-  */
-
-  const transacao = await db.ref(caminho).transaction(atual=>{
-
-    if(atual !== null){
-      return;
-    }
-
-    return resultado;
-
-  });
-
-  if(transacao.committed){
-
-    console.log(
-      "SORTEIO PUBLICADO:",
-      momento.data,
-      momento.horario,
-      numero,
-      time
-    );
-
-  }else{
-
-    console.log(
-      "Horário já possui resultado:",
-      momento.data,
-      momento.horario
-    );
-
-  }
-
-  /*
-    MESMO SE O RESULTADO JÁ EXISTIR,
-    AVANÇA A AGENDA PARA NÃO FICAR PRESO
-    NO MESMO HORÁRIO.
-  */
-
-  await avancarProximoHorario(timestamp);
-}
-
-/* VERIFICA SE EXISTE SORTEIO ATRASADO */
-
-async function verificarHorarioAutomatico(){
-
-  if(verificacaoEmAndamento) return;
-
-  if(!automaticoAtivo) return;
-
-  verificacaoEmAndamento = true;
-
-  try{
-
-    let processados = 0;
-
-    while(processados < 24){
-
-      const snapshot = await configAutoRef.once("value");
-
-      const config = snapshot.val() || {};
-
-      if(config.sorteioAutomatico !== true){
-
-        automaticoAtivo = false;
-        break;
-      }
-
-      const proximo = Number(
-        config.sorteioAutomaticoProximo || 0
-      );
-
-      if(!proximo || proximo > Date.now()){
-        break;
-      }
-
-      await processarSorteioAutomatico(proximo);
-
-      processados++;
-
-    }
-
-  }catch(error){
-
-    console.error(
-      "Erro no sorteio automático:",
-      error
-    );
-
-  }finally{
-
-    verificacaoEmAndamento = false;
-
-  }
-}
-
-/* RECEBE A ATIVAÇÃO E DESATIVAÇÃO DO ADMIN */
-
-configAutoRef.on("value",snapshot=>{
-
-  const config = snapshot.val() || {};
-
-  automaticoAtivo =
-    config.sorteioAutomatico === true;
-
-  if(automaticoAtivo){
-
-    console.log(
-      "SORTEIO AUTOMÁTICO ATIVADO"
-    );
-
-    verificarHorarioAutomatico();
-
-  }else{
-
-    console.log(
-      "SORTEIO AUTOMÁTICO DESATIVADO"
-    );
-
-  }
-
-},error=>{
-
-  console.error(
-    "Erro ao ler configuração automática:",
-    error
-  );
-
-});
-
-/* VERIFICA A CADA 5 SEGUNDOS */
-
-setInterval(()=>{
-
-  if(automaticoAtivo){
-    verificarHorarioAutomatico();
-  }
-
-},5000);
-
-/* RETOMA A VERIFICAÇÃO AO VOLTAR À PÁGINA */
-
-document.addEventListener("visibilitychange",()=>{
-
-  if(!document.hidden && automaticoAtivo){
-    verificarHorarioAutomatico();
-  }
-
-});
-
-window.addEventListener("online",()=>{
-
-  if(automaticoAtivo){
-    verificarHorarioAutomatico();
-  }
-
-});
-
-/* VALORES */
-function updateValues(){
-
-  const valorPorCombinacao =
-    Math.max(0,Number($("amount").value) || 0);
-
-  const quantidadeTimes = chosen.size;
-  const quantidadeHorarios = selectedSlots.size;
-
-  const combinacoes = quantidadeTimes * quantidadeHorarios;
-
-  const valorTotal = valorPorCombinacao * combinacoes;
-
-  const premioTotal = valorPorCombinacao * 35 * combinacoes;
-
-  $("amountDisplay").textContent = brl(valorPorCombinacao);
-
-  $("payValue").textContent = brl(valorTotal);
-
-  $("prizeValue").textContent = brl(premioTotal);
-
-  $("topValue").textContent = brl(valorTotal);
-}
-
-$("amount").addEventListener("input",updateValues);
-
-/* PIX */
-function tlv(id,value){
-  const v = String(value);
-  return id+String(v.length).padStart(2,"0")+v;
-}
-
-function crc16(str){
-  let crc = 0xFFFF;
-
-  for(let i=0;i<str.length;i++){
-    crc ^= str.charCodeAt(i)<<8;
-
-    for(let j=0;j<8;j++){
-      crc = (crc&0x8000)
-        ? ((crc<<1)^0x1021)
-        : (crc<<1);
-
-      crc &= 0xFFFF;
-    }
-  }
-
-  return crc.toString(16).toUpperCase().padStart(4,"0");
-}
-
-
-function removerAcentos(texto){
-  return String(texto)
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g,"");
-}
-
-function pixPayload(amount,txid){
-
-  const valor = Number(amount);
-
-  if(!Number.isFinite(valor) || valor < 0.01){
-    throw new Error("Valor Pix inválido.");
-  }
-
-  const nome = removerAcentos(PIX_NAME)
-    .substring(0,25)
-    .toUpperCase();
-
-  const cidade = removerAcentos(PIX_CITY)
-    .substring(0,15)
-    .toUpperCase();
-
-  const contaPix =
-    tlv("00","BR.GOV.BCB.PIX")+
-    tlv("01",PIX_KEY);
-
-  let payload =
-    tlv("00","01")+
-    tlv("26",contaPix)+
-    tlv("52","0000")+
-    tlv("53","986")+
-    tlv("54",valor.toFixed(2))+
-    tlv("58","BR")+
-    tlv("59",nome)+
-    tlv("60",cidade)+
-    tlv("62",tlv("05",String(txid).substring(0,25)));
-
-  const semCRC = payload+"6304";
-
-  return semCRC+crc16(semCRC);
-}
-
-
-/* HISTÓRICO LOCAL */
-function localHistoryAdd(item){
-  let arr = [];
-
-  try{
-    arr = JSON.parse(
-      localStorage.getItem("timeCertoHistory") || "[]"
-    );
-
-    if(!Array.isArray(arr)) arr = [];
-  }catch(e){
-    arr = [];
-  }
-
-  arr.unshift(item);
-
-  localStorage.setItem(
-    "timeCertoHistory",
-    JSON.stringify(arr.slice(0,20))
-  );
-
-  renderHistory();
-}
-
-function renderHistory(){
-  let arr = [];
-
-  try{
-    arr = JSON.parse(
-      localStorage.getItem("timeCertoHistory") || "[]"
-    );
-
-    if(!Array.isArray(arr)) arr = [];
-  }catch(e){
-    arr = [];
-  }
-
-  const root = $("history");
-  root.innerHTML = "";
-
-  if(!arr.length){
-    root.textContent =
-      "Nenhuma aposta registrada neste aparelho.";
-    return;
-  }
-
-  arr.forEach(item=>{
-    const div = document.createElement("div");
-    div.className = "history-item";
-
-    const title = document.createElement("strong");
-    title.textContent = item.id+" • "+item.status;
-
-    const horarios = item.horarios || [item.horario];
-
-const details = document.createElement("div");
-
-details.textContent =
-  item.data+
-  " • "+brl(item.valor)+
-  " • "+horarios.join(", ");
-
-    const teams = document.createElement("div");
-    teams.textContent = (item.times || []).join(", ");
-
-    div.append(title,details,teams);
-    root.appendChild(div);
-  });
-}
-
-function toggleHistory(){
-  const panel = $("historyPanel");
-
-  panel.classList.toggle("show");
-  $("dropdown").classList.remove("show");
-
-  if(panel.classList.contains("show")){
-    renderHistory();
-    panel.scrollIntoView({
-      behavior:"smooth",
-      block:"start"
-    });
-  }
-}
-
-$("historyMenu").onclick = toggleHistory;
-/* BOTÃO RESUMO */
-
-$("resumoMenu").onclick = ()=>{
-
-  const lista = $("resultsLista");
-  const status = $("resultsStatus");
-
-  const mostrar = !lista.classList.contains("show");
-
-  lista.classList.toggle("show",mostrar);
-  status.classList.toggle("show",mostrar);
-
-  $("dropdown").classList.remove("show");
-
-  if(mostrar){
-    lista.scrollIntoView({
-      behavior:"smooth",
-      block:"center"
-    });
-  }
-};
-
-/* LIMPAR SELEÇÃO */
-function clearSelection(){
-
-  chosen.clear();
-
-  document.querySelectorAll(".team").forEach(el=>{
-    el.classList.remove("selected");
-  });
-
-  selectedSlots.clear();
-
-  updateCount();
-
-  $("amount").value = "1.00";
-  updateValues();
-
-  $("pixPanel").classList.remove("show");
-  $("qr").innerHTML = "";
-  $("pixPayload").value = "";
-  $("pixAmount").textContent = "";
-  $("copyStatus").textContent = "";
-
-  currentBet = null;
-  currentBetSaved = false;
-
-  renderSlots();
-
-  $("dropdown").classList.remove("show");
-}
-$("clear").onclick = clearSelection;
-$("clearMenu").onclick = clearSelection;
-
-/* REGISTRAR APOSTA */
-$("createBet").onclick = async()=>{
-  if(tempoBloqueioPix() > 0){
-    atualizarBloqueioPix();
-    alert("Aguarde os 10 minutos para fazer um novo jogo.");
-    return;
-  }
-  if(configBlocked){
-    alert(configMessage || "Marcações temporariamente bloqueadas.");
-    return;
-  }
-
-  if(!playerName){
-    abrirModalNome();
-    alert("Informe seu nome para continuar.");
-    return;
-  }
-
-  const amount = Number($("amount").value);
-
-  if(!chosen.size){
-    alert("Selecione pelo menos um time.");
-    return;
-  }
-
-  if(chosen.size > 10){
-    alert("Máximo de 10 times.");
-    return;
-  }
-
-  if(!selectedSlots.size){
-    alert("Selecione pelo menos um horário.");
-    return;
-  }
-
-  const available = getAvailableSlots();
-
-  const horarios = [...selectedSlots].sort();
-
-  const horariosInvalidos = horarios.filter(h=>
-    !available.includes(h)
-  );
-
-  if(horariosInvalidos.length){
-
-    horariosInvalidos.forEach(h=>selectedSlots.delete(h));
-
-    renderSlots();
-    updateValues();
-
-    alert("Um ou mais horários já passaram. Confira sua seleção.");
-    return;
-  }
-
-  if(!Number.isFinite(amount) || amount < 1 || amount > 1000){
-    alert("Informe um valor entre R$ 1,00 e R$ 1.000,00.");
-    return;
-  }
-
-  const id = "TC"+Date.now().toString(36).toUpperCase();
-
-  const times = [...chosen]
-    .sort((a,b)=>a-b)
-    .map(n=>({
-      numero:n,
-      nome:teamNames[n-1]
-    }));
-
-  const quantidadeTimes = times.length;
-  const quantidadeHorarios = horarios.length;
-
-  const quantidadeCombinacoes =
-    quantidadeTimes * quantidadeHorarios;
-
-  const valorPorTime = amount;
-
-  const valorTotal =
-    valorPorTime * quantidadeCombinacoes;
-
-  const premioPotencial =
-    valorPorTime * 35 * quantidadeCombinacoes;
-
-  const payload = pixPayload(valorTotal,id);
-
-  const bet = {
-
-    id,
-    jogadorId: playerId,
-    nome: playerName,
-
-    valorPorTime,
-    quantidadeTimes,
-    quantidadeHorarios,
-    quantidadeCombinacoes,
-
-    valor: valorTotal,
-    premioPotencial,
-
-    dataHorario: getTodayKey(),
-
-    // Compatibilidade com apostas antigas e painel
-    horario: horarios[0],
-    horarios: horarios,
-
-    times,
-
-    status: "PENDENTE",
-
-    pixCopiaECola: payload,
-
-    criadoEm: new Date().toISOString(),
-    timestamp: Date.now()
-  };
-
-  const btn = $("createBet");
-
-  btn.disabled = true;
-  btn.textContent = "PREPARANDO PIX...";
-
-  try{
-
-    currentBet = bet;
-    currentBetSaved = false;
-
-    $("pixPanel").classList.add("show");
-
-    $("pixAmount").textContent =
-      quantidadeTimes+" time(s) × "+
-      quantidadeHorarios+" horário(s) × "+
-      brl(valorPorTime)+" = "+
-      brl(valorTotal);
-
-    $("pixPayload").value = payload;
-    $("qr").innerHTML = "";
-
-    new QRCode($("qr"),{
-      text:payload,
-      width:220,
-      height:220,
-      colorDark:"#000000",
-      colorLight:"#ffffff",
-      correctLevel:QRCode.CorrectLevel.M
-    });
-
-    $("copyStatus").textContent = "";
-
-    $("betModal").classList.add("show");
-
-    setTimeout(()=>{
-      $("pixPanel").scrollIntoView({
-        behavior:"smooth",
-        block:"start"
-      });
-    },150);
-
-  }catch(error){
-
-    console.error(error);
-
-    alert("Não foi possível preparar o Pix. Tente novamente.");
-
-  }finally{
-
-    btn.disabled = configBlocked;
-
-    btn.textContent = configBlocked
-      ? "MARCAÇÕES BLOQUEADAS"
-      : "APOSTAR • PIX";
-  }
-};
-/* COPIAR PIX */
-
-
-$("copyPix").onclick = async()=>{
-
-  const payload = $("pixPayload").value;
-
-  if(!payload || !currentBet){
-    alert("Nenhuma aposta Pix disponível.");
-    return;
-  }
-
-  const btn = $("copyPix");
-
-  btn.disabled = true;
-  btn.textContent = "PROCESSANDO...";
-
-  try{
-
-    // PRIMEIRO: COPIAR SOMENTE PELO BOTÃO
-    let copiado = false;
-
-    if(navigator.clipboard && window.isSecureContext){
-
-      await navigator.clipboard.writeText(payload);
-copiado = true;
-
-/* INICIA BLOQUEIO DE 10 MINUTOS */
-iniciarBloqueioPix();
-
-    }else{
-
-      throw new Error("Copie o Pix usando uma conexão segura (HTTPS).");
-
-    }
-
-    if(!copiado){
-      throw new Error("Não foi possível copiar o Pix.");
-    }
-
-    // SEGUNDO: GRAVAR NO FIREBASE
-    if(!currentBetSaved){
-
-      await db.ref(BETS_PATH+"/"+currentBet.id).set(currentBet);
-
-      currentBetSaved = true;
-
-      // HISTÓRICO LOCAL
-      localHistoryAdd({
-
-  id:currentBet.id,
-
-  valor:currentBet.valor,
-  valorPorTime:currentBet.valorPorTime,
-
-  quantidadeTimes:currentBet.quantidadeTimes,
-  quantidadeHorarios:currentBet.quantidadeHorarios,
-  quantidadeCombinacoes:currentBet.quantidadeCombinacoes,
-
-  horario:currentBet.horario,
-  horarios:currentBet.horarios,
-
-  status:"PENDENTE",
-
-  data:new Date().toLocaleString("pt-BR"),
-
-  times:currentBet.times.map(t=>
-    t.numero+" "+t.nome
-  )
-});
-
-    }
-
-    // TERCEIRO: MENSAGEM DE CONFIRMAÇÃO
-    $("copyStatus").innerHTML = "";
-
-    const mensagem = document.createElement("div");
-
-    mensagem.style.cssText = `
-      background:#123b30;
-      border:1px solid #18c889;
-      color:#fff;
-      padding:15px;
-      border-radius:12px;
-      margin-top:12px;
-      line-height:1.7;
-      text-align:left;
-    `;
-
-    mensagem.innerHTML = `
-      <strong style="color:#18c889;font-size:16px">
-        ✓ PIX COPIADO COM SUCESSO!
-      </strong>
-      <br><br>
-      Sua aposta foi registrada no sistema.
-      <br><br>
-      <strong style="color:#f5c451">
-        STATUS: AGUARDANDO PAGAMENTO
-      </strong>
-      <br>
-      Seu jogo somente será validado após a confirmação
-      do recebimento do pagamento
-    `;
-
-    $("copyStatus").appendChild(mensagem);
-
-  }catch(error){
-
-    console.error("Erro:",error);
-
-    $("copyStatus").textContent =
-      "Não foi possível copiar o Pix. Tente novamente.";
-
-  }finally{
-
-    btn.disabled = false;
-    btn.textContent = currentBetSaved
-      ? "PIX COPIADO • REGISTRADO"
-      : "COPIAR CÓDIGO PIX";
-
-  }
-
-};
-
-const modalComoJogar = document.getElementById("modalComoJogar");
-
-document.getElementById("comoJogarMenu").onclick = () => {
-  modalComoJogar.classList.add("ativo");
-  document.getElementById("dropdown")?.classList.remove("show");
-};
-
-document.getElementById("fecharComoJogar").onclick = () => {
-  modalComoJogar.classList.remove("ativo");
-};
-
-document.getElementById("entendiComoJogar").onclick = () => {
-  modalComoJogar.classList.remove("ativo");
-};
-
-modalComoJogar.onclick = (e) => {
-  if(e.target === modalComoJogar){
-    modalComoJogar.classList.remove("ativo");
-  }
-};
-
-
-/* =================================
-   ATUALIZAÇÃO AUTOMÁTICA NA INDEX
-================================= */
-
-const CAMINHO_RESULTADOS = "timeCerto/resultados";
-
-let resultadosAtualizados = {};
-
-/* INICIALIZAÇÃO */
-renderTeams();
-renderSlots();
-updateValues();
-updatePlayerDisplay();
-atualizarBloqueioPix();
-renderHistory();
-if(!playerName){
-  abrirModalNome();
-}
-setInterval(renderSlots,10000);
+/* CARROSSEL */
+(function(){
+ let atual=0;const imagens=$("carrosselImagens"),indicadores=document.querySelectorAll("#carrosselIndicadores span");
+ if(!imagens)return;setInterval(()=>{atual=(atual+1)%indicadores.length;imagens.style.transform=`translateX(-${atual*100}%)`;indicadores.forEach((x,i)=>x.classList.toggle("ativo",i===atual));},3000);
+})();
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){fecharModalPix();fecharModalAposta();fecharMenu();if(perfil?.nome)$("perfilOverlay").style.display="none";}});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){atualizarHorarioMarcacao();}});
+setInterval(atualizarHorarioMarcacao,1000);
+carregarPerfil();carregarResultadoLotinha();atualizarContador();renderizarJogosPreparados();atualizarHorarioMarcacao();
 </script>
-
 </body>
 </html>
