@@ -2892,7 +2892,7 @@ $("winModal").addEventListener("click",e=>{
 let playerId = localStorage.getItem("timeCertoPlayerId");
 
 /* BLOQUEIO DE NOVO JOGO APÓS COPIAR PIX */
-const PIX_LOCK_DURATION = 10 * 60 * 1000;
+const PIX_LOCK_DURATION = 2 * 60 * 1000;
 
 function chaveBloqueioPix(){
   return "timeCertoBloqueioPix_" + playerId;
@@ -2923,7 +2923,7 @@ function atualizarBloqueioPix(){
 
     botao.disabled = true;
     botao.textContent =
-      "AGUARDE " +
+      "FACA O PIX EM "  +
       String(minutos).padStart(2,"0") + ":" +
       String(segundos).padStart(2,"0");
 
@@ -4048,7 +4048,13 @@ iniciarBloqueioPix();
 });
 
     }
-
+// FECHA A JANELA PIX APÓS COPIAR E REGISTRAR
+setTimeout(()=>{
+  const modalPix = $("pixModal");
+if(modalPix){
+  modalPix.classList.remove("show");
+}
+}, 800);
     // TERCEIRO: MENSAGEM DE CONFIRMAÇÃO
     $("copyStatus").innerHTML = "";
 
